@@ -2,6 +2,8 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import React, { Component, Suspense } from 'react';
 import { Tabs } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
+import OnboardingScreen from '../components/OnboardingScreen';
+import { ProfileProvider, useProfile } from '../contexts/ProfileContext';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { DATABASE_NAME, initializeDatabase } from '../db';
 
@@ -45,30 +47,65 @@ function DatabaseLoadingFallback() {
 }
 
 const Navigation = () => {
-  const {theme, scheme, toggleTheme} = useTheme();
+  const { theme, scheme, toggleTheme } = useTheme();
+  const { profile } = useProfile();
 
   return (
-    <Tabs screenOptions={{
-      headerStyle: {
-        backgroundColor: theme.background,
-      },
-      headerTintColor: theme.text,
-      tabBarStyle: {
-        backgroundColor: theme.background,
-      },
-      tabBarActiveTintColor: theme.text,
-      tabBarInactiveTintColor: 'gray',
-      headerRight: () => (
-        <Pressable onPress={toggleTheme} style={{marginRight: 15}}>
-          <Text>{scheme === 'light' ? '☀️' : '🌙'}</Text>
-        </Pressable>
-      )
-    }}>
-      <Tabs.Screen name='index' options={{title: 'Home Page', headerTitle: 'Home'}}/>
-      <Tabs.Screen name='flat' options={{title: 'Flat Page', headerTitle: 'Flat'}}/>
-      <Tabs.Screen name='scrol' options={{title: 'Scroll Page', headerTitle: 'Sroll'}}/>
+    <Tabs
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.background,
+        },
+        headerTintColor: theme.text,
+        tabBarStyle: {
+          backgroundColor: theme.background,
+        },
+        tabBarActiveTintColor: '#FF7043',
+        tabBarInactiveTintColor: 'gray',
+        headerRight: () => (
+          <View style={styles.headerRightContainer}>
+            {profile && (
+              <View style={styles.profileBadge}>
+                <Text style={styles.profileBadgeText}>
+                  {profile.avatarEmoji} {profile.name} ({profile.age})
+                </Text>
+              </View>
+            )}
+            <Pressable onPress={toggleTheme} style={styles.themeToggle}>
+              <Text>{scheme === 'light' ? '☀️' : '🌙'}</Text>
+            </Pressable>
+          </View>
+        ),
+      }}
+    >
+      <Tabs.Screen name="index" options={{ title: 'Home', headerTitle: 'IdeaNook' }} />
+      <Tabs.Screen name="flat" options={{ title: 'Flat Page', headerTitle: 'Flat' }} />
+      <Tabs.Screen name="scrol" options={{ title: 'Scroll Page', headerTitle: 'Scroll' }} />
     </Tabs>
-  )
+  );
+};
+
+function RootApp() {
+  const { profile, loading, saveProfile } = useProfile();
+  const { theme } = useTheme();
+
+  if (loading) {
+    return (
+      <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.text} />
+        <Text style={[styles.loadingText, { color: theme.text }]}>
+          Checking child profile...
+        </Text>
+      </View>
+    );
+  }
+
+  // On first start: if no profile exists, ask for name, age, and gender
+  if (!profile) {
+    return <OnboardingScreen onComplete={saveProfile} isFirstTime={true} />;
+  }
+
+  return <Navigation />;
 }
 
 export default function RootLayout() {
@@ -81,7 +118,9 @@ export default function RootLayout() {
             onInit={initializeDatabase}
             useSuspense
           >
-            <Navigation />
+            <ProfileProvider>
+              <RootApp />
+            </ProfileProvider>
           </SQLiteProvider>
         </Suspense>
       </DatabaseErrorBoundary>
@@ -111,5 +150,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555555',
     textAlign: 'center',
+  },
+  headerRightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginRight: 15,
+  },
+  profileBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: '#FFEBE5',
+  },
+  profileBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#D84315',
+  },
+  themeToggle: {
+    padding: 4,
   },
 });

@@ -15,3 +15,8 @@ export {
   toggleMaterialChecked,
   toggleStepCompleted,
 } from './guidesRepository';
+export {
+  clearUserProfile,
+  getUserProfile,
+  saveUserProfile,
+} from './profileRepository';

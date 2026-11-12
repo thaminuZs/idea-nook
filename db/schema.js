@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { seedInitialGuides } from './seed';
 
 export const DATABASE_NAME = 'ideanook.db';
-export const DATABASE_VERSION = 1;
+export const DATABASE_VERSION = 2;
 
 const MIGRATIONS = [
   {
@@ -68,6 +68,22 @@ const MIGRATIONS = [
         CREATE INDEX IF NOT EXISTS idx_guides_favorite ON guides(is_favorite);
         CREATE INDEX IF NOT EXISTS idx_materials_guide ON materials(guide_id, sort_order);
         CREATE INDEX IF NOT EXISTS idx_steps_guide ON steps(guide_id, step_number);
+      `);
+    },
+  },
+  {
+    version: 2,
+    async up(db) {
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS user_profile (
+          id INTEGER PRIMARY KEY CHECK (id = 1),
+          name TEXT NOT NULL,
+          age INTEGER NOT NULL,
+          gender TEXT NOT NULL,
+          avatar_emoji TEXT NOT NULL DEFAULT '🌟',
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
       `);
     },
   },
