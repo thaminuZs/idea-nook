@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { Component, Suspense } from 'react';
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import OnboardingScreen from '../components/OnboardingScreen';
 import { ProfileProvider, useProfile } from '../contexts/ProfileContext';
@@ -65,11 +65,14 @@ const Navigation = () => {
         headerRight: () => (
           <View style={styles.headerRightContainer}>
             {profile && (
-              <View style={styles.profileBadge}>
+              <Pressable
+                onPress={() => router.push('/scrol')}
+                style={styles.profileBadge}
+              >
                 <Text style={styles.profileBadgeText}>
                   {profile.avatarEmoji} {profile.name} ({profile.age})
                 </Text>
-              </View>
+              </Pressable>
             )}
             <Pressable onPress={toggleTheme} style={styles.themeToggle}>
               <Text>{scheme === 'light' ? '☀️' : '🌙'}</Text>
@@ -80,7 +83,7 @@ const Navigation = () => {
     >
       <Tabs.Screen name="index" options={{ title: 'Home', headerTitle: 'IdeaNook' }} />
       <Tabs.Screen name="flat" options={{ title: 'Flat Page', headerTitle: 'Flat' }} />
-      <Tabs.Screen name="scrol" options={{ title: 'Scroll Page', headerTitle: 'Scroll' }} />
+      <Tabs.Screen name="scrol" options={{ title: 'Profile', headerTitle: 'My Profile' }} />
     </Tabs>
   );
 };

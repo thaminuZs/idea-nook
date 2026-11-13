@@ -1,16 +1,14 @@
 import {
   ActivityIndicator,
   FlatList,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import OnboardingScreen from '../components/OnboardingScreen';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getDashboardStats, getGuides } from '../db';
@@ -18,13 +16,12 @@ import { getDashboardStats, getGuides } from '../db';
 const Home = () => {
   const db = useSQLiteContext();
   const { theme, scheme } = useTheme();
-  const { profile, saveProfile, clearProfile } = useProfile();
+  const { profile } = useProfile();
 
   const [guides, setGuides] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -61,12 +58,6 @@ const Home = () => {
     );
   }, [guides, profile?.age]);
 
-  const genderBadge = useMemo(() => {
-    if (profile?.gender === 'boy') return 'Boy 👦';
-    if (profile?.gender === 'girl') return 'Girl 👧';
-    return 'Super Star ⭐';
-  }, [profile?.gender]);
-
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
@@ -91,64 +82,43 @@ const Home = () => {
         keyExtractor={(item) => String(item.id)}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Child Profile Welcome Card */}
+            {/* Friendly Greeting Card */}
             {profile && (
-              <View
+              <Pressable
                 style={[
-                  styles.profileHeroCard,
+                  styles.greetingCard,
                   {
                     backgroundColor: isDark ? '#261C18' : '#FFF7ED',
                     borderColor: '#FFD7C2',
                   },
                 ]}
+                onPress={() => router.push('/scrol')}
               >
-                <View style={styles.profileHeroTop}>
-                  <View style={styles.avatarCircle}>
+                <View style={styles.greetingLeft}>
+                  <View style={styles.avatarPill}>
                     <Text style={styles.avatarEmoji}>{profile.avatarEmoji}</Text>
                   </View>
-                  <View style={styles.profileInfo}>
-                    <Text style={[styles.welcomeGreeting, { color: theme.text }]}>
-                      Hello, {profile.name}! ✨
+                  <View>
+                    <Text style={[styles.greetingTitle, { color: theme.text }]}>
+                      Hi, {profile.name}! 👋
                     </Text>
-                    <Text style={[styles.profileMeta, { color: mutedText }]}>
-                      {genderBadge} • Age {profile.age}
+                    <Text style={[styles.greetingSubtitle, { color: mutedText }]}>
+                      Age {profile.age} • Tap to view Profile & Stats
                     </Text>
                   </View>
-                  <Pressable
-                    style={styles.editBtn}
-                    onPress={() => setIsEditingProfile(true)}
-                  >
-                    <Text style={styles.editBtnText}>Edit ✏️</Text>
-                  </Pressable>
                 </View>
-
-                {/* Age-tailored callout banner */}
-                <View style={styles.calloutBanner}>
-                  <Text style={styles.calloutText}>
-                    🎉 Showing {ageMatchedGuides.length} DIY crafts recommended for Age {profile.age}!
-                  </Text>
-                </View>
-
-                {/* Developer / Testing reset action */}
-                <Pressable
-                  style={styles.resetBtn}
-                  onPress={clearProfile}
-                >
-                  <Text style={styles.resetBtnText}>
-                    🔄 Reset Profile (Test First-Start Flow)
-                  </Text>
-                </Pressable>
-              </View>
+                <Text style={styles.viewProfileArrow}>→</Text>
+              </Pressable>
             )}
 
-            {/* Recommended Section Header if matched guides exist */}
+            {/* Age-tailored section header */}
             {ageMatchedGuides.length > 0 && (
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: theme.text }]}>
                   🎯 Recommended for Age {profile?.age}
                 </Text>
                 <Text style={[styles.sectionSubtitle, { color: mutedText }]}>
-                  Crafts handpicked for {profile?.name}'s age group ({ageMatchedGuides.length} activities)
+                  {ageMatchedGuides.length} activities handpicked for your age group
                 </Text>
               </View>
             )}
@@ -191,24 +161,6 @@ const Home = () => {
           );
         }}
       />
-
-      {/* Edit Profile Modal */}
-      <Modal
-        visible={isEditingProfile}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setIsEditingProfile(false)}
-      >
-        <OnboardingScreen
-          initialProfile={profile}
-          isFirstTime={false}
-          onComplete={async (updated) => {
-            await saveProfile(updated);
-            setIsEditingProfile(false);
-          }}
-          onCancel={() => setIsEditingProfile(false)}
-        />
-      </Modal>
     </View>
   );
 };
@@ -232,81 +184,54 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 6,
   },
-  profileHeroCard: {
-    borderRadius: 20,
+  greetingCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 18,
     borderWidth: 1.5,
-    padding: 16,
+    padding: 14,
     marginBottom: 16,
   },
-  profileHeroTop: {
+  greetingLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
   },
-  avatarCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  avatarPill: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2,
+    shadowColor: '#FF7043',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   avatarEmoji: {
-    fontSize: 28,
+    fontSize: 24,
   },
-  profileInfo: {
-    flex: 1,
-  },
-  welcomeGreeting: {
-    fontSize: 18,
+  greetingTitle: {
+    fontSize: 16,
     fontWeight: '800',
   },
-  profileMeta: {
-    fontSize: 13,
-    fontWeight: '600',
+  greetingSubtitle: {
+    fontSize: 12,
+    fontWeight: '500',
     marginTop: 2,
   },
-  editBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    backgroundColor: '#FF7043',
-  },
-  editBtnText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  calloutBanner: {
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 112, 67, 0.12)',
-  },
-  calloutText: {
-    color: '#D84315',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  resetBtn: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  resetBtnText: {
-    fontSize: 11,
-    color: '#94A3B8',
-    textDecorationLine: 'underline',
+  viewProfileArrow: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FF7043',
+    paddingHorizontal: 6,
   },
   sectionHeader: {
-    marginTop: 6,
+    marginTop: 4,
     marginBottom: 10,
   },
   sectionTitle: {
