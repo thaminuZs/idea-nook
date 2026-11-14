@@ -206,16 +206,26 @@ export default function ProfilePage() {
       >
         <Text style={styles.hintTitle}>💡 Tailored Content Active</Text>
         <Text style={[styles.hintBody, { color: mutedText }]}>
-          Your Home feed is customized for {profile.name} (Age {profile.age} • {genderLabel}). You can browse tailored projects or explore all DIY crafts anytime on the Home tab!
+          Your For You (FYP) feed is customized for {profile.name} (Age {profile.age} • {genderLabel}). Want to see every project? Visit the Explore tab!
         </Text>
-        <Pressable
-          style={styles.browseGuidesBtn}
-          onPress={() => router.push('/')}
-        >
-          <Text style={styles.browseGuidesBtnText}>
-            Browse Tailored DIY Guides 🚀
-          </Text>
-        </Pressable>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+          <Pressable
+            style={[styles.browseGuidesBtn, { flex: 1, marginTop: 0 }]}
+            onPress={() => router.push('/')}
+          >
+            <Text style={styles.browseGuidesBtnText}>
+              🎯 For You Feed
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.browseGuidesBtn, { flex: 1, marginTop: 0, backgroundColor: '#0284C7' }]}
+            onPress={() => router.push('/flat')}
+          >
+            <Text style={styles.browseGuidesBtnText}>
+              🌈 Explore All
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       {/* Testing / Reset Flow Button */}

@@ -19,14 +19,7 @@ import {
   seedInitialGuides,
 } from '../db';
 
-const FILTER_TABS = [
-  { id: 'for_you', label: '🎯 For You' },
-  { id: 'all', label: '🌈 All' },
-  { id: 'boy', label: '👦 Boys' },
-  { id: 'girl', label: '👧 Girls' },
-];
-
-const Home = () => {
+const ForYouScreen = () => {
   const db = useSQLiteContext();
   const { theme, scheme } = useTheme();
   const { profile } = useProfile();
@@ -35,7 +28,6 @@ const Home = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState('for_you');
   const [selectedGuide, setSelectedGuide] = useState(null);
 
   const loadData = useCallback(async () => {
@@ -65,45 +57,48 @@ const Home = () => {
   const cardBackground = isDark ? '#1A1A1A' : '#FFFFFF';
   const borderColor = isDark ? '#2D2D2D' : '#E2E8F0';
   const mutedText = isDark ? '#94A3B8' : '#64748B';
-  const filterPillBg = isDark ? '#262626' : '#F1F5F9';
+  const chipBg = isDark ? '#262626' : '#F1F5F9';
 
-  // Filtered guides based on selected tab and child profile
-  const displayedGuides = useMemo(() => {
-    if (selectedFilter === 'all') {
-      return guides;
-    }
+  const genderLabel =
+    profile?.gender === 'boy'
+      ? 'Boy 👦'
+      : profile?.gender === 'girl'
+      ? 'Girl 👧'
+      : 'Super Star ⭐';
 
-    if (selectedFilter === 'boy') {
-      return guides.filter((g) => g.genderTarget === 'boy' || g.genderTarget === 'all');
-    }
+  // Strictly For You (FYP) feed based on child's gender and age
+  const forYouGuides = useMemo(() => {
+    if (!profile) return guides;
 
-    if (selectedFilter === 'girl') {
-      return guides.filter((g) => g.genderTarget === 'girl' || g.genderTarget === 'all');
-    }
+    const genderMatched = guides.filter((g) => {
+      if (profile.gender === 'boy') {
+        return g.genderTarget === 'boy' || g.genderTarget === 'all';
+      }
+      if (profile.gender === 'girl') {
+        return g.genderTarget === 'girl' || g.genderTarget === 'all';
+      }
+      return true;
+    });
 
-    // Default 'for_you': Tailored to child's age AND gender
-    if (selectedFilter === 'for_you') {
-      if (!profile) return guides;
+    const strictAgeAndGender = genderMatched.filter(
+      (g) => !profile.age || (g.minAge <= profile.age && g.maxAge >= profile.age)
+    );
 
-      return guides.filter((g) => {
-        const matchesAge =
-          !profile.age || (g.minAge <= profile.age && g.maxAge >= profile.age);
+    const listToUse =
+      strictAgeAndGender.length >= 3 ? strictAgeAndGender : genderMatched;
 
-        let matchesGender = true;
-        if (profile.gender === 'boy') {
-          matchesGender = g.genderTarget === 'boy' || g.genderTarget === 'all';
-        } else if (profile.gender === 'girl') {
-          matchesGender = g.genderTarget === 'girl' || g.genderTarget === 'all';
-        }
+    // Prioritize projects specifically tailored to the child's gender first
+    return [...listToUse].sort((a, b) => {
+      const aExactGender = a.genderTarget === profile.gender ? 1 : 0;
+      const bExactGender = b.genderTarget === profile.gender ? 1 : 0;
+      if (aExactGender !== bExactGender) {
+        return bExactGender - aExactGender;
+      }
+      return a.id - b.id;
+    });
+  }, [guides, profile]);
 
-        return matchesAge && matchesGender;
-      });
-    }
-
-    return guides;
-  }, [guides, selectedFilter, profile]);
-
-  // If a project is selected, render its full interactive GuideDetailView right here!
+  // If a project is selected, render its full interactive GuideDetailView
   if (selectedGuide) {
     return (
       <GuideDetailView
@@ -137,11 +132,11 @@ const Home = () => {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <FlatList
         contentContainerStyle={styles.content}
-        data={displayedGuides}
+        data={forYouGuides}
         keyExtractor={(item) => String(item.id)}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Friendly Greeting Card */}
+            {/* Friendly Child Greeting & Profile Summary Card */}
             {profile && (
               <Pressable
                 style={[
@@ -162,12 +157,7 @@ const Home = () => {
                       Hi, {profile.name}! 👋
                     </Text>
                     <Text style={[styles.greetingSubtitle, { color: mutedText }]}>
-                      Age {profile.age} •{' '}
-                      {profile.gender === 'boy'
-                        ? 'Boy 👦'
-                        : profile.gender === 'girl'
-                        ? 'Girl 👧'
-                        : 'Super Star ⭐'}
+                      Age {profile.age} • {genderLabel}
                       {stats ? ` • ⭐ ${stats.totalStars} Stars` : ''}
                     </Text>
                   </View>
@@ -176,64 +166,56 @@ const Home = () => {
               </Pressable>
             )}
 
-            {/* Filter Tabs Row */}
-            <View style={styles.filterRow}>
-              {FILTER_TABS.map((tab) => {
-                const isSelected = selectedFilter === tab.id;
-                return (
-                  <Pressable
-                    key={tab.id}
-                    onPress={() => setSelectedFilter(tab.id)}
-                    style={[
-                      styles.filterPill,
-                      {
-                        backgroundColor: isSelected ? '#FF7043' : filterPillBg,
-                        borderColor: isSelected ? '#FF7043' : borderColor,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.filterPillText,
-                        {
-                          color: isSelected ? '#FFFFFF' : theme.text,
-                          fontWeight: isSelected ? '700' : '600',
-                        },
-                      ]}
-                    >
-                      {tab.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            {/* Active Section Info Banner */}
-            <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                {selectedFilter === 'for_you'
-                  ? `Recommended for ${profile?.name || 'You'}`
-                  : selectedFilter === 'boy'
-                  ? 'Projects for Boys 👦'
-                  : selectedFilter === 'girl'
-                  ? 'Projects for Girls 👧'
-                  : 'All DIY Guides 🌈'}
-              </Text>
+            {/* Dedicated FYP Header Banner */}
+            <View style={styles.fypHeroBanner}>
+              <View style={styles.fypTitleRow}>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                  🎯 Picked Just For You
+                </Text>
+                <View style={styles.fypCountPill}>
+                  <Text style={styles.fypCountText}>
+                    {forYouGuides.length} Matches
+                  </Text>
+                </View>
+              </View>
               <Text style={[styles.sectionSubtitle, { color: mutedText }]}>
-                Tap any project card below to open supplies, steps, fun facts & ideas ({displayedGuides.length} projects)
+                Showing DIY projects matched for{' '}
+                <Text style={{ fontWeight: '700', color: theme.text }}>
+                  {profile?.name || 'You'}
+                </Text>{' '}
+                (Age {profile?.age} • {genderLabel}). Tap any card to start building!
               </Text>
             </View>
           </View>
         }
+        ListFooterComponent={
+          <Pressable
+            style={[
+              styles.exploreAllFooterCard,
+              {
+                backgroundColor: isDark ? '#1A2433' : '#F0F9FF',
+                borderColor: '#BAE6FD',
+              },
+            ]}
+            onPress={() => router.push('/flat')}
+          >
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  styles.exploreFooterTitle,
+                  { color: isDark ? '#E0F2FE' : '#0369A1' },
+                ]}
+              >
+                🌈 Want to see all {guides.length} DIY projects?
+              </Text>
+              <Text style={[styles.exploreFooterSub, { color: mutedText }]}>
+                Switch to the Explore page to browse every category, search, and view all projects!
+              </Text>
+            </View>
+            <Text style={styles.exploreFooterArrow}>→</Text>
+          </Pressable>
+        }
         renderItem={({ item }) => {
-          const isBestForYou =
-            profile?.age &&
-            item.minAge <= profile.age &&
-            item.maxAge >= profile.age &&
-            (profile.gender === 'all' ||
-              item.genderTarget === 'all' ||
-              item.genderTarget === profile.gender);
-
           const isCompleted = item.status === 'completed';
           const isInProgress = item.status === 'in_progress';
           const richInfo = getStarterGuideRichContent(item.slug);
@@ -249,7 +231,7 @@ const Home = () => {
               style={({ pressed }) => [
                 styles.card,
                 { backgroundColor: cardBackground, borderColor },
-                isBestForYou && styles.cardRecommended,
+                styles.cardRecommended,
                 pressed && styles.cardPressed,
               ]}
               accessibilityRole="button"
@@ -265,11 +247,9 @@ const Home = () => {
                     <Text style={[styles.cardTitle, { color: theme.text }]}>
                       {item.title}
                     </Text>
-                    {isBestForYou && (
-                      <View style={styles.forYouBadge}>
-                        <Text style={styles.forYouBadgeText}>For You</Text>
-                      </View>
-                    )}
+                    <View style={styles.forYouBadge}>
+                      <Text style={styles.forYouBadgeText}>🎯 For You</Text>
+                    </View>
                     {isCompleted && (
                       <View style={styles.completedBadge}>
                         <Text style={styles.completedBadgeText}>⭐ Done</Text>
@@ -293,22 +273,22 @@ const Home = () => {
 
               {/* Content Preview Badges: Supplies, Steps, Time, Age, Gender */}
               <View style={styles.contentMetaRow}>
-                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
                   <Text style={[styles.metaChipText, { color: theme.text }]}>
                     🎒 {totalMaterialsCount} Supplies
                   </Text>
                 </View>
-                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
                   <Text style={[styles.metaChipText, { color: theme.text }]}>
                     🛠️ {totalStepsCount} Steps
                   </Text>
                 </View>
-                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
                   <Text style={[styles.metaChipText, { color: theme.text }]}>
                     ⏱️ {item.estimatedMinutes} min
                   </Text>
                 </View>
-                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
                   <Text style={[styles.metaChipText, { color: theme.text }]}>
                     🎯 Ages {item.minAge}–{item.maxAge}
                   </Text>
@@ -369,7 +349,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ForYouScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -387,7 +367,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   header: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
   greetingCard: {
     flexDirection: 'row',
@@ -434,31 +414,33 @@ const styles = StyleSheet.create({
     color: '#FF7043',
     paddingHorizontal: 6,
   },
-  filterRow: {
+  fypHeroBanner: {
+    marginBottom: 6,
+    gap: 4,
+  },
+  fypTitleRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 14,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  filterPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 14,
-    borderWidth: 1,
+  fypCountPill: {
+    backgroundColor: '#FFEBE5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  filterPillText: {
-    fontSize: 13,
-  },
-  sectionHeader: {
-    marginTop: 2,
-    marginBottom: 8,
+  fypCountText: {
+    color: '#D84315',
+    fontSize: 12,
+    fontWeight: '800',
   },
   sectionTitle: {
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: '800',
   },
   sectionSubtitle: {
-    fontSize: 12,
-    marginTop: 2,
+    fontSize: 13,
+    lineHeight: 19,
   },
   card: {
     padding: 15,
@@ -614,6 +596,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '900',
     color: '#D84315',
+  },
+  exploreAllFooterCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginTop: 6,
+    gap: 12,
+  },
+  exploreFooterTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  exploreFooterSub: {
+    fontSize: 12,
+    marginTop: 3,
+    lineHeight: 17,
+  },
+  exploreFooterArrow: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#0284C7',
   },
   errorText: {
     color: '#D32F2F',
