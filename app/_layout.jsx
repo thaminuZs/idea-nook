@@ -1,7 +1,13 @@
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { Component, Suspense } from 'react';
+import React, { Component, Suspense, useMemo } from 'react';
 import { useFonts } from 'expo-font';
-import { router, Tabs } from 'expo-router';
+import {
+  DarkTheme,
+  DefaultTheme,
+  router,
+  Tabs,
+  ThemeProvider as NavigationThemeProvider,
+} from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import AppIcon from '../components/AppIcon';
@@ -56,7 +62,7 @@ function DatabaseLoadingFallback() {
   );
 }
 
-function CustomBottomTabBar({ state, descriptors, emitter, navigateToTab, insets }) {
+function CustomBottomTabBar({ state, emitter, navigateToTab, insets }) {
   const { theme } = useTheme();
 
   const currentRoute = state.routes[state.index];
@@ -64,7 +70,8 @@ function CustomBottomTabBar({ state, descriptors, emitter, navigateToTab, insets
     return null;
   }
 
-  const bottomInset = Math.max(insets?.bottom || 0, Platform.OS === 'ios' ? 18 : 12);
+  const bottomPadding =
+    Platform.OS === 'ios' ? Math.max(insets?.bottom || 0, 12) : 6;
 
   return (
     <View
@@ -73,16 +80,10 @@ function CustomBottomTabBar({ state, descriptors, emitter, navigateToTab, insets
         {
           backgroundColor: theme.surface,
           borderTopColor: theme.border,
-          paddingBottom: bottomInset,
+          paddingBottom: bottomPadding,
         },
       ]}
     >
-      {/* Extends surface color below safe area to eliminate any bottom white line */}
-      <View
-        pointerEvents="none"
-        style={[styles.bottomBleedFill, { backgroundColor: theme.surface }]}
-      />
-
       <View style={styles.tabBarRow} role="tablist">
         {state.routes.map((route, index) => {
           const tabMeta = VISIBLE_TABS[route.name];
@@ -144,96 +145,115 @@ const Navigation = () => {
   const { theme, scheme, toggleTheme } = useTheme();
   const { profile } = useProfile();
 
+  const navigationTheme = useMemo(() => {
+    const baseTheme = scheme === 'dark' ? DarkTheme : DefaultTheme;
+    return {
+      ...baseTheme,
+      dark: scheme === 'dark',
+      colors: {
+        ...baseTheme.colors,
+        primary: theme.primary,
+        background: theme.background,
+        card: theme.surface,
+        text: theme.text,
+        border: theme.border,
+        notification: theme.primary,
+      },
+    };
+  }, [scheme, theme]);
+
   return (
-    <View style={[styles.navRoot, { backgroundColor: theme.surface }]}>
-      <StatusBar
-        style={scheme === 'dark' ? 'light' : 'dark'}
-        backgroundColor={theme.surface}
-      />
-      <Tabs
-        tabBar={(props) => <CustomBottomTabBar {...props} />}
-        screenOptions={{
-          sceneStyle: {
-            backgroundColor: theme.background,
-          },
-          headerStyle: {
-            backgroundColor: theme.surface,
-            borderBottomColor: theme.border,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          headerShadowVisible: false,
-          headerTitleStyle: {
-            fontFamily: Fonts.extraBold,
-            fontSize: 18,
-            color: theme.text,
-          },
-          headerTintColor: theme.text,
-          headerRight: () => (
-            <View style={styles.headerRightContainer}>
-              {profile && (
+    <NavigationThemeProvider value={navigationTheme}>
+      <View style={[styles.navRoot, { backgroundColor: theme.surface }]}>
+        <StatusBar
+          style={scheme === 'dark' ? 'light' : 'dark'}
+          backgroundColor={theme.surface}
+        />
+        <Tabs
+          tabBar={(props) => <CustomBottomTabBar {...props} />}
+          screenOptions={{
+            sceneStyle: {
+              backgroundColor: theme.background,
+            },
+            headerStyle: {
+              backgroundColor: theme.surface,
+              borderBottomColor: theme.border,
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              elevation: 0,
+              shadowOpacity: 0,
+            },
+            headerShadowVisible: false,
+            headerTitleStyle: {
+              fontFamily: Fonts.extraBold,
+              fontSize: 18,
+              color: theme.text,
+            },
+            headerTintColor: theme.text,
+            headerRight: () => (
+              <View style={styles.headerRightContainer}>
+                {profile && (
+                  <Pressable
+                    onPress={() => router.push('/scrol')}
+                    style={[
+                      styles.profileBadge,
+                      { backgroundColor: theme.surfaceSubtle },
+                    ]}
+                  >
+                    <AppIcon name={profile.avatarEmoji} size={15} color={theme.primary} />
+                    <Text style={[styles.profileBadgeText, { color: theme.text }]}>
+                      {profile.name}
+                    </Text>
+                  </Pressable>
+                )}
                 <Pressable
-                  onPress={() => router.push('/scrol')}
+                  onPress={toggleTheme}
                   style={[
-                    styles.profileBadge,
+                    styles.themeToggle,
                     { backgroundColor: theme.surfaceSubtle },
                   ]}
                 >
-                  <AppIcon name={profile.avatarEmoji} size={15} color={theme.primary} />
-                  <Text style={[styles.profileBadgeText, { color: theme.text }]}>
-                    {profile.name}
-                  </Text>
+                  <AppIcon
+                    name={scheme === 'light' ? 'weather-night' : 'weather-sunny'}
+                    size={18}
+                    color={theme.text}
+                  />
                 </Pressable>
-              )}
-              <Pressable
-                onPress={toggleTheme}
-                style={[
-                  styles.themeToggle,
-                  { backgroundColor: theme.surfaceSubtle },
-                ]}
-              >
-                <AppIcon
-                  name={scheme === 'light' ? 'weather-night' : 'weather-sunny'}
-                  size={18}
-                  color={theme.text}
-                />
-              </Pressable>
-            </View>
-          ),
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'For You',
-            headerTitle: 'IdeaNook',
+              </View>
+            ),
           }}
-        />
-        <Tabs.Screen
-          name="flat"
-          options={{
-            title: 'Explore',
-            headerTitle: 'Explore',
-          }}
-        />
-        <Tabs.Screen
-          name="scrol"
-          options={{
-            title: 'Profile',
-            headerTitle: 'Profile',
-          }}
-        />
-        <Tabs.Screen
-          name="guide/[id]"
-          options={{
-            href: null,
-            title: 'DIY Guide',
-            headerShown: false,
-          }}
-        />
-      </Tabs>
-    </View>
+        >
+          <Tabs.Screen
+            name="index"
+            options={{
+              title: 'For You',
+              headerTitle: 'IdeaNook',
+            }}
+          />
+          <Tabs.Screen
+            name="flat"
+            options={{
+              title: 'Explore',
+              headerTitle: 'Explore',
+            }}
+          />
+          <Tabs.Screen
+            name="scrol"
+            options={{
+              title: 'Profile',
+              headerTitle: 'Profile',
+            }}
+          />
+          <Tabs.Screen
+            name="guide/[id]"
+            options={{
+              href: null,
+              title: 'DIY Guide',
+              headerShown: false,
+            }}
+          />
+        </Tabs>
+      </View>
+    </NavigationThemeProvider>
   );
 };
 
@@ -344,15 +364,10 @@ const styles = StyleSheet.create({
   },
   tabBarContainer: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 8,
-    position: 'relative',
-  },
-  bottomBleedFill: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: -100,
-    height: 100,
+    borderBottomWidth: 0,
+    paddingTop: 6,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   tabBarRow: {
     flexDirection: 'row',
@@ -363,8 +378,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4,
-    gap: 4,
+    paddingVertical: 2,
+    gap: 3,
   },
   tabIconPill: {
     paddingHorizontal: 16,
