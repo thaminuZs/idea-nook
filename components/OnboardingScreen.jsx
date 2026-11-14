@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Fonts } from '../constants/Colors';
 import { useTheme } from '../contexts/ThemeContext';
 
 const AVATAR_OPTIONS = ['🌟', '🚀', '🎨', '🦁', '🦄', '🦖', '🤖', '🐼'];
@@ -296,12 +297,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     textAlign: 'center',
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
     lineHeight: 20,
     paddingHorizontal: 12,
@@ -320,12 +322,12 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     marginBottom: 12,
   },
   selectedBadgeText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     color: '#FF7043',
   },
   avatarRow: {
@@ -357,7 +359,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   ageGrid: {
     flexDirection: 'row',
@@ -376,7 +378,7 @@ const styles = StyleSheet.create({
   },
   agePillText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   genderRow: {
     flexDirection: 'row',
@@ -396,6 +398,7 @@ const styles = StyleSheet.create({
   },
   genderLabel: {
     fontSize: 13,
+    fontFamily: Fonts.semiBold,
   },
   errorBox: {
     backgroundColor: '#FEE2E2',
@@ -408,7 +411,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#B91C1C',
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     textAlign: 'center',
   },
   buttonContainer: {
@@ -433,7 +436,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   cancelButton: {
     paddingVertical: 12,
@@ -444,6 +447,6 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
 });

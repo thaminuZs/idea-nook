@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Fonts } from '../constants/Colors';
 import { useTheme } from '../contexts/ThemeContext';
 import { getStarterGuideRichContent } from '../db';
 
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
   eyebrowRow: {
     flexDirection: 'row',
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   doneBadgeText: {
     color: '#047857',
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   progressBadge: {
     backgroundColor: '#FEF3C7',
@@ -161,15 +162,16 @@ const styles = StyleSheet.create({
   progressBadgeText: {
     color: '#B45309',
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   title: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     lineHeight: 22,
   },
   summary: {
     fontSize: 13,
+    fontFamily: Fonts.medium,
     lineHeight: 19,
   },
   footerRow: {
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   openPill: {
     paddingHorizontal: 12,
@@ -190,6 +192,6 @@ const styles = StyleSheet.create({
   },
   openPillText: {
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
 });

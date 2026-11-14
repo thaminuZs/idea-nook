@@ -11,6 +11,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import GuideDetailView from '../components/GuideDetailView';
 import ProjectCard from '../components/ProjectCard';
+import { Fonts } from '../constants/Colors';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getDashboardStats, getGuides, seedInitialGuides } from '../db';
@@ -213,12 +214,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 13,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
     marginTop: 2,
   },
   starChip: {
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
   },
   starCount: {
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   exploreBanner: {
     flexDirection: 'row',
@@ -248,19 +249,21 @@ const styles = StyleSheet.create({
   },
   exploreTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   exploreSub: {
     fontSize: 12,
+    fontFamily: Fonts.medium,
     marginTop: 2,
   },
   exploreArrow: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   errorText: {
     color: '#DC2626',
     fontSize: 15,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
   },
 });

@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
+import { Fonts } from '../constants/Colors';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
 import {
@@ -726,11 +727,12 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     marginBottom: 6,
   },
   errorSubtitle: {
     fontSize: 14,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -741,7 +743,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     fontSize: 14,
   },
   topBar: {
@@ -759,15 +761,15 @@ const styles = StyleSheet.create({
   },
   navBackArrow: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   navBackText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   topBarCategory: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -813,16 +815,17 @@ const styles = StyleSheet.create({
   },
   guideTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     lineHeight: 26,
   },
   metaLine: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   storyText: {
     fontSize: 14,
-    lineHeight: 21,
+    fontFamily: Fonts.medium,
+    lineHeight: 22,
   },
   safetyCallout: {
     flexDirection: 'row',
@@ -838,9 +841,9 @@ const styles = StyleSheet.create({
   safetyText: {
     flex: 1,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     color: '#92400E',
-    lineHeight: 17,
+    lineHeight: 18,
   },
   progressBlock: {
     paddingTop: 14,
@@ -854,7 +857,7 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   starsText: {
     fontSize: 15,
@@ -881,11 +884,12 @@ const styles = StyleSheet.create({
   },
   celebrationTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     color: '#065F46',
   },
   celebrationSubtitle: {
     fontSize: 12,
+    fontFamily: Fonts.medium,
     color: '#047857',
     marginTop: 2,
   },
@@ -897,7 +901,7 @@ const styles = StyleSheet.create({
   },
   resetCraftBtnText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     color: '#FFFFFF',
   },
   segmentedBar: {
@@ -915,7 +919,7 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   stepsList: {
     gap: 12,
@@ -946,19 +950,20 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   stepTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   stepMeta: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     marginTop: 2,
   },
   stepInstruction: {
     fontSize: 14,
+    fontFamily: Fonts.medium,
     lineHeight: 22,
   },
   tipBox: {
@@ -970,7 +975,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#854D0E',
     lineHeight: 18,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   warningBox: {
     backgroundColor: '#FEE2E2',
@@ -981,7 +986,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#991B1B',
     lineHeight: 18,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   stepActionBtn: {
     paddingVertical: 11,
@@ -990,7 +995,7 @@ const styles = StyleSheet.create({
   },
   stepActionBtnText: {
     fontSize: 13,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   resetFooterBtn: {
     alignSelf: 'center',
@@ -998,7 +1003,7 @@ const styles = StyleSheet.create({
   },
   resetFooterText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   sectionCard: {
     borderRadius: 20,
@@ -1013,11 +1018,11 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   resetLink: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   materialsList: {
     gap: 8,
@@ -1041,12 +1046,12 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: '#FFFFFF',
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     fontSize: 13,
   },
   materialName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   materialNameChecked: {
     textDecorationLine: 'line-through',
@@ -1054,11 +1059,12 @@ const styles = StyleSheet.create({
   },
   materialQuantity: {
     fontSize: 12,
+    fontFamily: Fonts.medium,
     marginTop: 2,
   },
   optionalTag: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   goToStepsBtn: {
     paddingVertical: 13,
@@ -1069,7 +1075,7 @@ const styles = StyleSheet.create({
   goToStepsBtnText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   extrasContainer: {
     gap: 12,
@@ -1084,11 +1090,12 @@ const styles = StyleSheet.create({
   factDot: {
     fontSize: 16,
     color: '#FF6B35',
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   factText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: Fonts.medium,
     lineHeight: 20,
   },
   variationsList: {
@@ -1106,10 +1113,11 @@ const styles = StyleSheet.create({
   },
   variationTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   variationDesc: {
     fontSize: 12,
+    fontFamily: Fonts.medium,
     lineHeight: 18,
   },
   troubleItem: {
@@ -1119,10 +1127,11 @@ const styles = StyleSheet.create({
   },
   troubleQ: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   troubleA: {
     fontSize: 12,
+    fontFamily: Fonts.medium,
     lineHeight: 18,
   },
 });

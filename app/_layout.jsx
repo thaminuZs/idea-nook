@@ -1,8 +1,10 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { Component, Suspense } from 'react';
+import { useFonts } from 'expo-font';
 import { router, Tabs } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import OnboardingScreen from '../components/OnboardingScreen';
+import { Fonts } from '../constants/Colors';
 import { ProfileProvider, useProfile } from '../contexts/ProfileContext';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { DATABASE_NAME, initializeDatabase } from '../db';
@@ -60,7 +62,7 @@ const Navigation = () => {
         },
         headerShadowVisible: false,
         headerTitleStyle: {
-          fontWeight: '800',
+          fontFamily: Fonts.extraBold,
           fontSize: 18,
           color: theme.text,
         },
@@ -73,8 +75,8 @@ const Navigation = () => {
           paddingTop: 6,
         },
         tabBarLabelStyle: {
+          fontFamily: Fonts.bold,
           fontSize: 11,
-          fontWeight: '700',
         },
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.textMuted,
@@ -166,6 +168,18 @@ function RootApp() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Montserrat_400Regular: require('../assets/fonts/Montserrat-Regular.ttf'),
+    Montserrat_500Medium: require('../assets/fonts/Montserrat-Medium.ttf'),
+    Montserrat_600SemiBold: require('../assets/fonts/Montserrat-SemiBold.ttf'),
+    Montserrat_700Bold: require('../assets/fonts/Montserrat-Bold.ttf'),
+    Montserrat_800ExtraBold: require('../assets/fonts/Montserrat-ExtraBold.ttf'),
+  });
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <ThemeProvider>
       <DatabaseErrorBoundary>
@@ -181,7 +195,7 @@ export default function RootLayout() {
           </SQLiteProvider>
         </Suspense>
       </DatabaseErrorBoundary>
-      </ThemeProvider>
+    </ThemeProvider>
   );
 }
 
@@ -195,17 +209,18 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   errorTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     color: '#DC2626',
     marginBottom: 8,
     textAlign: 'center',
   },
   errorMessage: {
     fontSize: 14,
+    fontFamily: Fonts.regular,
     color: '#64748B',
     textAlign: 'center',
   },
@@ -228,7 +243,7 @@ const styles = StyleSheet.create({
   },
   profileBadgeText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   themeToggle: {
     width: 34,

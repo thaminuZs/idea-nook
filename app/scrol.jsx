@@ -15,6 +15,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import GuideDetailView from '../components/GuideDetailView';
 import OnboardingScreen from '../components/OnboardingScreen';
 import ProjectCard from '../components/ProjectCard';
+import { Fonts } from '../constants/Colors';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getDashboardStats, getGuides } from '../db';
@@ -341,6 +342,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 15,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
   },
   heroCard: {
@@ -369,7 +371,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   tagRow: {
     flexDirection: 'row',
@@ -382,7 +384,7 @@ const styles = StyleSheet.create({
   },
   tagBadgeText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   editButton: {
     paddingHorizontal: 14,
@@ -391,7 +393,7 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: 13,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -412,18 +414,18 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   savedSection: {
     gap: 10,
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   savedList: {
     gap: 12,
@@ -436,7 +438,7 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   modalOverlay: {
     flex: 1,
@@ -454,11 +456,12 @@ const styles = StyleSheet.create({
   },
   confirmTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     marginBottom: 8,
   },
   confirmBody: {
     fontSize: 14,
+    fontFamily: Fonts.medium,
     lineHeight: 20,
     marginBottom: 16,
   },

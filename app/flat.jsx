@@ -13,6 +13,7 @@ import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import GuideDetailView from '../components/GuideDetailView';
 import ProjectCard from '../components/ProjectCard';
+import { Fonts } from '../constants/Colors';
 import { useTheme } from '../contexts/ThemeContext';
 import { getCategories, getGuides, seedInitialGuides } from '../db';
 
@@ -297,11 +298,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
+    fontFamily: Fonts.medium,
     paddingVertical: 0,
   },
   clearText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     paddingHorizontal: 4,
   },
   audienceRow: {
@@ -317,7 +319,7 @@ const styles = StyleSheet.create({
   },
   audiencePillText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   categoryScroll: {
     gap: 8,
@@ -329,7 +331,7 @@ const styles = StyleSheet.create({
   },
   catPillText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   emptyBox: {
     padding: 40,
@@ -341,10 +343,11 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   emptySub: {
     fontSize: 13,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
   },
   resetFilterBtn: {
@@ -356,6 +359,6 @@ const styles = StyleSheet.create({
   resetFilterBtnText: {
     color: '#FFFFFF',
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
 });
