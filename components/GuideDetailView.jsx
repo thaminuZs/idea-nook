@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -26,6 +24,8 @@ import {
   toggleStepCompleted,
 } from '../db';
 import AppIcon from './AppIcon';
+import ConfirmDialog from './ConfirmDialog';
+import PopArtCelebration from './PopArtCelebration';
 
 export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const db = useSQLiteContext();
@@ -37,7 +37,9 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const [guide, setGuide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('steps'); // 'steps' | 'supplies' | 'ideas'
+  const [activeTab, setActiveTab] = useState('supplies'); // 'supplies' | 'steps' | 'ideas'
+  const [showPopArt, setShowPopArt] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const loadGuide = useCallback(async () => {
     if (!numericId || Number.isNaN(numericId)) {
@@ -125,44 +127,43 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const handleToggleStep = async (step) => {
     if (!guide) return;
     try {
+      const wasCompleted =
+        guide.status === 'completed' ||
+        (guide.steps?.length > 0 && guide.completedSteps >= guide.steps.length);
+
       await toggleStepCompleted(db, guide.id, step.id);
       const refreshed = await getGuideById(db, guide.id);
       if (refreshed) {
         setGuide(refreshed);
+        const nowCompleted =
+          refreshed.status === 'completed' ||
+          (refreshed.steps?.length > 0 &&
+            refreshed.completedSteps >= refreshed.steps.length);
+        if (!wasCompleted && nowCompleted) {
+          setShowPopArt(true);
+        }
       }
     } catch (err) {
       console.error('Failed to toggle step:', err);
     }
   };
 
-  const handleResetGuide = async () => {
+  const handleResetGuide = () => {
     if (!guide) return;
+    setShowResetDialog(true);
+  };
 
-    const doReset = async () => {
-      try {
-        await resetGuideProgress(db, guide.id);
-        const refreshed = await getGuideById(db, guide.id);
-        if (refreshed) {
-          setGuide(refreshed);
-        }
-      } catch (err) {
-        console.error('Failed to reset project progress:', err);
+  const confirmResetGuide = async () => {
+    if (!guide) return;
+    setShowResetDialog(false);
+    try {
+      await resetGuideProgress(db, guide.id);
+      const refreshed = await getGuideById(db, guide.id);
+      if (refreshed) {
+        setGuide(refreshed);
       }
-    };
-
-    if (Platform.OS === 'web') {
-      if (window.confirm('Reset all steps and start this project from Step 1?')) {
-        await doReset();
-      }
-    } else {
-      Alert.alert(
-        'Start Over',
-        'Reset your step progress and start this project from Step 1?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Reset', style: 'destructive', onPress: doReset },
-        ]
-      );
+    } catch (err) {
+      console.error('Failed to reset project progress:', err);
     }
   };
 
@@ -245,7 +246,10 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
 
         <Pressable
           onPress={handleToggleFav}
-          style={[styles.favBtn, { backgroundColor: theme.surfaceSubtle }]}
+          style={[
+            styles.favBtn,
+            { backgroundColor: theme.surfaceSubtle, borderColor: theme.border },
+          ]}
           hitSlop={10}
           accessibilityLabel="Toggle Favorite"
         >
@@ -385,23 +389,55 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
         {/* Completion Banner */}
         {isCompleted && (
           <View style={styles.celebrationCard}>
-            <AppIcon name="trophy" size={26} color="#047857" />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.celebrationTitle}>
-                Great job, {profile?.name || 'Builder'}!
-              </Text>
-              <Text style={styles.celebrationSubtitle}>
-                You finished all {stepsList.length} steps and earned 3 Stars!
-              </Text>
+            <View style={styles.celebrationTopRow}>
+              <AppIcon name="trophy" size={26} color="#047857" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.celebrationTitle}>
+                  Great job, {profile?.name || 'Builder'}!
+                </Text>
+                <Text style={styles.celebrationSubtitle}>
+                  You finished all {stepsList.length} steps and earned 3 Stars!
+                </Text>
+              </View>
+              <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
+                <AppIcon name="restart" size={14} color="#FFFFFF" />
+                <Text style={styles.resetCraftBtnText}>Restart</Text>
+              </Pressable>
             </View>
-            <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
-              <AppIcon name="restart" size={14} color="#FFFFFF" />
-              <Text style={styles.resetCraftBtnText}>Restart</Text>
+
+            {/* Interactive Pop-Art Comic Stickers Row (Tap to replay burst) */}
+            <Pressable
+              style={styles.popArtMiniRow}
+              onPress={() => setShowPopArt(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Replay Pop Art Celebration"
+            >
+              {[
+                { label: 'GOOD JOB!', bg: '#FF5252', color: '#FFFFFF', rot: '-2deg' },
+                { label: 'WOW!', bg: '#FFEB3B', color: '#0F172A', rot: '2deg' },
+                { label: 'SUPERB!', bg: '#00E5FF', color: '#0F172A', rot: '-2deg' },
+                { label: 'EXCELLENT!', bg: '#69F0AE', color: '#0F172A', rot: '2deg' },
+              ].map((tag) => (
+                <View
+                  key={tag.label}
+                  style={[
+                    styles.popArtMiniBadge,
+                    {
+                      backgroundColor: tag.bg,
+                      transform: [{ rotate: tag.rot }],
+                    },
+                  ]}
+                >
+                  <Text style={[styles.popArtMiniText, { color: tag.color }]}>
+                    {tag.label}
+                  </Text>
+                </View>
+              ))}
             </Pressable>
           </View>
         )}
 
-        {/* Segmented Control: Steps | Supplies | Tips & Facts */}
+        {/* Segmented Control: Supplies | Steps | Tips & Facts */}
         <View
           style={[
             styles.segmentedBar,
@@ -411,28 +447,6 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             },
           ]}
         >
-          <Pressable
-            style={[
-              styles.segmentBtn,
-              activeTab === 'steps' && { backgroundColor: theme.primary },
-            ]}
-            onPress={() => setActiveTab('steps')}
-          >
-            <AppIcon
-              name="hammer-wrench"
-              size={14}
-              color={activeTab === 'steps' ? '#FFFFFF' : theme.textMuted}
-            />
-            <Text
-              style={[
-                styles.segmentText,
-                { color: activeTab === 'steps' ? '#FFFFFF' : theme.textMuted },
-              ]}
-            >
-              Steps ({guide.completedSteps}/{stepsList.length})
-            </Text>
-          </Pressable>
-
           <Pressable
             style={[
               styles.segmentBtn,
@@ -452,6 +466,28 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
               ]}
             >
               Supplies ({checkedMaterialsCount}/{materialsList.length})
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.segmentBtn,
+              activeTab === 'steps' && { backgroundColor: theme.primary },
+            ]}
+            onPress={() => setActiveTab('steps')}
+          >
+            <AppIcon
+              name="hammer-wrench"
+              size={14}
+              color={activeTab === 'steps' ? '#FFFFFF' : theme.textMuted}
+            />
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'steps' ? '#FFFFFF' : theme.textMuted },
+              ]}
+            >
+              Steps ({guide.completedSteps}/{stepsList.length})
             </Text>
           </Pressable>
 
@@ -556,8 +592,8 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                   style={[
                     styles.stepActionBtn,
                     step.isCompleted
-                      ? { backgroundColor: theme.successSoft }
-                      : { backgroundColor: theme.surfaceSubtle },
+                      ? { backgroundColor: theme.successSoft, borderColor: theme.success }
+                      : { backgroundColor: theme.surfaceSubtle, borderColor: theme.border },
                   ]}
                   onPress={() => handleToggleStep(step)}
                 >
@@ -739,7 +775,10 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                       key={idx}
                       style={[
                         styles.variationItem,
-                        { backgroundColor: theme.surfaceSubtle },
+                        {
+                          backgroundColor: theme.surfaceSubtle,
+                          borderColor: theme.border,
+                        },
                       ]}
                     >
                       <Text style={styles.variationEmoji}>{v.emoji}</Text>
@@ -786,7 +825,10 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                       key={idx}
                       style={[
                         styles.troubleItem,
-                        { backgroundColor: theme.surfaceSubtle },
+                        {
+                          backgroundColor: theme.surfaceSubtle,
+                          borderColor: theme.border,
+                        },
                       ]}
                     >
                       <Text style={[styles.troubleQ, { color: theme.text }]}>
@@ -803,6 +845,25 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           </View>
         )}
       </ScrollView>
+
+      {/* Small Pop-Art Celebration Burst on All Steps Completed */}
+      <PopArtCelebration
+        visible={showPopArt}
+        onFinish={() => setShowPopArt(false)}
+      />
+
+      {/* Unified Reset Project Confirmation Dialog */}
+      <ConfirmDialog
+        visible={showResetDialog}
+        icon="restart"
+        title="Start Over?"
+        message="Reset all checked supplies and step progress so you can start this DIY project from the beginning?"
+        confirmText="Reset Project"
+        cancelText="Cancel"
+        destructive
+        onConfirm={confirmResetGuide}
+        onCancel={() => setShowResetDialog(false)}
+      />
     </View>
   );
 }
@@ -816,10 +877,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-  },
-  errorEmoji: {
-    fontSize: 42,
-    marginBottom: 12,
   },
   errorTitle: {
     fontSize: 18,
@@ -838,7 +895,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 20,
     paddingVertical: 11,
-    borderRadius: 99,
+    borderRadius: 10,
   },
   backButtonText: {
     color: '#FFFFFF',
@@ -851,7 +908,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: 1,
+    borderStyle: 'solid',
   },
   navBackBtn: {
     flexDirection: 'row',
@@ -859,11 +917,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   navBackText: {
-    fontSize: 15,
+    fontSize: 16,
     fontFamily: Fonts.bold,
   },
   topBarCategory: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: Fonts.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -871,7 +929,9 @@ const styles = StyleSheet.create({
   favBtn: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -881,16 +941,18 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   heroCard: {
-    borderRadius: 22,
+    borderRadius: 14,
     padding: 18,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 14,
   },
   heroImageWrapper: {
     width: '100%',
     height: 170,
-    borderRadius: 18,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'solid',
     padding: 18,
     alignItems: 'center',
     justifyContent: 'center',
@@ -905,13 +967,13 @@ const styles = StyleSheet.create({
     bottom: 10,
     right: 10,
     backgroundColor: 'rgba(15, 23, 42, 0.78)',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 99,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   heroOutcomeBadgeText: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.bold,
   },
   heroHeaderRow: {
@@ -922,7 +984,7 @@ const styles = StyleSheet.create({
   heroEmojiBox: {
     width: 60,
     height: 60,
-    borderRadius: 18,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -934,9 +996,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   guideTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: Fonts.extraBold,
-    lineHeight: 26,
+    lineHeight: 29,
   },
   metaInlineRow: {
     flexDirection: 'row',
@@ -944,32 +1006,36 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   metaLine: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.semiBold,
   },
   storyText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.medium,
-    lineHeight: 22,
+    lineHeight: 25,
   },
   safetyCallout: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFBEB',
+    borderColor: '#FDE68A',
+    borderWidth: 1,
+    borderStyle: 'solid',
     padding: 12,
-    borderRadius: 14,
+    borderRadius: 10,
     gap: 10,
   },
   safetyText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.semiBold,
     color: '#92400E',
-    lineHeight: 18,
+    lineHeight: 20,
   },
   progressBlock: {
     paddingTop: 14,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 1,
+    borderStyle: 'solid',
     gap: 8,
   },
   progressLabelRow: {
@@ -978,7 +1044,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressLabel: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: Fonts.bold,
   },
   starsRow: {
@@ -996,22 +1062,50 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   celebrationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#ECFDF5',
-    borderRadius: 18,
+    borderRadius: 12,
     padding: 16,
     borderWidth: 1,
+    borderStyle: 'solid',
     borderColor: '#10B981',
     gap: 12,
   },
+  celebrationTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  popArtMiniRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingTop: 4,
+  },
+  popArtMiniBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#0F172A',
+    borderStyle: 'solid',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 2,
+  },
+  popArtMiniText: {
+    fontSize: 11,
+    fontFamily: Fonts.extraBold,
+    letterSpacing: 0.6,
+  },
   celebrationTitle: {
-    fontSize: 15,
+    fontSize: 17,
     fontFamily: Fonts.extraBold,
     color: '#065F46',
   },
   celebrationSubtitle: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.medium,
     color: '#047857',
     marginTop: 2,
@@ -1023,18 +1117,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 99,
+    borderRadius: 8,
   },
   resetCraftBtnText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.bold,
     color: '#FFFFFF',
   },
   segmentedBar: {
     flexDirection: 'row',
     padding: 4,
-    borderRadius: 16,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 4,
   },
   segmentBtn: {
@@ -1042,21 +1137,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 5,
-    paddingVertical: 9,
-    borderRadius: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
     alignItems: 'center',
   },
   segmentText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: Fonts.bold,
   },
   stepsList: {
     gap: 12,
   },
   stepCard: {
-    borderRadius: 20,
+    borderRadius: 12,
     padding: 16,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 12,
   },
   stepHeaderRow: {
@@ -1071,48 +1167,47 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepNumberCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 38,
+    height: 38,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepNumberText: {
-    fontSize: 14,
-    fontFamily: Fonts.extraBold,
-  },
-  stepTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  stepTitle: {
-    flex: 1,
     fontSize: 16,
     fontFamily: Fonts.extraBold,
   },
+  stepTitle: {
+    flex: 1,
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: Fonts.extraBold,
+  },
   stepMeta: {
-    fontSize: 11,
+    fontSize: 13,
     fontFamily: Fonts.semiBold,
     marginTop: 2,
   },
   stepInstruction: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.medium,
-    lineHeight: 22,
+    lineHeight: 25,
   },
   tipBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
     backgroundColor: '#FEF9C3',
+    borderColor: '#FDE047',
+    borderWidth: 1,
+    borderStyle: 'solid',
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   tipText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#854D0E',
-    lineHeight: 18,
+    lineHeight: 21,
     fontFamily: Fonts.semiBold,
   },
   warningBox: {
@@ -1120,25 +1215,30 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
     backgroundColor: '#FEE2E2',
+    borderColor: '#FECACA',
+    borderWidth: 1,
+    borderStyle: 'solid',
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   warningText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#991B1B',
-    lineHeight: 18,
+    lineHeight: 21,
     fontFamily: Fonts.semiBold,
   },
   stepActionBtn: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 11,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
   },
   stepActionBtnText: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: Fonts.extraBold,
   },
   resetFooterBtn: {
@@ -1146,13 +1246,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   resetFooterText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.semiBold,
   },
   sectionCard: {
-    borderRadius: 20,
+    borderRadius: 12,
     padding: 16,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 14,
   },
   sectionHeaderRow: {
@@ -1166,11 +1267,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: Fonts.extraBold,
   },
   resetLink: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.bold,
   },
   materialsList: {
@@ -1179,27 +1280,24 @@ const styles = StyleSheet.create({
   materialRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 14,
+    padding: 13,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 12,
   },
   checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
+    width: 24,
+    height: 24,
+    borderRadius: 5,
     borderWidth: 2,
+    borderStyle: 'solid',
     borderColor: '#CBD5E1',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkmark: {
-    color: '#FFFFFF',
-    fontFamily: Fonts.extraBold,
-    fontSize: 13,
-  },
   materialName: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.semiBold,
   },
   materialNameChecked: {
@@ -1207,26 +1305,26 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   materialQuantity: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.medium,
     marginTop: 2,
   },
   optionalTag: {
-    fontSize: 11,
+    fontSize: 13,
     fontFamily: Fonts.semiBold,
   },
   goToStepsBtn: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 13,
-    borderRadius: 14,
+    paddingVertical: 14,
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 4,
   },
   goToStepsBtnText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.extraBold,
   },
   extrasContainer: {
@@ -1240,50 +1338,54 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   factDot: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#FF6B35',
     fontFamily: Fonts.extraBold,
   },
   factText: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: Fonts.medium,
-    lineHeight: 20,
+    lineHeight: 23,
   },
   variationsList: {
     gap: 10,
   },
   variationItem: {
     flexDirection: 'row',
-    padding: 12,
-    borderRadius: 14,
+    padding: 13,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'solid',
     gap: 12,
     alignItems: 'flex-start',
   },
   variationEmoji: {
-    fontSize: 24,
+    fontSize: 26,
   },
   variationTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.bold,
   },
   variationDesc: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.medium,
-    lineHeight: 18,
+    lineHeight: 21,
   },
   troubleItem: {
-    padding: 12,
-    borderRadius: 14,
+    padding: 13,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'solid',
     gap: 4,
   },
   troubleQ: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: Fonts.bold,
   },
   troubleA: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.medium,
-    lineHeight: 18,
+    lineHeight: 21,
   },
 });

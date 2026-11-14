@@ -194,6 +194,8 @@ export default function ExploreScreen() {
                       selectedCategory === 'All'
                         ? theme.text
                         : theme.surfaceSubtle,
+                    borderColor:
+                      selectedCategory === 'All' ? theme.text : theme.border,
                   },
                 ]}
                 onPress={() => setSelectedCategory('All')}
@@ -224,6 +226,7 @@ export default function ExploreScreen() {
                         backgroundColor: isSelected
                           ? theme.text
                           : theme.surfaceSubtle,
+                        borderColor: isSelected ? theme.text : theme.border,
                       },
                     ]}
                     onPress={() => setSelectedCategory(c.category)}
@@ -296,23 +299,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 11,
-    borderRadius: 16,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 10,
-  },
-  searchIcon: {
-    fontSize: 15,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
     fontFamily: Fonts.medium,
     paddingVertical: 0,
-  },
-  clearText: {
-    fontSize: 15,
-    fontFamily: Fonts.bold,
-    paddingHorizontal: 4,
   },
   audienceRow: {
     flexDirection: 'row',
@@ -324,8 +320,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 5,
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
   },
   audiencePillText: {
@@ -338,7 +335,9 @@ const styles = StyleSheet.create({
   catPill: {
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 99,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: 'solid',
   },
   catPillText: {
     fontSize: 12,
@@ -348,9 +347,6 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: 'center',
     gap: 8,
-  },
-  emptyEmoji: {
-    fontSize: 36,
   },
   emptyTitle: {
     fontSize: 16,
@@ -365,7 +361,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 16,
     paddingVertical: 9,
-    borderRadius: 99,
+    borderRadius: 8,
   },
   resetFilterBtnText: {
     color: '#FFFFFF',

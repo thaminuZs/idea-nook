@@ -78,15 +78,8 @@ export default function ProjectCard({ item, onPress }) {
             </View>
           </View>
 
-          <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
+          <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
             {item.title}
-          </Text>
-
-          <Text
-            style={[styles.summary, { color: theme.textMuted }]}
-            numberOfLines={2}
-          >
-            {item.summary}
           </Text>
         </View>
       </View>
@@ -126,9 +119,10 @@ export default function ProjectCard({ item, onPress }) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
+    borderRadius: 12,
     padding: 16,
     borderWidth: 1,
+    borderStyle: 'solid',
     gap: 14,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
@@ -146,11 +140,12 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   iconBox: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
+    width: 68,
+    height: 68,
+    borderRadius: 12,
     borderWidth: 1,
-    padding: 10,
+    borderStyle: 'solid',
+    padding: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -163,7 +158,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    gap: 4,
+    gap: 6,
   },
   eyebrowRow: {
     flexDirection: 'row',
@@ -171,7 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   categoryText: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -188,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DEF7EC',
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 99,
+    borderRadius: 6,
   },
   doneBadgeText: {
     color: '#047857',
@@ -199,7 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 99,
+    borderRadius: 6,
   },
   progressBadgeText: {
     color: '#B45309',
@@ -207,21 +202,17 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: Fonts.extraBold,
-    lineHeight: 22,
-  },
-  summary: {
-    fontSize: 13,
-    fontFamily: Fonts.medium,
-    lineHeight: 19,
+    lineHeight: 23,
   },
   footerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 1,
+    borderStyle: 'solid',
   },
   metaRow: {
     flexDirection: 'row',
@@ -247,7 +238,7 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 99,
+    borderRadius: 8,
   },
   openPillText: {
     fontSize: 12,

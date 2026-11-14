@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +11,7 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import AppIcon from '../components/AppIcon';
+import ConfirmDialog from '../components/ConfirmDialog';
 import GuideDetailView from '../components/GuideDetailView';
 import OnboardingScreen from '../components/OnboardingScreen';
 import ProjectCard from '../components/ProjectCard';
@@ -72,22 +71,7 @@ export default function ProfilePage() {
       : 'star-circle';
 
   const handleReset = () => {
-    if (Platform.OS === 'web') {
-      setShowResetConfirm(true);
-    } else {
-      Alert.alert(
-        'Reset Profile',
-        'Do you want to clear this profile and set up a new one?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Reset',
-            style: 'destructive',
-            onPress: () => clearProfile(),
-          },
-        ]
-      );
-    }
+    setShowResetConfirm(true);
   };
 
   if (selectedGuide) {
@@ -147,7 +131,7 @@ export default function ProfilePage() {
               <View
                 style={[
                   styles.tagBadge,
-                  { backgroundColor: theme.surfaceSubtle },
+                  { backgroundColor: theme.surfaceSubtle, borderColor: theme.border },
                 ]}
               >
                 <Text style={[styles.tagBadgeText, { color: theme.textMuted }]}>
@@ -157,7 +141,7 @@ export default function ProfilePage() {
               <View
                 style={[
                   styles.tagBadge,
-                  { backgroundColor: theme.surfaceSubtle },
+                  { backgroundColor: theme.surfaceSubtle, borderColor: theme.border },
                 ]}
               >
                 <AppIcon name={genderIcon} size={13} color={theme.textMuted} />
@@ -267,51 +251,21 @@ export default function ProfilePage() {
         </Text>
       </Pressable>
 
-      {/* Web Confirmation Modal */}
-      {showResetConfirm && (
-        <Modal transparent animationType="fade" visible={showResetConfirm}>
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.confirmModal,
-                { backgroundColor: theme.surface, borderColor: theme.border },
-              ]}
-            >
-              <Text style={[styles.confirmTitle, { color: theme.text }]}>
-                Reset Profile?
-              </Text>
-              <Text style={[styles.confirmBody, { color: theme.textMuted }]}>
-                This will clear your current profile and open the welcome setup screen.
-              </Text>
-              <View style={styles.confirmActions}>
-                <Pressable
-                  style={[
-                    styles.confirmBtn,
-                    styles.cancelBtn,
-                    { borderColor: theme.border },
-                  ]}
-                  onPress={() => setShowResetConfirm(false)}
-                >
-                  <Text style={{ color: theme.text, fontWeight: '600' }}>
-                    Cancel
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.confirmBtn, styles.deleteBtn]}
-                  onPress={async () => {
-                    setShowResetConfirm(false);
-                    await clearProfile();
-                  }}
-                >
-                  <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>
-                    Reset
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      )}
+      {/* Unified Reset Profile Confirmation Dialog */}
+      <ConfirmDialog
+        visible={showResetConfirm}
+        icon="account-circle-outline"
+        title="Reset Profile?"
+        message="This will clear your current profile, reset all DIY project progress, and open the welcome setup screen."
+        confirmText="Reset"
+        cancelText="Cancel"
+        destructive
+        onCancel={() => setShowResetConfirm(false)}
+        onConfirm={async () => {
+          setShowResetConfirm(false);
+          await clearProfile();
+        }}
+      />
 
       {/* Edit Profile Modal */}
       <Modal
@@ -355,8 +309,9 @@ const styles = StyleSheet.create({
   },
   heroCard: {
     padding: 18,
-    borderRadius: 22,
+    borderRadius: 14,
     borderWidth: 1,
+    borderStyle: 'solid',
   },
   heroRow: {
     flexDirection: 'row',
@@ -366,12 +321,9 @@ const styles = StyleSheet.create({
   avatarWrapper: {
     width: 64,
     height: 64,
-    borderRadius: 22,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  avatarEmoji: {
-    fontSize: 34,
   },
   heroInfo: {
     flex: 1,
@@ -391,7 +343,9 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 99,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: 'solid',
   },
   tagBadgeText: {
     fontSize: 12,
@@ -400,7 +354,7 @@ const styles = StyleSheet.create({
   editButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 99,
+    borderRadius: 8,
   },
   editButtonText: {
     fontSize: 13,
@@ -415,13 +369,11 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: '46%',
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 12,
     borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
     gap: 4,
-  },
-  statEmoji: {
-    fontSize: 22,
   },
   statValue: {
     fontSize: 22,
@@ -450,46 +402,5 @@ const styles = StyleSheet.create({
   resetButtonText: {
     fontSize: 13,
     fontFamily: Fonts.semiBold,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  confirmModal: {
-    width: '100%',
-    maxWidth: 340,
-    padding: 20,
-    borderRadius: 22,
-    borderWidth: 1,
-  },
-  confirmTitle: {
-    fontSize: 18,
-    fontFamily: Fonts.extraBold,
-    marginBottom: 8,
-  },
-  confirmBody: {
-    fontSize: 14,
-    fontFamily: Fonts.medium,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  confirmActions: {
-    flexDirection: 'row',
-    gap: 10,
-    justifyContent: 'flex-end',
-  },
-  confirmBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-  cancelBtn: {
-    borderWidth: 1,
-  },
-  deleteBtn: {
-    backgroundColor: '#DC2626',
   },
 });
