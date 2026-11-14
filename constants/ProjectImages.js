@@ -1,19 +1,19 @@
-// Offline bundled final outcome images downloaded from Wikimedia Commons
+// Offline bundled PNG illustrations from assets/projects/new-pngs/
 export const PROJECT_IMAGES = {
-  'blast-off-paper-tube-rocket': require('../assets/projects/blast-off-paper-tube-rocket.jpg'),
-  'fizzing-kitchen-volcano': require('../assets/projects/fizzing-kitchen-volcano.jpg'),
-  'rainbow-sensory-calm-bottle': require('../assets/projects/rainbow-sensory-calm-bottle.jpg'),
-  'pressed-leaf-animal-art': require('../assets/projects/pressed-leaf-animal-art.jpg'),
-  'milk-carton-bird-feeder': require('../assets/projects/milk-carton-bird-feeder.jpg'),
-  'jumping-origami-frog': require('../assets/projects/jumping-origami-frog.jpg'),
-  'rubber-band-race-car': require('../assets/projects/rubber-band-race-car.jpg'),
-  'cardboard-marble-labyrinth': require('../assets/projects/cardboard-marble-labyrinth.jpg'),
-  'superhero-power-cuffs': require('../assets/projects/superhero-power-cuffs.jpg'),
-  'dinosaur-salt-dough-fossils': require('../assets/projects/dinosaur-salt-dough-fossils.jpg'),
-  'enchanted-fairy-garden-lantern': require('../assets/projects/enchanted-fairy-garden-lantern.jpg'),
-  'kumihimo-friendship-bracelet': require('../assets/projects/kumihimo-friendship-bracelet.jpg'),
-  'yarn-wrapped-nature-heart': require('../assets/projects/yarn-wrapped-nature-heart.jpg'),
-  'felt-play-food-strawberries': require('../assets/projects/felt-play-food-strawberries.jpg'),
+  'blast-off-paper-tube-rocket': require('../assets/projects/new-pngs/blast-off-paper-rocket.png'),
+  'fizzing-kitchen-volcano': require('../assets/projects/new-pngs/kitchen-volcano.png'),
+  'rainbow-sensory-calm-bottle': require('../assets/projects/new-pngs/rainbow-jar.png'),
+  'pressed-leaf-animal-art': require('../assets/projects/new-pngs/pressed-leaf-animal-art.png'),
+  'milk-carton-bird-feeder': require('../assets/projects/new-pngs/bird-feeder.png'),
+  'jumping-origami-frog': require('../assets/projects/new-pngs/origami-frog.png'),
+  'rubber-band-race-car': require('../assets/projects/new-pngs/rubber-band-race-car.png'),
+  'cardboard-marble-labyrinth': require('../assets/projects/new-pngs/marble-labyrinth.png'),
+  'superhero-power-cuffs': require('../assets/projects/new-pngs/superhero-wrist-cuffs.png'),
+  'dinosaur-salt-dough-fossils': require('../assets/projects/new-pngs/dinosaur-fossils.png'),
+  'enchanted-fairy-garden-lantern': require('../assets/projects/new-pngs/fairy-jar-lantern.png'),
+  'kumihimo-friendship-bracelet': require('../assets/projects/new-pngs/japanese-bracelet.png'),
+  'yarn-wrapped-nature-heart': require('../assets/projects/new-pngs/yarn-wand.png'),
+  'felt-play-food-strawberries': require('../assets/projects/new-pngs/felt-strawberries.png'),
 };
 
 export function getProjectImage(slug) {
