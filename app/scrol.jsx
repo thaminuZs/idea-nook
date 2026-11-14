@@ -147,7 +147,7 @@ export default function ProfilePage() {
               <View
                 style={[
                   styles.tagBadge,
-                  { backgroundColor: theme.surfaceSubtle },
+                  { backgroundColor: theme.surfaceSubtle, borderColor: theme.border },
                 ]}
               >
                 <Text style={[styles.tagBadgeText, { color: theme.textMuted }]}>
@@ -157,7 +157,7 @@ export default function ProfilePage() {
               <View
                 style={[
                   styles.tagBadge,
-                  { backgroundColor: theme.surfaceSubtle },
+                  { backgroundColor: theme.surfaceSubtle, borderColor: theme.border },
                 ]}
               >
                 <AppIcon name={genderIcon} size={13} color={theme.textMuted} />
@@ -355,8 +355,9 @@ const styles = StyleSheet.create({
   },
   heroCard: {
     padding: 18,
-    borderRadius: 22,
+    borderRadius: 14,
     borderWidth: 1,
+    borderStyle: 'solid',
   },
   heroRow: {
     flexDirection: 'row',
@@ -366,12 +367,9 @@ const styles = StyleSheet.create({
   avatarWrapper: {
     width: 64,
     height: 64,
-    borderRadius: 22,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  avatarEmoji: {
-    fontSize: 34,
   },
   heroInfo: {
     flex: 1,
@@ -391,7 +389,9 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 99,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: 'solid',
   },
   tagBadgeText: {
     fontSize: 12,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   editButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 99,
+    borderRadius: 8,
   },
   editButtonText: {
     fontSize: 13,
@@ -415,13 +415,11 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: '46%',
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 12,
     borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
     gap: 4,
-  },
-  statEmoji: {
-    fontSize: 22,
   },
   statValue: {
     fontSize: 22,
@@ -462,8 +460,9 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 340,
     padding: 20,
-    borderRadius: 22,
+    borderRadius: 14,
     borderWidth: 1,
+    borderStyle: 'solid',
   },
   confirmTitle: {
     fontSize: 18,
@@ -484,10 +483,11 @@ const styles = StyleSheet.create({
   confirmBtn: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   cancelBtn: {
     borderWidth: 1,
+    borderStyle: 'solid',
   },
   deleteBtn: {
     backgroundColor: '#DC2626',

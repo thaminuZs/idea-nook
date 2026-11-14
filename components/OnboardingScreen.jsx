@@ -100,7 +100,12 @@ export default function OnboardingScreen({
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={[styles.heroIconCircle, { backgroundColor: theme.primarySoft }]}>
+          <View
+            style={[
+              styles.heroIconCircle,
+              { backgroundColor: theme.primarySoft, borderColor: borderCol },
+            ]}
+          >
             <AppIcon name={avatarEmoji} size={40} color={theme.primary} />
           </View>
           <Text style={[styles.title, { color: theme.text }]}>
@@ -130,7 +135,7 @@ export default function OnboardingScreen({
                   onPress={() => setAvatarEmoji(item)}
                   style={[
                     styles.avatarBtn,
-                    { backgroundColor: inputBg },
+                    { backgroundColor: inputBg, borderColor: borderCol },
                     isSelected && styles.avatarBtnSelected,
                   ]}
                 >
@@ -337,7 +342,9 @@ const styles = StyleSheet.create({
   heroIconCircle: {
     width: 76,
     height: 76,
-    borderRadius: 26,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
@@ -356,8 +363,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   card: {
-    borderRadius: 18,
+    borderRadius: 12,
     borderWidth: 1,
+    borderStyle: 'solid',
     padding: 16,
     marginBottom: 16,
   },
@@ -400,24 +408,23 @@ const styles = StyleSheet.create({
   avatarBtn: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
+    borderStyle: 'solid',
   },
   avatarBtnSelected: {
+    borderWidth: 2,
     borderColor: '#FF7043',
     backgroundColor: '#FFEBE5',
-    transform: [{ scale: 1.15 }],
-  },
-  avatarEmojiText: {
-    fontSize: 26,
+    transform: [{ scale: 1.1 }],
   },
   textInput: {
     height: 52,
-    borderRadius: 14,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'solid',
     paddingHorizontal: 16,
     fontSize: 17,
     fontFamily: Fonts.semiBold,
@@ -432,8 +439,9 @@ const styles = StyleSheet.create({
     minWidth: 46,
     height: 44,
     paddingHorizontal: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -449,13 +457,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     paddingHorizontal: 8,
-    borderRadius: 14,
+    borderRadius: 10,
+    borderStyle: 'solid',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-  },
-  genderEmoji: {
-    fontSize: 28,
   },
   genderLabel: {
     fontSize: 13,
@@ -469,7 +475,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEE2E2',
     borderColor: '#EF4444',
     borderWidth: 1,
-    borderRadius: 12,
+    borderStyle: 'solid',
+    borderRadius: 8,
     padding: 12,
     marginBottom: 16,
   },
@@ -486,7 +493,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: '#FF7043',
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#FF7043',
@@ -510,8 +517,9 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     paddingVertical: 12,
-    borderRadius: 14,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'solid',
     alignItems: 'center',
     justifyContent: 'center',
   },

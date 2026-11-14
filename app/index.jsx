@@ -237,11 +237,9 @@ const styles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 99,
+    borderRadius: 10,
     borderWidth: 1,
-  },
-  starIcon: {
-    fontSize: 14,
+    borderStyle: 'solid',
   },
   starCount: {
     fontSize: 14,
@@ -252,8 +250,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    borderRadius: 18,
+    borderRadius: 12,
     borderWidth: 1,
+    borderStyle: 'solid',
     marginTop: 4,
   },
   exploreTitle: {
@@ -264,10 +263,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.medium,
     marginTop: 2,
-  },
-  exploreArrow: {
-    fontSize: 18,
-    fontFamily: Fonts.extraBold,
   },
   errorText: {
     color: '#DC2626',

@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 99,
+    borderRadius: 8,
   },
   profileBadgeText: {
     fontSize: 13,
@@ -358,12 +358,13 @@ const styles = StyleSheet.create({
   themeToggle: {
     width: 34,
     height: 34,
-    borderRadius: 17,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   tabBarContainer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 1,
+    borderStyle: 'solid',
     borderBottomWidth: 0,
     paddingTop: 6,
     elevation: 0,
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
   tabIconPill: {
     paddingHorizontal: 16,
     paddingVertical: 4,
-    borderRadius: 99,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
