@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -34,6 +35,7 @@ export default function ExploreScreen() {
   const [selectedAudience, setSelectedAudience] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedGuide, setSelectedGuide] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -121,17 +123,29 @@ export default function ExploreScreen() {
                 styles.searchBox,
                 {
                   backgroundColor: theme.surface,
-                  borderColor: theme.border,
+                  borderColor: isSearchFocused ? theme.primary : theme.border,
                 },
               ]}
             >
-              <AppIcon name="magnify" size={22} color={theme.textMuted} />
+              <AppIcon
+                name="magnify"
+                size={22}
+                color={isSearchFocused ? theme.primary : theme.textMuted}
+              />
               <TextInput
-                style={[styles.searchInput, { color: theme.text }]}
+                style={[
+                  styles.searchInput,
+                  { color: theme.text },
+                  Platform.OS === 'web' && styles.webInputNoOutline,
+                ]}
                 placeholder="Search rockets, volcano, bracelets..."
                 placeholderTextColor={theme.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                underlineColorAndroid="transparent"
+                selectionColor={theme.primary}
                 returnKeyType="search"
                 autoCorrect={false}
               />
@@ -319,7 +333,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.semiBold,
     paddingVertical: 10,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
     textAlignVertical: 'center',
+  },
+  webInputNoOutline: {
+    outlineStyle: 'none',
+    outlineWidth: 0,
   },
   clearBtn: {
     width: 28,

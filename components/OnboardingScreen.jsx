@@ -166,6 +166,7 @@ export default function OnboardingScreen({
                 color: theme.text,
                 borderColor: borderCol,
               },
+              Platform.OS === 'web' && { outlineStyle: 'none', outlineWidth: 0 },
             ]}
             placeholder="e.g. Leo, Maya, Sam"
             placeholderTextColor={isDark ? '#6B7280' : '#94A3B8'}
@@ -174,6 +175,8 @@ export default function OnboardingScreen({
               setName(val);
               if (errorMsg) setErrorMsg('');
             }}
+            underlineColorAndroid="transparent"
+            selectionColor={theme.primary}
             maxLength={25}
             autoCorrect={false}
             autoCapitalize="words"
