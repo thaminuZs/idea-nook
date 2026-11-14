@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { seedInitialGuides } from './seed';
 
 export const DATABASE_NAME = 'ideanook.db';
-export const DATABASE_VERSION = 2;
+export const DATABASE_VERSION = 3;
 
 const MIGRATIONS = [
   {
@@ -84,6 +84,15 @@ const MIGRATIONS = [
           created_at TEXT NOT NULL DEFAULT (datetime('now')),
           updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
+      `);
+    },
+  },
+  {
+    version: 3,
+    async up(db) {
+      await db.execAsync(`
+        ALTER TABLE guides ADD COLUMN gender_target TEXT NOT NULL DEFAULT 'all';
+        CREATE INDEX IF NOT EXISTS idx_guides_gender ON guides(gender_target);
       `);
     },
   },

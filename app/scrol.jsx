@@ -197,7 +197,7 @@ export default function ProfilePage() {
         </View>
       </View>
 
-      {/* Age Recommendation Guide Hint */}
+      {/* Age & Gender Recommendation Guide Hint */}
       <View
         style={[
           styles.hintCard,
@@ -206,7 +206,7 @@ export default function ProfilePage() {
       >
         <Text style={styles.hintTitle}>💡 Tailored Content Active</Text>
         <Text style={[styles.hintBody, { color: mutedText }]}>
-          Your feed on the Home tab is actively personalized for Age {profile.age}. You can change your age anytime in "Edit Profile" to see activities for different age groups!
+          Your Home feed is customized for {profile.name} (Age {profile.age} • {genderLabel}). You can browse tailored projects or explore all DIY crafts anytime on the Home tab!
         </Text>
       </View>
 

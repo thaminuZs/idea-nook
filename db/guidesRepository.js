@@ -31,6 +31,7 @@ function mapGuideRow(row) {
     safetyNote: row.safety_note ?? null,
     iconEmoji: row.icon_emoji,
     accentColor: row.accent_color,
+    genderTarget: row.gender_target ?? 'all',
     isFavorite: Boolean(row.is_favorite),
     isCustom: Boolean(row.is_custom),
     createdAt: row.created_at,
@@ -81,13 +82,16 @@ export async function insertGuideRecord(db, guideData, { isCustom = false } = {}
     ? guideData.difficulty
     : 'easy';
   const slug = guideData.slug || `${slugify(guideData.title)}-${Date.now()}`;
+  const genderTarget = ['all', 'boy', 'girl'].includes(guideData.genderTarget)
+    ? guideData.genderTarget
+    : 'all';
 
   const guideResult = await db.runAsync(
     `INSERT INTO guides (
       slug, title, summary, category, difficulty,
       min_age, max_age, estimated_minutes, adult_supervision,
-      safety_note, icon_emoji, accent_color, is_favorite, is_custom
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      safety_note, icon_emoji, accent_color, gender_target, is_favorite, is_custom
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
     [
       slug,
       guideData.title.trim(),
@@ -101,6 +105,7 @@ export async function insertGuideRecord(db, guideData, { isCustom = false } = {}
       guideData.safetyNote ?? null,
       guideData.iconEmoji ?? '🎨',
       guideData.accentColor ?? '#FF8A65',
+      genderTarget,
       guideData.isFavorite ? 1 : 0,
       isCustom ? 1 : 0,
     ]
@@ -211,6 +216,14 @@ export async function getGuides(db, filters = {}) {
   if (typeof filters.age === 'number' && Number.isFinite(filters.age)) {
     clauses.push('g.min_age <= ? AND g.max_age >= ?');
     params.push(filters.age, filters.age);
+  }
+
+  if (filters.genderTarget && ['boy', 'girl'].includes(filters.genderTarget)) {
+    clauses.push('(g.gender_target = ? OR g.gender_target = ?)');
+    params.push(filters.genderTarget, 'all');
+  } else if (filters.exactGender && ['all', 'boy', 'girl'].includes(filters.exactGender)) {
+    clauses.push('g.gender_target = ?');
+    params.push(filters.exactGender);
   }
 
   if (filters.favoritesOnly) {
