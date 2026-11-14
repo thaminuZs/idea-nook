@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import OnboardingScreen from '../components/OnboardingScreen';
 import { useProfile } from '../contexts/ProfileContext';
@@ -197,7 +197,7 @@ export default function ProfilePage() {
         </View>
       </View>
 
-      {/* Age Recommendation Guide Hint */}
+      {/* Age & Gender Recommendation Guide Hint */}
       <View
         style={[
           styles.hintCard,
@@ -206,8 +206,26 @@ export default function ProfilePage() {
       >
         <Text style={styles.hintTitle}>💡 Tailored Content Active</Text>
         <Text style={[styles.hintBody, { color: mutedText }]}>
-          Your feed on the Home tab is actively personalized for Age {profile.age}. You can change your age anytime in "Edit Profile" to see activities for different age groups!
+          Your For You (FYP) feed is customized for {profile.name} (Age {profile.age} • {genderLabel}). Want to see every project? Visit the Explore tab!
         </Text>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+          <Pressable
+            style={[styles.browseGuidesBtn, { flex: 1, marginTop: 0 }]}
+            onPress={() => router.push('/')}
+          >
+            <Text style={styles.browseGuidesBtnText}>
+              🎯 For You Feed
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.browseGuidesBtn, { flex: 1, marginTop: 0, backgroundColor: '#0284C7' }]}
+            onPress={() => router.push('/flat')}
+          >
+            <Text style={styles.browseGuidesBtnText}>
+              🌈 Explore All
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       {/* Testing / Reset Flow Button */}
@@ -486,5 +504,18 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     backgroundColor: '#DC2626',
+  },
+  browseGuidesBtn: {
+    backgroundColor: '#FF7043',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  browseGuidesBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

@@ -9,11 +9,17 @@ import {
 import React, { useCallback, useMemo, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import GuideDetailView from '../components/GuideDetailView';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { getDashboardStats, getGuides } from '../db';
+import {
+  getDashboardStats,
+  getGuides,
+  getStarterGuideRichContent,
+  seedInitialGuides,
+} from '../db';
 
-const Home = () => {
+const ForYouScreen = () => {
   const db = useSQLiteContext();
   const { theme, scheme } = useTheme();
   const { profile } = useProfile();
@@ -22,10 +28,12 @@ const Home = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedGuide, setSelectedGuide] = useState(null);
 
   const loadData = useCallback(async () => {
     try {
       setError(null);
+      await seedInitialGuides(db);
       const [guideRows, dashboardStats] = await Promise.all([
         getGuides(db),
         getDashboardStats(db),
@@ -49,14 +57,60 @@ const Home = () => {
   const cardBackground = isDark ? '#1A1A1A' : '#FFFFFF';
   const borderColor = isDark ? '#2D2D2D' : '#E2E8F0';
   const mutedText = isDark ? '#94A3B8' : '#64748B';
+  const chipBg = isDark ? '#262626' : '#F1F5F9';
 
-  // Content tailored to the child's age
-  const ageMatchedGuides = useMemo(() => {
-    if (!profile?.age) return [];
-    return guides.filter(
-      (g) => g.minAge <= profile.age && g.maxAge >= profile.age
+  const genderLabel =
+    profile?.gender === 'boy'
+      ? 'Boy 👦'
+      : profile?.gender === 'girl'
+      ? 'Girl 👧'
+      : 'Super Star ⭐';
+
+  // Strictly For You (FYP) feed based on child's gender and age
+  const forYouGuides = useMemo(() => {
+    if (!profile) return guides;
+
+    const genderMatched = guides.filter((g) => {
+      if (profile.gender === 'boy') {
+        return g.genderTarget === 'boy' || g.genderTarget === 'all';
+      }
+      if (profile.gender === 'girl') {
+        return g.genderTarget === 'girl' || g.genderTarget === 'all';
+      }
+      return true;
+    });
+
+    const strictAgeAndGender = genderMatched.filter(
+      (g) => !profile.age || (g.minAge <= profile.age && g.maxAge >= profile.age)
     );
-  }, [guides, profile?.age]);
+
+    const listToUse =
+      strictAgeAndGender.length >= 3 ? strictAgeAndGender : genderMatched;
+
+    // Prioritize projects specifically tailored to the child's gender first
+    return [...listToUse].sort((a, b) => {
+      const aExactGender = a.genderTarget === profile.gender ? 1 : 0;
+      const bExactGender = b.genderTarget === profile.gender ? 1 : 0;
+      if (aExactGender !== bExactGender) {
+        return bExactGender - aExactGender;
+      }
+      return a.id - b.id;
+    });
+  }, [guides, profile]);
+
+  // If a project is selected, render its full interactive GuideDetailView
+  if (selectedGuide) {
+    return (
+      <GuideDetailView
+        guideId={selectedGuide.id}
+        initialGuide={selectedGuide}
+        onBack={() => {
+          setSelectedGuide(null);
+          loadData();
+        }}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -78,11 +132,11 @@ const Home = () => {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <FlatList
         contentContainerStyle={styles.content}
-        data={guides}
+        data={forYouGuides}
         keyExtractor={(item) => String(item.id)}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Friendly Greeting Card */}
+            {/* Friendly Child Greeting & Profile Summary Card */}
             {profile && (
               <Pressable
                 style={[
@@ -103,7 +157,8 @@ const Home = () => {
                       Hi, {profile.name}! 👋
                     </Text>
                     <Text style={[styles.greetingSubtitle, { color: mutedText }]}>
-                      Age {profile.age} • Tap to view Profile & Stats
+                      Age {profile.age} • {genderLabel}
+                      {stats ? ` • ⭐ ${stats.totalStars} Stars` : ''}
                     </Text>
                   </View>
                 </View>
@@ -111,53 +166,182 @@ const Home = () => {
               </Pressable>
             )}
 
-            {/* Age-tailored section header */}
-            {ageMatchedGuides.length > 0 && (
-              <View style={styles.sectionHeader}>
+            {/* Dedicated FYP Header Banner */}
+            <View style={styles.fypHeroBanner}>
+              <View style={styles.fypTitleRow}>
                 <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                  🎯 Recommended for Age {profile?.age}
+                  🎯 Picked Just For You
                 </Text>
-                <Text style={[styles.sectionSubtitle, { color: mutedText }]}>
-                  {ageMatchedGuides.length} activities handpicked for your age group
-                </Text>
+                <View style={styles.fypCountPill}>
+                  <Text style={styles.fypCountText}>
+                    {forYouGuides.length} Matches
+                  </Text>
+                </View>
               </View>
-            )}
+              <Text style={[styles.sectionSubtitle, { color: mutedText }]}>
+                Showing DIY projects matched for{' '}
+                <Text style={{ fontWeight: '700', color: theme.text }}>
+                  {profile?.name || 'You'}
+                </Text>{' '}
+                (Age {profile?.age} • {genderLabel}). Tap any card to start building!
+              </Text>
+            </View>
           </View>
         }
+        ListFooterComponent={
+          <Pressable
+            style={[
+              styles.exploreAllFooterCard,
+              {
+                backgroundColor: isDark ? '#1A2433' : '#F0F9FF',
+                borderColor: '#BAE6FD',
+              },
+            ]}
+            onPress={() => router.push('/flat')}
+          >
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  styles.exploreFooterTitle,
+                  { color: isDark ? '#E0F2FE' : '#0369A1' },
+                ]}
+              >
+                🌈 Want to see all {guides.length} DIY projects?
+              </Text>
+              <Text style={[styles.exploreFooterSub, { color: mutedText }]}>
+                Switch to the Explore page to browse every category, search, and view all projects!
+              </Text>
+            </View>
+            <Text style={styles.exploreFooterArrow}>→</Text>
+          </Pressable>
+        }
         renderItem={({ item }) => {
-          const isRecommended =
-            profile?.age && item.minAge <= profile.age && item.maxAge >= profile.age;
+          const isCompleted = item.status === 'completed';
+          const isInProgress = item.status === 'in_progress';
+          const richInfo = getStarterGuideRichContent(item.slug);
+          const totalMaterialsCount =
+            item.totalMaterials || richInfo?.materials?.length || 5;
+          const totalStepsCount =
+            item.totalSteps || richInfo?.steps?.length || 5;
+          const skillTags = richInfo?.skills?.slice(0, 2) || [];
 
           return (
-            <View
-              style={[
+            <Pressable
+              onPress={() => setSelectedGuide(item)}
+              style={({ pressed }) => [
                 styles.card,
                 { backgroundColor: cardBackground, borderColor },
-                isRecommended && styles.cardRecommended,
+                styles.cardRecommended,
+                pressed && styles.cardPressed,
               ]}
+              accessibilityRole="button"
+              accessibilityLabel={`Open DIY Guide: ${item.title}`}
             >
-              <View style={[styles.badge, { backgroundColor: item.accentColor }]}>
-                <Text style={styles.emoji}>{item.iconEmoji}</Text>
-              </View>
-              <View style={styles.cardBody}>
-                <View style={styles.cardTitleRow}>
-                  <Text style={[styles.cardTitle, { color: theme.text }]}>
-                    {item.title}
-                  </Text>
-                  {isRecommended && (
-                    <View style={styles.forYouBadge}>
-                      <Text style={styles.forYouBadgeText}>For You</Text>
-                    </View>
-                  )}
+              <View style={styles.cardTopRow}>
+                <View style={[styles.badge, { backgroundColor: item.accentColor }]}>
+                  <Text style={styles.emoji}>{item.iconEmoji}</Text>
                 </View>
-                <Text style={[styles.cardSummary, { color: mutedText }]} numberOfLines={2}>
-                  {item.summary}
-                </Text>
-                <Text style={[styles.cardMeta, { color: mutedText }]}>
-                  {item.category} • Ages {item.minAge}–{item.maxAge} • {item.estimatedMinutes} min • {item.difficulty}
-                </Text>
+
+                <View style={styles.cardBody}>
+                  <View style={styles.cardTitleRow}>
+                    <Text style={[styles.cardTitle, { color: theme.text }]}>
+                      {item.title}
+                    </Text>
+                    <View style={styles.forYouBadge}>
+                      <Text style={styles.forYouBadgeText}>🎯 For You</Text>
+                    </View>
+                    {isCompleted && (
+                      <View style={styles.completedBadge}>
+                        <Text style={styles.completedBadgeText}>⭐ Done</Text>
+                      </View>
+                    )}
+                    {isInProgress && !isCompleted && (
+                      <View style={styles.inProgressBadge}>
+                        <Text style={styles.inProgressBadgeText}>🛠️ In Progress</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <Text
+                    style={[styles.cardSummary, { color: mutedText }]}
+                    numberOfLines={2}
+                  >
+                    {item.summary}
+                  </Text>
+                </View>
               </View>
-            </View>
+
+              {/* Content Preview Badges: Supplies, Steps, Time, Age, Gender */}
+              <View style={styles.contentMetaRow}>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    🎒 {totalMaterialsCount} Supplies
+                  </Text>
+                </View>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    🛠️ {totalStepsCount} Steps
+                  </Text>
+                </View>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    ⏱️ {item.estimatedMinutes} min
+                  </Text>
+                </View>
+                <View style={[styles.metaChip, { backgroundColor: chipBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    🎯 Ages {item.minAge}–{item.maxAge}
+                  </Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.genderTargetPill,
+                    item.genderTarget === 'boy'
+                      ? styles.genderPillBoy
+                      : item.genderTarget === 'girl'
+                      ? styles.genderPillGirl
+                      : styles.genderPillAll,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.genderTargetText,
+                      item.genderTarget === 'boy'
+                        ? styles.genderTextBoy
+                        : item.genderTarget === 'girl'
+                        ? styles.genderTextGirl
+                        : styles.genderTextAll,
+                    ]}
+                  >
+                    {item.genderTarget === 'boy'
+                      ? '👦 Boys'
+                      : item.genderTarget === 'girl'
+                      ? '👧 Girls'
+                      : '🌟 Everyone'}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Skill Pills Row */}
+              {skillTags.length > 0 && (
+                <View style={styles.skillPreviewRow}>
+                  {skillTags.map((skill, idx) => (
+                    <Text key={idx} style={[styles.skillPreviewText, { color: mutedText }]}>
+                      {skill}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              {/* Explicit Action Button Bar */}
+              <View style={styles.openProjectBtnBar}>
+                <Text style={styles.openProjectBtnText}>
+                  📖 Open Project & Browse Steps ({totalStepsCount} Steps)
+                </Text>
+                <Text style={styles.openProjectBtnArrow}>→</Text>
+              </View>
+            </Pressable>
           );
         }}
       />
@@ -165,7 +349,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ForYouScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -173,7 +357,8 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    gap: 12,
+    gap: 14,
+    paddingBottom: 32,
   },
   centered: {
     flex: 1,
@@ -182,27 +367,26 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   header: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
   greetingCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 18,
-    borderWidth: 1.5,
     padding: 14,
-    marginBottom: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginBottom: 14,
   },
   greetingLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    flex: 1,
   },
   avatarPill: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -230,39 +414,62 @@ const styles = StyleSheet.create({
     color: '#FF7043',
     paddingHorizontal: 6,
   },
-  sectionHeader: {
-    marginTop: 4,
-    marginBottom: 10,
+  fypHeroBanner: {
+    marginBottom: 6,
+    gap: 4,
+  },
+  fypTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  fypCountPill: {
+    backgroundColor: '#FFEBE5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  fypCountText: {
+    color: '#D84315',
+    fontSize: 12,
+    fontWeight: '800',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '800',
   },
   sectionSubtitle: {
     fontSize: 13,
-    marginTop: 2,
+    lineHeight: 19,
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 16,
+    padding: 15,
+    borderRadius: 18,
     borderWidth: 1,
     gap: 12,
+  },
+  cardPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.99 }],
   },
   cardRecommended: {
     borderColor: '#FFAB91',
     borderWidth: 1.5,
   },
+  cardTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
   badge: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emoji: {
-    fontSize: 24,
+    fontSize: 26,
   },
   cardBody: {
     flex: 1,
@@ -275,7 +482,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
     flex: 1,
   },
   forYouBadge: {
@@ -289,15 +496,130 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
+  completedBadge: {
+    backgroundColor: '#DEF7EC',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  completedBadgeText: {
+    color: '#03543F',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  inProgressBadge: {
+    backgroundColor: '#FEF08A',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  inProgressBadgeText: {
+    color: '#713F12',
+    fontSize: 11,
+    fontWeight: '700',
+  },
   cardSummary: {
     fontSize: 13,
     marginTop: 4,
     lineHeight: 18,
   },
-  cardMeta: {
-    fontSize: 12,
+  contentMetaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 6,
+  },
+  metaChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  metaChipText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  genderTargetPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  genderPillBoy: {
+    backgroundColor: '#EFF6FF',
+  },
+  genderTextBoy: {
+    color: '#1D4ED8',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  genderPillGirl: {
+    backgroundColor: '#FDF2F8',
+  },
+  genderTextGirl: {
+    color: '#DB2777',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  genderPillAll: {
+    backgroundColor: '#F3F4F6',
+  },
+  genderTextAll: {
+    color: '#4B5563',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  skillPreviewRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  skillPreviewText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  openProjectBtnBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFF0EB',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFCCBC',
+  },
+  openProjectBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#D84315',
+  },
+  openProjectBtnArrow: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#D84315',
+  },
+  exploreAllFooterCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
     marginTop: 6,
-    fontWeight: '500',
+    gap: 12,
+  },
+  exploreFooterTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  exploreFooterSub: {
+    fontSize: 12,
+    marginTop: 3,
+    lineHeight: 17,
+  },
+  exploreFooterArrow: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#0284C7',
   },
   errorText: {
     color: '#D32F2F',

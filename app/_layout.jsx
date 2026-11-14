@@ -81,9 +81,18 @@ const Navigation = () => {
         ),
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Home', headerTitle: 'IdeaNook' }} />
-      <Tabs.Screen name="flat" options={{ title: 'Flat Page', headerTitle: 'Flat' }} />
+      <Tabs.Screen name="index" options={{ title: 'For You', headerTitle: 'For You 🎯' }} />
+      <Tabs.Screen name="flat" options={{ title: 'Explore', headerTitle: 'Explore All Projects 🌈' }} />
       <Tabs.Screen name="scrol" options={{ title: 'Profile', headerTitle: 'My Profile' }} />
+      <Tabs.Screen
+        name="guide/[id]"
+        options={{
+          href: null,
+          title: 'DIY Guide',
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tabs>
   );
 };
