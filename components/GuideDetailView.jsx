@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -26,6 +24,7 @@ import {
   toggleStepCompleted,
 } from '../db';
 import AppIcon from './AppIcon';
+import ConfirmDialog from './ConfirmDialog';
 import PopArtCelebration from './PopArtCelebration';
 
 export default function GuideDetailView({ guideId, initialGuide, onBack }) {
@@ -38,8 +37,9 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const [guide, setGuide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('steps'); // 'steps' | 'supplies' | 'ideas'
+  const [activeTab, setActiveTab] = useState('supplies'); // 'supplies' | 'steps' | 'ideas'
   const [showPopArt, setShowPopArt] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const loadGuide = useCallback(async () => {
     if (!numericId || Number.isNaN(numericId)) {
@@ -148,34 +148,22 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
     }
   };
 
-  const handleResetGuide = async () => {
+  const handleResetGuide = () => {
     if (!guide) return;
+    setShowResetDialog(true);
+  };
 
-    const doReset = async () => {
-      try {
-        await resetGuideProgress(db, guide.id);
-        const refreshed = await getGuideById(db, guide.id);
-        if (refreshed) {
-          setGuide(refreshed);
-        }
-      } catch (err) {
-        console.error('Failed to reset project progress:', err);
+  const confirmResetGuide = async () => {
+    if (!guide) return;
+    setShowResetDialog(false);
+    try {
+      await resetGuideProgress(db, guide.id);
+      const refreshed = await getGuideById(db, guide.id);
+      if (refreshed) {
+        setGuide(refreshed);
       }
-    };
-
-    if (Platform.OS === 'web') {
-      if (window.confirm('Reset all steps and start this project from Step 1?')) {
-        await doReset();
-      }
-    } else {
-      Alert.alert(
-        'Start Over',
-        'Reset your step progress and start this project from Step 1?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Reset', style: 'destructive', onPress: doReset },
-        ]
-      );
+    } catch (err) {
+      console.error('Failed to reset project progress:', err);
     }
   };
 
@@ -449,7 +437,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           </View>
         )}
 
-        {/* Segmented Control: Steps | Supplies | Tips & Facts */}
+        {/* Segmented Control: Supplies | Steps | Tips & Facts */}
         <View
           style={[
             styles.segmentedBar,
@@ -459,28 +447,6 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             },
           ]}
         >
-          <Pressable
-            style={[
-              styles.segmentBtn,
-              activeTab === 'steps' && { backgroundColor: theme.primary },
-            ]}
-            onPress={() => setActiveTab('steps')}
-          >
-            <AppIcon
-              name="hammer-wrench"
-              size={14}
-              color={activeTab === 'steps' ? '#FFFFFF' : theme.textMuted}
-            />
-            <Text
-              style={[
-                styles.segmentText,
-                { color: activeTab === 'steps' ? '#FFFFFF' : theme.textMuted },
-              ]}
-            >
-              Steps ({guide.completedSteps}/{stepsList.length})
-            </Text>
-          </Pressable>
-
           <Pressable
             style={[
               styles.segmentBtn,
@@ -500,6 +466,28 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
               ]}
             >
               Supplies ({checkedMaterialsCount}/{materialsList.length})
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.segmentBtn,
+              activeTab === 'steps' && { backgroundColor: theme.primary },
+            ]}
+            onPress={() => setActiveTab('steps')}
+          >
+            <AppIcon
+              name="hammer-wrench"
+              size={14}
+              color={activeTab === 'steps' ? '#FFFFFF' : theme.textMuted}
+            />
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'steps' ? '#FFFFFF' : theme.textMuted },
+              ]}
+            >
+              Steps ({guide.completedSteps}/{stepsList.length})
             </Text>
           </Pressable>
 
@@ -862,6 +850,19 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
       <PopArtCelebration
         visible={showPopArt}
         onFinish={() => setShowPopArt(false)}
+      />
+
+      {/* Unified Reset Project Confirmation Dialog */}
+      <ConfirmDialog
+        visible={showResetDialog}
+        icon="restart"
+        title="Start Over?"
+        message="Reset all checked supplies and step progress so you can start this DIY project from the beginning?"
+        confirmText="Reset Project"
+        cancelText="Cancel"
+        destructive
+        onConfirm={confirmResetGuide}
+        onCancel={() => setShowResetDialog(false)}
       />
     </View>
   );

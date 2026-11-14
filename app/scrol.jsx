@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +11,7 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import AppIcon from '../components/AppIcon';
+import ConfirmDialog from '../components/ConfirmDialog';
 import GuideDetailView from '../components/GuideDetailView';
 import OnboardingScreen from '../components/OnboardingScreen';
 import ProjectCard from '../components/ProjectCard';
@@ -72,22 +71,7 @@ export default function ProfilePage() {
       : 'star-circle';
 
   const handleReset = () => {
-    if (Platform.OS === 'web') {
-      setShowResetConfirm(true);
-    } else {
-      Alert.alert(
-        'Reset Profile',
-        'Do you want to clear this profile and reset all DIY project progress?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Reset',
-            style: 'destructive',
-            onPress: () => clearProfile(),
-          },
-        ]
-      );
-    }
+    setShowResetConfirm(true);
   };
 
   if (selectedGuide) {
@@ -267,51 +251,21 @@ export default function ProfilePage() {
         </Text>
       </Pressable>
 
-      {/* Web Confirmation Modal */}
-      {showResetConfirm && (
-        <Modal transparent animationType="fade" visible={showResetConfirm}>
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.confirmModal,
-                { backgroundColor: theme.surface, borderColor: theme.border },
-              ]}
-            >
-              <Text style={[styles.confirmTitle, { color: theme.text }]}>
-                Reset Profile?
-              </Text>
-              <Text style={[styles.confirmBody, { color: theme.textMuted }]}>
-                This will clear your current profile, reset all DIY project progress, and open the welcome setup screen.
-              </Text>
-              <View style={styles.confirmActions}>
-                <Pressable
-                  style={[
-                    styles.confirmBtn,
-                    styles.cancelBtn,
-                    { borderColor: theme.border },
-                  ]}
-                  onPress={() => setShowResetConfirm(false)}
-                >
-                  <Text style={{ color: theme.text, fontWeight: '600' }}>
-                    Cancel
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.confirmBtn, styles.deleteBtn]}
-                  onPress={async () => {
-                    setShowResetConfirm(false);
-                    await clearProfile();
-                  }}
-                >
-                  <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>
-                    Reset
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      )}
+      {/* Unified Reset Profile Confirmation Dialog */}
+      <ConfirmDialog
+        visible={showResetConfirm}
+        icon="account-circle-outline"
+        title="Reset Profile?"
+        message="This will clear your current profile, reset all DIY project progress, and open the welcome setup screen."
+        confirmText="Reset"
+        cancelText="Cancel"
+        destructive
+        onCancel={() => setShowResetConfirm(false)}
+        onConfirm={async () => {
+          setShowResetConfirm(false);
+          await clearProfile();
+        }}
+      />
 
       {/* Edit Profile Modal */}
       <Modal
@@ -448,48 +402,5 @@ const styles = StyleSheet.create({
   resetButtonText: {
     fontSize: 13,
     fontFamily: Fonts.semiBold,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  confirmModal: {
-    width: '100%',
-    maxWidth: 340,
-    padding: 20,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderStyle: 'solid',
-  },
-  confirmTitle: {
-    fontSize: 18,
-    fontFamily: Fonts.extraBold,
-    marginBottom: 8,
-  },
-  confirmBody: {
-    fontSize: 14,
-    fontFamily: Fonts.medium,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  confirmActions: {
-    flexDirection: 'row',
-    gap: 10,
-    justifyContent: 'flex-end',
-  },
-  confirmBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  cancelBtn: {
-    borderWidth: 1,
-    borderStyle: 'solid',
-  },
-  deleteBtn: {
-    backgroundColor: '#DC2626',
   },
 });
