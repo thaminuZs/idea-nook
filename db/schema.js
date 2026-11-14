@@ -21,7 +21,7 @@ const MIGRATIONS = [
           estimated_minutes INTEGER NOT NULL DEFAULT 15,
           adult_supervision INTEGER NOT NULL DEFAULT 0,
           safety_note TEXT,
-          icon_emoji TEXT NOT NULL DEFAULT '🎨',
+          icon_emoji TEXT NOT NULL DEFAULT 'palette',
           accent_color TEXT NOT NULL DEFAULT '#FF8A65',
           is_favorite INTEGER NOT NULL DEFAULT 0,
           is_custom INTEGER NOT NULL DEFAULT 0,
@@ -80,7 +80,7 @@ const MIGRATIONS = [
           name TEXT NOT NULL,
           age INTEGER NOT NULL,
           gender TEXT NOT NULL,
-          avatar_emoji TEXT NOT NULL DEFAULT '🌟',
+          avatar_emoji TEXT NOT NULL DEFAULT 'star-four-points',
           created_at TEXT NOT NULL DEFAULT (datetime('now')),
           updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );

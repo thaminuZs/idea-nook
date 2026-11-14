@@ -23,6 +23,7 @@ import {
   toggleMaterialChecked,
   toggleStepCompleted,
 } from '../db';
+import AppIcon from './AppIcon';
 
 export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const db = useSQLiteContext();
@@ -174,7 +175,12 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   if (error || !guide) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <Text style={styles.errorEmoji}>🔍</Text>
+        <AppIcon
+          name="magnify"
+          size={42}
+          color={theme.textMuted}
+          style={{ marginBottom: 12 }}
+        />
         <Text style={[styles.errorTitle, { color: theme.text }]}>Project Not Found</Text>
         <Text style={[styles.errorSubtitle, { color: theme.textMuted }]}>
           {error || "We couldn't find the requested DIY project."}
@@ -183,7 +189,8 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           style={[styles.backButton, { backgroundColor: theme.primary }]}
           onPress={onBack}
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <AppIcon name="arrow-left" size={16} color="#FFFFFF" />
+          <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
       </View>
     );
@@ -198,7 +205,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const materialsList = guide.materials || [];
   const stepsList = (guide.steps || []).map((step, index) => ({
     ...step,
-    emoji: richContent.steps?.[index]?.emoji || '🛠️',
+    emoji: richContent.steps?.[index]?.emoji || 'hammer-wrench',
   }));
 
   const checkedMaterialsCount = materialsList.filter((m) => m.isChecked).length;
@@ -221,7 +228,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
         ]}
       >
         <Pressable onPress={onBack} style={styles.navBackBtn} hitSlop={10}>
-          <Text style={[styles.navBackArrow, { color: theme.primary }]}>←</Text>
+          <AppIcon name="arrow-left" size={20} color={theme.primary} />
           <Text style={[styles.navBackText, { color: theme.text }]}>Back</Text>
         </Pressable>
 
@@ -238,7 +245,11 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           hitSlop={10}
           accessibilityLabel="Toggle Favorite"
         >
-          <Text style={styles.favBtnEmoji}>{guide.isFavorite ? '❤️' : '🤍'}</Text>
+          <AppIcon
+            name={guide.isFavorite ? 'heart' : 'heart-outline'}
+            size={18}
+            color={guide.isFavorite ? '#EF4444' : theme.textMuted}
+          />
         </Pressable>
       </View>
 
@@ -263,16 +274,19 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                 { backgroundColor: guide.accentColor || theme.primary },
               ]}
             >
-              <Text style={styles.heroEmoji}>{guide.iconEmoji}</Text>
+              <AppIcon name={guide.iconEmoji} size={34} color="#FFFFFF" />
             </View>
 
             <View style={styles.heroHeaderInfo}>
               <Text style={[styles.guideTitle, { color: theme.text }]}>
                 {guide.title}
               </Text>
-              <Text style={[styles.metaLine, { color: theme.textMuted }]}>
-                ⏱️ {guide.estimatedMinutes} min  •  Ages {guide.minAge}–{guide.maxAge}  •  {guide.difficulty.toUpperCase()}
-              </Text>
+              <View style={styles.metaInlineRow}>
+                <AppIcon name="clock-outline" size={14} color={theme.textMuted} />
+                <Text style={[styles.metaLine, { color: theme.textMuted }]}>
+                  {guide.estimatedMinutes} min  •  Ages {guide.minAge}–{guide.maxAge}  •  {guide.difficulty.toUpperCase()}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -283,9 +297,11 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           {/* Compact Safety Notice */}
           {(guide.adultSupervision || guide.safetyNote) && (
             <View style={styles.safetyCallout}>
-              <Text style={styles.safetyIcon}>
-                {guide.adultSupervision ? '👨‍👩‍👧' : '⚠️'}
-              </Text>
+              <AppIcon
+                name={guide.adultSupervision ? 'account-supervisor' : 'alert-circle-outline'}
+                size={18}
+                color="#B45309"
+              />
               <Text style={styles.safetyText}>
                 {guide.safetyNote ||
                   'Adult helper recommended while building this project.'}
@@ -296,14 +312,29 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           {/* Integrated Progress Bar */}
           <View style={[styles.progressBlock, { borderTopColor: theme.border }]}>
             <View style={styles.progressLabelRow}>
-              <Text style={[styles.progressLabel, { color: theme.text }]}>
-                {isCompleted
-                  ? 'Completed! 🎉'
-                  : `${guide.completedSteps} of ${stepsList.length} steps done`}
-              </Text>
-              <Text style={styles.starsText}>
-                {isCompleted ? '⭐⭐⭐' : guide.completedSteps > 0 ? '⭐☆☆' : '☆☆☆'}
-              </Text>
+              <View style={styles.metaInlineRow}>
+                {isCompleted && (
+                  <AppIcon name="check-circle" size={16} color={theme.success} />
+                )}
+                <Text style={[styles.progressLabel, { color: theme.text }]}>
+                  {isCompleted
+                    ? 'Completed!'
+                    : `${guide.completedSteps} of ${stepsList.length} steps done`}
+                </Text>
+              </View>
+              <View style={styles.starsRow}>
+                {[1, 2, 3].map((idx) => {
+                  const filled = isCompleted || (idx === 1 && guide.completedSteps > 0);
+                  return (
+                    <AppIcon
+                      key={idx}
+                      name={filled ? 'star' : 'star-outline'}
+                      size={16}
+                      color={filled ? '#F59E0B' : theme.textMuted}
+                    />
+                  );
+                })}
+              </View>
             </View>
             <View
               style={[
@@ -327,15 +358,17 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
         {/* Completion Banner */}
         {isCompleted && (
           <View style={styles.celebrationCard}>
+            <AppIcon name="trophy" size={26} color="#047857" />
             <View style={{ flex: 1 }}>
               <Text style={styles.celebrationTitle}>
-                🎉 Great job, {profile?.name || 'Builder'}!
+                Great job, {profile?.name || 'Builder'}!
               </Text>
               <Text style={styles.celebrationSubtitle}>
                 You finished all {stepsList.length} steps and earned 3 Stars!
               </Text>
             </View>
             <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
+              <AppIcon name="restart" size={14} color="#FFFFFF" />
               <Text style={styles.resetCraftBtnText}>Restart</Text>
             </Pressable>
           </View>
@@ -358,13 +391,18 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             ]}
             onPress={() => setActiveTab('steps')}
           >
+            <AppIcon
+              name="hammer-wrench"
+              size={14}
+              color={activeTab === 'steps' ? '#FFFFFF' : theme.textMuted}
+            />
             <Text
               style={[
                 styles.segmentText,
                 { color: activeTab === 'steps' ? '#FFFFFF' : theme.textMuted },
               ]}
             >
-              🛠️ Steps ({guide.completedSteps}/{stepsList.length})
+              Steps ({guide.completedSteps}/{stepsList.length})
             </Text>
           </Pressable>
 
@@ -375,13 +413,18 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             ]}
             onPress={() => setActiveTab('supplies')}
           >
+            <AppIcon
+              name="bag-personal"
+              size={14}
+              color={activeTab === 'supplies' ? '#FFFFFF' : theme.textMuted}
+            />
             <Text
               style={[
                 styles.segmentText,
                 { color: activeTab === 'supplies' ? '#FFFFFF' : theme.textMuted },
               ]}
             >
-              🎒 Supplies ({checkedMaterialsCount}/{materialsList.length})
+              Supplies ({checkedMaterialsCount}/{materialsList.length})
             </Text>
           </Pressable>
 
@@ -392,13 +435,18 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             ]}
             onPress={() => setActiveTab('ideas')}
           >
+            <AppIcon
+              name="lightbulb-on-outline"
+              size={14}
+              color={activeTab === 'ideas' ? '#FFFFFF' : theme.textMuted}
+            />
             <Text
               style={[
                 styles.segmentText,
                 { color: activeTab === 'ideas' ? '#FFFFFF' : theme.textMuted },
               ]}
             >
-              💡 Tips & Facts
+              Tips & Facts
             </Text>
           </Pressable>
         </View>
@@ -431,21 +479,30 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                         },
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.stepNumberText,
-                          {
-                            color: step.isCompleted ? '#FFFFFF' : theme.primary,
-                          },
-                        ]}
-                      >
-                        {step.isCompleted ? '✓' : step.stepNumber}
-                      </Text>
+                      {step.isCompleted ? (
+                        <AppIcon name="check" size={16} color="#FFFFFF" />
+                      ) : (
+                        <Text
+                          style={[
+                            styles.stepNumberText,
+                            { color: theme.primary },
+                          ]}
+                        >
+                          {step.stepNumber}
+                        </Text>
+                      )}
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={[styles.stepTitle, { color: theme.text }]}>
-                        {step.emoji} {step.title}
-                      </Text>
+                      <View style={styles.stepTitleRow}>
+                        <AppIcon
+                          name={step.emoji}
+                          size={17}
+                          color={theme.primary}
+                        />
+                        <Text style={[styles.stepTitle, { color: theme.text }]}>
+                          {step.title}
+                        </Text>
+                      </View>
                       {step.durationMinutes ? (
                         <Text style={[styles.stepMeta, { color: theme.textMuted }]}>
                           About {step.durationMinutes} min
@@ -461,13 +518,17 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
 
                 {step.tip && (
                   <View style={styles.tipBox}>
-                    <Text style={styles.tipText}>💡 {step.tip}</Text>
+                    <AppIcon name="lightbulb-on-outline" size={16} color="#92400E" />
+                    <Text style={[styles.tipText, { flex: 1 }]}>{step.tip}</Text>
                   </View>
                 )}
 
                 {step.safetyWarning && (
                   <View style={styles.warningBox}>
-                    <Text style={styles.warningText}>⚠️ {step.safetyWarning}</Text>
+                    <AppIcon name="alert-circle-outline" size={16} color="#991B1B" />
+                    <Text style={[styles.warningText, { flex: 1 }]}>
+                      {step.safetyWarning}
+                    </Text>
                   </View>
                 )}
 
@@ -480,6 +541,9 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                   ]}
                   onPress={() => handleToggleStep(step)}
                 >
+                  {step.isCompleted && (
+                    <AppIcon name="check" size={15} color={theme.success} />
+                  )}
                   <Text
                     style={[
                       styles.stepActionBtnText,
@@ -489,7 +553,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                     ]}
                   >
                     {step.isCompleted
-                      ? `✓ Step ${step.stepNumber} Done`
+                      ? `Step ${step.stepNumber} Done`
                       : `Mark Step ${step.stepNumber} Done`}
                   </Text>
                 </Pressable>
@@ -556,7 +620,9 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                       },
                     ]}
                   >
-                    {item.isChecked && <Text style={styles.checkmark}>✓</Text>}
+                    {item.isChecked && (
+                      <AppIcon name="check" size={14} color="#FFFFFF" />
+                    )}
                   </View>
 
                   <View style={{ flex: 1 }}>
@@ -591,7 +657,8 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
               style={[styles.goToStepsBtn, { backgroundColor: theme.primary }]}
               onPress={() => setActiveTab('steps')}
             >
-              <Text style={styles.goToStepsBtnText}>Go to Steps →</Text>
+              <Text style={styles.goToStepsBtnText}>Go to Steps</Text>
+              <AppIcon name="arrow-right" size={16} color="#FFFFFF" />
             </Pressable>
           </View>
         )}
@@ -611,9 +678,12 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                   },
                 ]}
               >
-                <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                  🧠 Did You Know?
-                </Text>
+                <View style={styles.sectionTitleWithIcon}>
+                  <AppIcon name="lightbulb-on-outline" size={18} color={theme.primary} />
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                    Did You Know?
+                  </Text>
+                </View>
                 <View style={styles.factsList}>
                   {funFacts.map((fact, idx) => (
                     <View key={idx} style={styles.factRow}>
@@ -637,9 +707,12 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                   },
                 ]}
               >
-                <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                  🎨 Remix & Level-Up Ideas
-                </Text>
+                <View style={styles.sectionTitleWithIcon}>
+                  <AppIcon name="palette" size={18} color={theme.primary} />
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                    Remix & Level-Up Ideas
+                  </Text>
+                </View>
                 <View style={styles.variationsList}>
                   {variations.map((v, idx) => (
                     <View
@@ -649,7 +722,12 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                         { backgroundColor: theme.surfaceSubtle },
                       ]}
                     >
-                      <Text style={styles.variationEmoji}>{v.emoji}</Text>
+                      <AppIcon
+                        name={v.emoji}
+                        size={22}
+                        color={theme.primary}
+                        style={{ marginTop: 2 }}
+                      />
                       <View style={{ flex: 1, gap: 2 }}>
                         <Text
                           style={[styles.variationTitle, { color: theme.text }]}
@@ -681,9 +759,12 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                   },
                 ]}
               >
-                <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                  🔧 Quick Fixes
-                </Text>
+                <View style={styles.sectionTitleWithIcon}>
+                  <AppIcon name="hammer-wrench" size={18} color={theme.primary} />
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                    Quick Fixes
+                  </Text>
+                </View>
                 <View style={styles.variationsList}>
                   {troubleshooting.map((item, idx) => (
                     <View
@@ -737,6 +818,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: 20,
     paddingVertical: 11,
     borderRadius: 99,
@@ -759,10 +843,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  navBackArrow: {
-    fontSize: 18,
-    fontFamily: Fonts.extraBold,
-  },
   navBackText: {
     fontSize: 15,
     fontFamily: Fonts.bold,
@@ -779,9 +859,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  favBtnEmoji: {
-    fontSize: 16,
   },
   scrollContent: {
     padding: 16,
@@ -806,9 +883,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  heroEmoji: {
-    fontSize: 32,
-  },
   heroHeaderInfo: {
     flex: 1,
     gap: 4,
@@ -817,6 +891,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: Fonts.extraBold,
     lineHeight: 26,
+  },
+  metaInlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
   },
   metaLine: {
     fontSize: 12,
@@ -834,9 +913,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 14,
     gap: 10,
-  },
-  safetyIcon: {
-    fontSize: 18,
   },
   safetyText: {
     flex: 1,
@@ -859,9 +935,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.bold,
   },
-  starsText: {
-    fontSize: 15,
-    letterSpacing: 2,
+  starsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
   },
   progressBarTrack: {
     height: 8,
@@ -894,6 +971,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   resetCraftBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: '#10B981',
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -913,6 +993,9 @@ const styles = StyleSheet.create({
   },
   segmentBtn: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 5,
     paddingVertical: 9,
     borderRadius: 12,
     alignItems: 'center',
@@ -952,7 +1035,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.extraBold,
   },
+  stepTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   stepTitle: {
+    flex: 1,
     fontSize: 16,
     fontFamily: Fonts.extraBold,
   },
@@ -967,6 +1056,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   tipBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
     backgroundColor: '#FEF9C3',
     padding: 12,
     borderRadius: 12,
@@ -978,6 +1070,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
   },
   warningBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
     backgroundColor: '#FEE2E2',
     padding: 12,
     borderRadius: 12,
@@ -989,6 +1084,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
   },
   stepActionBtn: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
     paddingVertical: 11,
     borderRadius: 12,
     alignItems: 'center',
@@ -1015,6 +1113,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  sectionTitleWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   sectionTitle: {
     fontSize: 16,
@@ -1067,6 +1170,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
   },
   goToStepsBtn: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
     paddingVertical: 13,
     borderRadius: 14,
     alignItems: 'center',

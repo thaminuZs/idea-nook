@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Fonts } from '../constants/Colors';
 import { useTheme } from '../contexts/ThemeContext';
 import { getStarterGuideRichContent } from '../db';
+import AppIcon from './AppIcon';
 
 export default function ProjectCard({ item, onPress }) {
   const { theme } = useTheme();
@@ -27,14 +28,14 @@ export default function ProjectCard({ item, onPress }) {
       accessibilityLabel={`Open DIY Guide: ${item.title}`}
     >
       <View style={styles.mainRow}>
-        {/* Project Emoji Icon */}
+        {/* Project Vector Icon */}
         <View
           style={[
             styles.iconBox,
             { backgroundColor: item.accentColor || theme.primary },
           ]}
         >
-          <Text style={styles.emoji}>{item.iconEmoji}</Text>
+          <AppIcon name={item.iconEmoji} size={28} color="#FFFFFF" />
         </View>
 
         {/* Project Details */}
@@ -45,10 +46,13 @@ export default function ProjectCard({ item, onPress }) {
             </Text>
 
             <View style={styles.statusGroup}>
-              {item.isFavorite && <Text style={styles.favIcon}>❤️</Text>}
+              {item.isFavorite && (
+                <AppIcon name="heart" size={14} color="#EF4444" />
+              )}
               {isCompleted && (
                 <View style={styles.doneBadge}>
-                  <Text style={styles.doneBadgeText}>✓ Done</Text>
+                  <AppIcon name="check" size={11} color="#047857" />
+                  <Text style={styles.doneBadgeText}>Done</Text>
                 </View>
               )}
               {isInProgress && !isCompleted && (
@@ -74,14 +78,31 @@ export default function ProjectCard({ item, onPress }) {
 
       {/* Clean Footer Row */}
       <View style={[styles.footerRow, { borderTopColor: theme.border }]}>
-        <Text style={[styles.metaText, { color: theme.textMuted }]}>
-          ⏱️ {item.estimatedMinutes}m  •  🛠️ {totalStepsCount} steps  •  Ages {item.minAge}–{item.maxAge}
-        </Text>
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
+            <AppIcon name="clock-outline" size={14} color={theme.textMuted} />
+            <Text style={[styles.metaText, { color: theme.textMuted }]}>
+              {item.estimatedMinutes}m
+            </Text>
+          </View>
+          <Text style={[styles.metaDot, { color: theme.textMuted }]}>•</Text>
+          <View style={styles.metaItem}>
+            <AppIcon name="hammer-wrench" size={13} color={theme.textMuted} />
+            <Text style={[styles.metaText, { color: theme.textMuted }]}>
+              {totalStepsCount} steps
+            </Text>
+          </View>
+          <Text style={[styles.metaDot, { color: theme.textMuted }]}>•</Text>
+          <Text style={[styles.metaText, { color: theme.textMuted }]}>
+            Ages {item.minAge}–{item.maxAge}
+          </Text>
+        </View>
 
         <View style={[styles.openPill, { backgroundColor: theme.primarySoft }]}>
           <Text style={[styles.openPillText, { color: theme.primary }]}>
-            Open →
+            Open
           </Text>
+          <AppIcon name="arrow-right" size={13} color={theme.primary} />
         </View>
       </View>
     </Pressable>
@@ -143,6 +164,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   doneBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
     backgroundColor: '#DEF7EC',
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -181,11 +205,28 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaDot: {
+    fontSize: 12,
+    fontFamily: Fonts.semiBold,
+  },
   metaText: {
     fontSize: 12,
     fontFamily: Fonts.semiBold,
   },
   openPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 99,

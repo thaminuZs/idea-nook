@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import AppIcon from '../components/AppIcon';
 import GuideDetailView from '../components/GuideDetailView';
 import OnboardingScreen from '../components/OnboardingScreen';
 import ProjectCard from '../components/ProjectCard';
@@ -59,10 +60,16 @@ export default function ProfilePage() {
 
   const genderLabel =
     profile?.gender === 'boy'
-      ? 'Boy 👦'
+      ? 'Boy'
       : profile?.gender === 'girl'
-      ? 'Girl 👧'
-      : 'Super Star ⭐';
+      ? 'Girl'
+      : 'Super Star';
+  const genderIcon =
+    profile?.gender === 'boy'
+      ? 'human-male'
+      : profile?.gender === 'girl'
+      ? 'human-female'
+      : 'star-circle';
 
   const handleReset = () => {
     if (Platform.OS === 'web') {
@@ -129,7 +136,7 @@ export default function ProfilePage() {
               { backgroundColor: theme.primarySoft },
             ]}
           >
-            <Text style={styles.avatarEmoji}>{profile.avatarEmoji}</Text>
+            <AppIcon name={profile.avatarEmoji} size={34} color={theme.primary} />
           </View>
 
           <View style={styles.heroInfo}>
@@ -153,6 +160,7 @@ export default function ProfilePage() {
                   { backgroundColor: theme.surfaceSubtle },
                 ]}
               >
+                <AppIcon name={genderIcon} size={13} color={theme.textMuted} />
                 <Text style={[styles.tagBadgeText, { color: theme.textMuted }]}>
                   {genderLabel}
                 </Text>
@@ -182,7 +190,7 @@ export default function ProfilePage() {
               { backgroundColor: theme.surface, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.statEmoji}>⭐</Text>
+            <AppIcon name="star" size={24} color="#F59E0B" />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.totalStars ?? 0}
             </Text>
@@ -197,7 +205,7 @@ export default function ProfilePage() {
               { backgroundColor: theme.surface, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.statEmoji}>🏆</Text>
+            <AppIcon name="trophy" size={24} color="#10B981" />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.completedGuides ?? 0}
             </Text>
@@ -212,7 +220,7 @@ export default function ProfilePage() {
               { backgroundColor: theme.surface, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.statEmoji}>🛠️</Text>
+            <AppIcon name="hammer-wrench" size={24} color={theme.primary} />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.inProgressGuides ?? 0}
             </Text>
@@ -227,7 +235,7 @@ export default function ProfilePage() {
               { backgroundColor: theme.surface, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.statEmoji}>❤️</Text>
+            <AppIcon name="heart" size={24} color="#EF4444" />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.favoriteGuides ?? 0}
             </Text>
@@ -378,6 +386,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   tagBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 99,

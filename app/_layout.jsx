@@ -3,6 +3,7 @@ import React, { Component, Suspense } from 'react';
 import { useFonts } from 'expo-font';
 import { router, Tabs } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
+import AppIcon from '../components/AppIcon';
 import OnboardingScreen from '../components/OnboardingScreen';
 import { Fonts } from '../constants/Colors';
 import { ProfileProvider, useProfile } from '../contexts/ProfileContext';
@@ -90,7 +91,7 @@ const Navigation = () => {
                   { backgroundColor: theme.surfaceSubtle },
                 ]}
               >
-                <Text style={styles.profileBadgeEmoji}>{profile.avatarEmoji}</Text>
+                <AppIcon name={profile.avatarEmoji} size={15} color={theme.primary} />
                 <Text style={[styles.profileBadgeText, { color: theme.text }]}>
                   {profile.name}
                 </Text>
@@ -103,9 +104,11 @@ const Navigation = () => {
                 { backgroundColor: theme.surfaceSubtle },
               ]}
             >
-              <Text style={styles.themeToggleIcon}>
-                {scheme === 'light' ? '🌙' : '☀️'}
-              </Text>
+              <AppIcon
+                name={scheme === 'light' ? 'weather-night' : 'weather-sunny'}
+                size={18}
+                color={theme.text}
+              />
             </Pressable>
           </View>
         ),
@@ -116,7 +119,9 @@ const Navigation = () => {
         options={{
           title: 'For You',
           headerTitle: 'IdeaNook',
-          tabBarIcon: () => <Text style={styles.tabIcon}>✨</Text>,
+          tabBarIcon: ({ color }) => (
+            <AppIcon name="star-four-points" size={22} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -124,7 +129,9 @@ const Navigation = () => {
         options={{
           title: 'Explore',
           headerTitle: 'Explore',
-          tabBarIcon: () => <Text style={styles.tabIcon}>🧭</Text>,
+          tabBarIcon: ({ color }) => (
+            <AppIcon name="compass-outline" size={22} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -132,7 +139,9 @@ const Navigation = () => {
         options={{
           title: 'Profile',
           headerTitle: 'Profile',
-          tabBarIcon: () => <Text style={styles.tabIcon}>👤</Text>,
+          tabBarIcon: ({ color }) => (
+            <AppIcon name="account-circle-outline" size={22} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -174,6 +183,7 @@ export default function RootLayout() {
     Montserrat_600SemiBold: require('../assets/fonts/Montserrat-SemiBold.ttf'),
     Montserrat_700Bold: require('../assets/fonts/Montserrat-Bold.ttf'),
     Montserrat_800ExtraBold: require('../assets/fonts/Montserrat-ExtraBold.ttf'),
+    MaterialCommunityIcons: require('../assets/fonts/MaterialCommunityIcons.ttf'),
   });
 
   if (!fontsLoaded && !fontError) {

@@ -9,6 +9,7 @@ import {
 import React, { useCallback, useMemo, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import AppIcon from '../components/AppIcon';
 import GuideDetailView from '../components/GuideDetailView';
 import ProjectCard from '../components/ProjectCard';
 import { Fonts } from '../constants/Colors';
@@ -128,9 +129,12 @@ const ForYouScreen = () => {
           <View style={styles.header}>
             <View style={styles.headerTopRow}>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.title, { color: theme.text }]}>
-                  Picked for {profile?.name || 'You'} ✨
-                </Text>
+                <View style={styles.titleRow}>
+                  <Text style={[styles.title, { color: theme.text }]}>
+                    Picked for {profile?.name || 'You'}
+                  </Text>
+                  <AppIcon name="star-four-points" size={20} color={theme.primary} />
+                </View>
                 <Text style={[styles.subtitle, { color: theme.textMuted }]}>
                   Age {profile?.age} • {genderLabel} • {forYouGuides.length} activities
                 </Text>
@@ -147,7 +151,7 @@ const ForYouScreen = () => {
                     },
                   ]}
                 >
-                  <Text style={styles.starIcon}>⭐</Text>
+                  <AppIcon name="star" size={16} color="#F59E0B" />
                   <Text style={[styles.starCount, { color: theme.text }]}>
                     {stats.totalStars}
                   </Text>
@@ -175,7 +179,7 @@ const ForYouScreen = () => {
                 Browse all {guides.length} projects in Explore
               </Text>
             </View>
-            <Text style={[styles.exploreArrow, { color: theme.primary }]}>→</Text>
+            <AppIcon name="arrow-right" size={20} color={theme.primary} />
           </Pressable>
         }
         renderItem={({ item }) => (
@@ -211,6 +215,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   title: {
     fontSize: 22,

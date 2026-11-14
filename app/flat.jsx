@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import AppIcon from '../components/AppIcon';
 import GuideDetailView from '../components/GuideDetailView';
 import ProjectCard from '../components/ProjectCard';
 import { Fonts } from '../constants/Colors';
@@ -18,10 +19,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import { getCategories, getGuides, seedInitialGuides } from '../db';
 
 const AUDIENCE_TABS = [
-  { id: 'all', label: 'All' },
-  { id: 'boy', label: '👦 Boys' },
-  { id: 'girl', label: '👧 Girls' },
-  { id: 'favorites', label: '❤️ Saved' },
+  { id: 'all', label: 'All', icon: null },
+  { id: 'boy', label: 'Boys', icon: 'human-male' },
+  { id: 'girl', label: 'Girls', icon: 'human-female' },
+  { id: 'favorites', label: 'Saved', icon: 'heart' },
 ];
 
 export default function ExploreScreen() {
@@ -124,7 +125,7 @@ export default function ExploreScreen() {
                 },
               ]}
             >
-              <Text style={styles.searchIcon}>🔍</Text>
+              <AppIcon name="magnify" size={18} color={theme.textMuted} />
               <TextInput
                 style={[styles.searchInput, { color: theme.text }]}
                 placeholder="Search rockets, volcano, bracelets..."
@@ -134,7 +135,7 @@ export default function ExploreScreen() {
               />
               {searchQuery.length > 0 && (
                 <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
-                  <Text style={[styles.clearText, { color: theme.textMuted }]}>✕</Text>
+                  <AppIcon name="close" size={18} color={theme.textMuted} />
                 </Pressable>
               )}
             </View>
@@ -157,6 +158,13 @@ export default function ExploreScreen() {
                       },
                     ]}
                   >
+                    {tab.icon && (
+                      <AppIcon
+                        name={tab.icon}
+                        size={14}
+                        color={isSelected ? '#FFFFFF' : theme.text}
+                      />
+                    )}
                     <Text
                       style={[
                         styles.audiencePillText,
@@ -238,7 +246,7 @@ export default function ExploreScreen() {
         }
         ListEmptyComponent={
           <View style={styles.emptyBox}>
-            <Text style={styles.emptyEmoji}>🔍</Text>
+            <AppIcon name="magnify" size={38} color={theme.textMuted} />
             <Text style={[styles.emptyTitle, { color: theme.text }]}>
               No projects found
             </Text>
@@ -312,6 +320,9 @@ const styles = StyleSheet.create({
   },
   audiencePill: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 5,
     paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1,
