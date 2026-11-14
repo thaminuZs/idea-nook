@@ -480,6 +480,29 @@ export async function resetGuideProgress(db, guideId) {
 }
 
 /**
+ * Resets all DIY projects' statuses, steps, checked materials, stars, and favorites across the entire database.
+ */
+export async function resetAllGuidesProgress(db) {
+  const nowIso = new Date().toISOString();
+
+  await db.withTransactionAsync(async () => {
+    await db.runAsync('UPDATE steps SET is_completed = 0;');
+    await db.runAsync('UPDATE materials SET is_checked = 0;');
+    await db.runAsync('UPDATE guides SET is_favorite = 0;');
+    await db.runAsync(
+      `UPDATE guide_progress
+       SET status = 'not_started',
+           current_step = 1,
+           stars_earned = 0,
+           started_at = NULL,
+           completed_at = NULL,
+           updated_at = ?;`,
+      [nowIso]
+    );
+  });
+}
+
+/**
  * Returns aggregate progress and library counts for the home dashboard.
  */
 export async function getDashboardStats(db) {

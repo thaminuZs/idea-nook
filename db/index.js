@@ -11,6 +11,7 @@ export {
   getDashboardStats,
   getGuideById,
   getGuides,
+  resetAllGuidesProgress,
   resetGuideMaterials,
   resetGuideProgress,
   setCurrentStep,

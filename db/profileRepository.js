@@ -68,8 +68,25 @@ export async function saveUserProfile(db, { name, age, gender, avatarEmoji = 'st
 }
 
 /**
- * Clears the active child profile (useful for testing the first-start flow).
+ * Clears the active child profile and resets all DIY project statuses, steps, materials, and favorites.
  */
 export async function clearUserProfile(db) {
-  await db.runAsync('DELETE FROM user_profile WHERE id = 1;');
+  const nowIso = new Date().toISOString();
+
+  await db.withTransactionAsync(async () => {
+    await db.runAsync('DELETE FROM user_profile WHERE id = 1;');
+    await db.runAsync('UPDATE steps SET is_completed = 0;');
+    await db.runAsync('UPDATE materials SET is_checked = 0;');
+    await db.runAsync('UPDATE guides SET is_favorite = 0;');
+    await db.runAsync(
+      `UPDATE guide_progress
+       SET status = 'not_started',
+           current_step = 1,
+           stars_earned = 0,
+           started_at = NULL,
+           completed_at = NULL,
+           updated_at = ?;`,
+      [nowIso]
+    );
+  });
 }

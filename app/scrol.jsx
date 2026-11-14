@@ -77,7 +77,7 @@ export default function ProfilePage() {
     } else {
       Alert.alert(
         'Reset Profile',
-        'Do you want to clear this profile and set up a new one?',
+        'Do you want to clear this profile and reset all DIY project progress?',
         [
           { text: 'Cancel', style: 'cancel' },
           {
@@ -281,7 +281,7 @@ export default function ProfilePage() {
                 Reset Profile?
               </Text>
               <Text style={[styles.confirmBody, { color: theme.textMuted }]}>
-                This will clear your current profile and open the welcome setup screen.
+                This will clear your current profile, reset all DIY project progress, and open the welcome setup screen.
               </Text>
               <View style={styles.confirmActions}>
                 <Pressable
