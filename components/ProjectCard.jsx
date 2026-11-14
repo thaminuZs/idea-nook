@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Fonts } from '../constants/Colors';
+import { getProjectImage, resolveProjectEmoji } from '../constants/ProjectImages';
 import { useTheme } from '../contexts/ThemeContext';
 import { getStarterGuideRichContent } from '../db';
 import AppIcon from './AppIcon';
@@ -12,6 +13,8 @@ export default function ProjectCard({ item, onPress }) {
   const isInProgress = item.status === 'in_progress';
   const richInfo = getStarterGuideRichContent(item.slug);
   const totalStepsCount = item.totalSteps || richInfo?.steps?.length || 5;
+  const projectEmoji = resolveProjectEmoji(item.iconEmoji, item.slug);
+  const outcomeImage = getProjectImage(item.slug);
 
   return (
     <Pressable
@@ -27,22 +30,46 @@ export default function ProjectCard({ item, onPress }) {
       accessibilityRole="button"
       accessibilityLabel={`Open DIY Guide: ${item.title}`}
     >
-      <View style={styles.mainRow}>
-        {/* Project Vector Icon */}
-        <View
-          style={[
-            styles.iconBox,
-            { backgroundColor: item.accentColor || theme.primary },
-          ]}
-        >
-          <AppIcon name={item.iconEmoji} size={28} color="#FFFFFF" />
+      {/* Final Outcome Image Banner */}
+      {outcomeImage && (
+        <View style={styles.imageBannerWrapper}>
+          <Image
+            source={outcomeImage}
+            style={styles.outcomeImage}
+            resizeMode="cover"
+          />
+          <View
+            style={[
+              styles.floatingEmojiBadge,
+              { backgroundColor: item.accentColor || theme.primary },
+            ]}
+          >
+            <Text style={styles.emoji}>{projectEmoji}</Text>
+          </View>
+          <View style={styles.outcomeTag}>
+            <Text style={styles.outcomeTagText}>Final Outcome</Text>
+          </View>
         </View>
+      )}
+
+      <View style={styles.mainRow}>
+        {/* Fallback Emoji Box if custom guide has no image */}
+        {!outcomeImage && (
+          <View
+            style={[
+              styles.iconBox,
+              { backgroundColor: item.accentColor || theme.primary },
+            ]}
+          >
+            <Text style={styles.emoji}>{projectEmoji}</Text>
+          </View>
+        )}
 
         {/* Project Details */}
         <View style={styles.body}>
           <View style={styles.eyebrowRow}>
             <Text style={[styles.categoryText, { color: theme.primary }]}>
-              {item.category}
+              {outcomeImage ? `${projectEmoji}  ${item.category}` : item.category}
             </Text>
 
             <View style={styles.statusGroup}>
@@ -112,9 +139,9 @@ export default function ProjectCard({ item, onPress }) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
-    padding: 16,
+    padding: 14,
     borderWidth: 1,
-    gap: 14,
+    gap: 12,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -122,8 +149,50 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   cardPressed: {
-    opacity: 0.9,
+    opacity: 0.92,
     transform: [{ scale: 0.99 }],
+  },
+  imageBannerWrapper: {
+    width: '100%',
+    height: 156,
+    borderRadius: 14,
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: '#E2E8F0',
+  },
+  outcomeImage: {
+    width: '100%',
+    height: '100%',
+  },
+  floatingEmojiBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  outcomeTag: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: 'rgba(15, 23, 42, 0.72)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 99,
+  },
+  outcomeTagText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontFamily: Fonts.bold,
+    letterSpacing: 0.3,
   },
   mainRow: {
     flexDirection: 'row',
@@ -138,7 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emoji: {
-    fontSize: 28,
+    fontSize: 22,
   },
   body: {
     flex: 1,
@@ -159,9 +228,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-  },
-  favIcon: {
-    fontSize: 12,
   },
   doneBadge: {
     flexDirection: 'row',

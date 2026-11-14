@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -11,6 +12,7 @@ import {
 } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Fonts } from '../constants/Colors';
+import { getProjectImage, resolveProjectEmoji } from '../constants/ProjectImages';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
 import {
@@ -205,8 +207,10 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const materialsList = guide.materials || [];
   const stepsList = (guide.steps || []).map((step, index) => ({
     ...step,
-    emoji: richContent.steps?.[index]?.emoji || 'hammer-wrench',
+    emoji: richContent.steps?.[index]?.emoji || '🛠️',
   }));
+  const projectEmoji = resolveProjectEmoji(guide.iconEmoji, guide.slug);
+  const outcomeImage = getProjectImage(guide.slug);
 
   const checkedMaterialsCount = materialsList.filter((m) => m.isChecked).length;
   const progressPercent =
@@ -267,6 +271,21 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             },
           ]}
         >
+          {outcomeImage && (
+            <View style={styles.heroImageWrapper}>
+              <Image
+                source={outcomeImage}
+                style={styles.heroOutcomeImage}
+                resizeMode="cover"
+              />
+              <View style={styles.heroOutcomeBadge}>
+                <Text style={styles.heroOutcomeBadgeText}>
+                  {projectEmoji} Final Outcome
+                </Text>
+              </View>
+            </View>
+          )}
+
           <View style={styles.heroHeaderRow}>
             <View
               style={[
@@ -274,7 +293,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                 { backgroundColor: guide.accentColor || theme.primary },
               ]}
             >
-              <AppIcon name={guide.iconEmoji} size={34} color="#FFFFFF" />
+              <Text style={styles.heroEmoji}>{projectEmoji}</Text>
             </View>
 
             <View style={styles.heroHeaderInfo}>
@@ -493,16 +512,9 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                       )}
                     </View>
                     <View style={{ flex: 1 }}>
-                      <View style={styles.stepTitleRow}>
-                        <AppIcon
-                          name={step.emoji}
-                          size={17}
-                          color={theme.primary}
-                        />
-                        <Text style={[styles.stepTitle, { color: theme.text }]}>
-                          {step.title}
-                        </Text>
-                      </View>
+                      <Text style={[styles.stepTitle, { color: theme.text }]}>
+                        {step.emoji} {step.title}
+                      </Text>
                       {step.durationMinutes ? (
                         <Text style={[styles.stepMeta, { color: theme.textMuted }]}>
                           About {step.durationMinutes} min
@@ -722,12 +734,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                         { backgroundColor: theme.surfaceSubtle },
                       ]}
                     >
-                      <AppIcon
-                        name={v.emoji}
-                        size={22}
-                        color={theme.primary}
-                        style={{ marginTop: 2 }}
-                      />
+                      <Text style={styles.variationEmoji}>{v.emoji}</Text>
                       <View style={{ flex: 1, gap: 2 }}>
                         <Text
                           style={[styles.variationTitle, { color: theme.text }]}
@@ -871,6 +878,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 14,
   },
+  heroImageWrapper: {
+    width: '100%',
+    height: 210,
+    borderRadius: 16,
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: '#E2E8F0',
+  },
+  heroOutcomeImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOutcomeBadge: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: 'rgba(15, 23, 42, 0.78)',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 99,
+  },
+  heroOutcomeBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontFamily: Fonts.bold,
+  },
   heroHeaderRow: {
     flexDirection: 'row',
     gap: 14,
@@ -882,6 +915,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  heroEmoji: {
+    fontSize: 30,
   },
   heroHeaderInfo: {
     flex: 1,

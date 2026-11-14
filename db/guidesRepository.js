@@ -103,7 +103,7 @@ export async function insertGuideRecord(db, guideData, { isCustom = false } = {}
       guideData.estimatedMinutes ?? 15,
       guideData.adultSupervision ? 1 : 0,
       guideData.safetyNote ?? null,
-      guideData.iconEmoji ?? 'palette',
+      guideData.iconEmoji ?? '🎨',
       guideData.accentColor ?? '#FF8A65',
       genderTarget,
       guideData.isFavorite ? 1 : 0,

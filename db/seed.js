@@ -17,7 +17,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 20,
     adultSupervision: false,
     safetyNote: 'Use rounded kid-safe scissors when cutting paper shapes.',
-    iconEmoji: 'rocket-launch',
+    iconEmoji: '🚀',
     accentColor: '#FF7043',
     genderTarget: 'all',
     skills: ['Space Design', 'Scissor Control', '3D Shapes', 'Creative Decorating'],
@@ -28,17 +28,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'rocket-launch-outline',
+        emoji: '🛸',
         title: 'Glow-in-the-Dark Star Cruiser',
         description: 'Add glow-in-the-dark star stickers or neon highlighter windows so your rocket shines when bedroom lights go out!',
       },
       {
-        emoji: 'account-circle',
+        emoji: '🧑‍🚀',
         title: 'Astronaut Crew Porthole',
         description: 'Cut out a small photo of yourself or draw your pet and glue it inside a round paper window frame on the rocket body.',
       },
       {
-        emoji: 'needle',
+        emoji: '🧵',
         title: 'Zip-Line Flying Rocket',
         description: 'Tape a piece of drinking straw along the side of your rocket, thread a long string through it across your room, and let it zoom down the line!',
       },
@@ -63,7 +63,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'layers-triple',
+        emoji: '📜',
         title: 'Wrap the rocket fuselage body',
         instruction:
           'Measure and cut a rectangle of construction paper tall enough to cover your cardboard tube. Spread glue across the paper, wrap it tightly around the tube, and press the seam flat.',
@@ -71,7 +71,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 4,
       },
       {
-        emoji: 'triangle',
+        emoji: '🔺',
         title: 'Shape the aerodynamic nose cone',
         instruction:
           'Trace a small bowl on contrasting paper and cut out the circle. Cut one straight slit from the outer edge to the center point, overlap the cut edges until it forms a pointed cone, and tape it shut.',
@@ -79,21 +79,21 @@ export const STARTER_GUIDES = [
         durationMinutes: 5,
       },
       {
-        emoji: 'hammer-wrench',
+        emoji: '🛠️',
         title: 'Attach the nose cone and stabilizer fins',
         instruction:
           'Add four small loops of tape inside the top rim of your tube and press the nose cone on top. Next, cut 3 matching triangles from stiff paper and tape them evenly around the base as fins.',
         durationMinutes: 5,
       },
       {
-        emoji: 'fire',
+        emoji: '🔥',
         title: 'Install the fiery thruster flames',
         instruction:
           'Cut strips of red, orange, and yellow tissue paper. Glue or tape the tips of the strips around the inside rim of the bottom opening so they hang down like roaring rocket exhaust.',
         durationMinutes: 3,
       },
       {
-        emoji: 'star-four-points',
+        emoji: '🌟',
         title: 'Add astronaut windows and blast off!',
         instruction:
           'Draw circular porthole windows, rivets, planet emblems, and your rocket’s name along the side. Wave your rocket through the air to make the tissue flames dance—3, 2, 1, BLAST OFF!',
@@ -115,7 +115,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 15,
     adultSupervision: true,
     safetyNote: 'Ask a grown-up to help set up on a tray and keep vinegar away from eyes.',
-    iconEmoji: 'flask',
+    iconEmoji: '🌋',
     accentColor: '#EF5350',
     genderTarget: 'all',
     skills: ['Kitchen Chemistry', 'Measuring & Mixing', 'Scientific Observation'],
@@ -126,17 +126,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'looks',
+        emoji: '🌈',
         title: 'Rainbow Lava Eruption',
         description: 'Line up 4 small cups side-by-side with red, yellow, green, and blue food coloring, then pour vinegar across all of them at once!',
       },
       {
-        emoji: 'snowflake',
+        emoji: '❄️',
         title: 'Frozen Snow Volcano',
         description: 'Take your cup outside in the snow or pack crushed ice around the cup in a tray to build a realistic snowy mountain peak!',
       },
       {
-        emoji: 'flask',
+        emoji: '🍋',
         title: 'Lemon Juice Citrus Eruption',
         description: 'Test squeezing fresh lemon or lime juice instead of vinegar and compare which acid makes the biggest foam bubbles!',
       },
@@ -161,7 +161,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'tune-variant',
+        emoji: '🍽️',
         title: 'Set up your volcano containment tray',
         instruction:
           'Place your empty cup right in the center of a rimmed baking tray or large shallow dish. This catches all the foamy lava so clean-up is super easy.',
@@ -169,14 +169,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 2,
       },
       {
-        emoji: 'silverware-spoon',
+        emoji: '🥄',
         title: 'Load the volcano chamber with baking soda',
         instruction:
           'Spoon 2 to 3 tablespoons of baking soda into the bottom of your cup. Gently shake the cup so the powder settles evenly.',
         durationMinutes: 2,
       },
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Swirl in dish soap and lava color',
         instruction:
           'Add one squirt of liquid dish soap and 4–5 drops of red or orange food coloring directly on top of the baking soda.',
@@ -184,7 +184,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 2,
       },
       {
-        emoji: 'flare',
+        emoji: '💥',
         title: 'Pour the vinegar and watch it erupt!',
         instruction:
           'Pour the vinegar steadily into the cup and step back! Within one second, foamy red lava will rise up the cup and cascade down the sides.',
@@ -192,7 +192,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 4,
       },
       {
-        emoji: 'magnify',
+        emoji: '🔍',
         title: 'Test a second aftershock eruption',
         instruction:
           'Listen closely to the popping fizz sound! Once the foam slows down, stir the bottom of the cup with a stick and splash in a bit more vinegar to trigger a second eruption.',
@@ -213,7 +213,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 15,
     adultSupervision: true,
     safetyNote: 'Have a grown-up handle warm water and glue the bottle cap tightly shut.',
-    iconEmoji: 'looks',
+    iconEmoji: '🌈',
     accentColor: '#AB47BC',
     genderTarget: 'all',
     skills: ['Mindfulness & Focus', 'Liquid Density', 'Color & Light Play'],
@@ -224,17 +224,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'weather-night',
+        emoji: '🌌',
         title: 'Deep Space Nebula Bottle',
         description: 'Use 1 drop of blue and 1 drop of purple food coloring with silver star confetti for a swirling night-sky galaxy.',
       },
       {
-        emoji: 'water',
+        emoji: '💧',
         title: 'Ocean Treasure Hunt Jar',
         description: 'Drop in small plastic sea shells, pony beads, or a tiny plastic fish and watch it swim through blue sparkle water!',
       },
       {
-        emoji: 'weather-sunny',
+        emoji: '☀️',
         title: 'Golden Sunshine Bottle',
         description: 'Use yellow food coloring with gold and orange glitter for a warm, sunny morning glow.',
       },
@@ -259,7 +259,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'water',
+        emoji: '💧',
         title: 'Pour warm water halfway up',
         instruction:
           'Peel any paper labels off your clean plastic bottle. Ask a grown-up to help fill the bottle halfway with warm tap water.',
@@ -267,7 +267,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 2,
       },
       {
-        emoji: 'eyedropper',
+        emoji: '🧴',
         title: 'Whisk in the clear glue',
         instruction:
           'Squeeze the clear glue into the warm water. Screw the cap on, shake vigorously for 20 seconds until the glue dissolves completely into the water.',
@@ -275,14 +275,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 4,
       },
       {
-        emoji: 'auto-fix',
+        emoji: '✨',
         title: 'Pour in rainbow glitter and sequins',
         instruction:
           'Unscrew the cap and funnel in 2 tablespoons of fine glitter, star sequins, and 1 drop of food coloring. Keep the coloring light so the sparkles shine bright!',
         durationMinutes: 3,
       },
       {
-        emoji: 'check',
+        emoji: '🔒',
         title: 'Top off with water and seal the lid',
         instruction:
           'Fill the bottle almost to the top with warm water, leaving 2 cm of air space. Have an adult glue or wrap strong tape around the cap so it stays permanently sealed.',
@@ -290,7 +290,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: 'weather-sunny',
+        emoji: '☀️',
         title: 'Swirl, watch, and take 3 calm breaths',
         instruction:
           'Turn the bottle upside down and give it a big spin! Set it on a table and take slow, deep belly breaths until the very last sparkle lands on the bottom.',
@@ -311,7 +311,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 25,
     adultSupervision: false,
     safetyNote: 'Only pick up fallen leaves from the ground and wash hands afterward.',
-    iconEmoji: 'leaf',
+    iconEmoji: '🍃',
     accentColor: '#66BB6A',
     genderTarget: 'all',
     skills: ['Nature Exploration', 'Shape Recognition', 'Woodland Art'],
@@ -322,17 +322,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'flower',
+        emoji: '🌸',
         title: 'Symmetrical Leaf Butterfly',
         description: 'Pick two matching wide leaves for top wings, two smaller leaves for bottom wings, and a thin twig for the body!',
       },
       {
-        emoji: 'paw',
+        emoji: '🐾',
         title: 'Golden Leaf Mane Lion',
         description: 'Draw a friendly lion face in the middle of your paper and glue a ring of yellow and orange leaves all around it for a wild mane.',
       },
       {
-        emoji: 'lead-pencil',
+        emoji: '🖍️',
         title: 'Leaf Vein Crayon Rubbings',
         description: 'Place an extra sheet of thin paper over your leaves and rub the side of a peeled crayon across it to reveal the hidden leaf veins!',
       },
@@ -357,7 +357,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'bag-personal',
+        emoji: '🧺',
         title: 'Go on a nature leaf treasure hunt',
         instruction:
           'Walk through a yard or park and gather fallen dry leaves in different sizes: round leaves make great bodies, pointy leaves become fox ears or bird beaks, and tiny leaves make paws!',
@@ -365,28 +365,28 @@ export const STARTER_GUIDES = [
         durationMinutes: 8,
       },
       {
-        emoji: 'layers-triple',
+        emoji: '📜',
         title: 'Press curly leaves flat',
         instruction:
           'Place your collected leaves between two sheets of paper towel and press them under a heavy book for 5 minutes so they lie nice and flat.',
         durationMinutes: 5,
       },
       {
-        emoji: 'paw',
+        emoji: '🐾',
         title: 'Test-fit your animal puzzle',
         instruction:
           'Lay your leaves onto the paper without glue first! Try arranging an owl on a branch, a swimming fish with leafy fins, or a playful woodland fox.',
         durationMinutes: 5,
       },
       {
-        emoji: 'water',
+        emoji: '💧',
         title: 'Glue each leaf into place',
         instruction:
           'Lift one leaf at a time, dot glue onto the back center, and press it gently onto your paper for 10 seconds.',
         durationMinutes: 4,
       },
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Draw faces, legs, and forest scenery',
         instruction:
           'Add googly eyes or draw expressive eyes, whiskers, bird legs, tree branches, and clouds with your markers to bring your nature scene to life!',
@@ -407,7 +407,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 30,
     adultSupervision: true,
     safetyNote: 'Ask a grown-up to cut the window opening in the carton with scissors or a craft knife.',
-    iconEmoji: 'bird',
+    iconEmoji: '🐦',
     accentColor: '#29B6F6',
     genderTarget: 'all',
     skills: ['Upcycling & Eco-Craft', 'Wildlife Observation', 'Structural Building'],
@@ -418,17 +418,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'pine-tree',
+        emoji: '🪵',
         title: 'Bark & Twig Cottage Roof',
         description: 'Glue small flat twigs or pine cones along the sloped top of the carton so it looks like a miniature log cabin!',
       },
       {
-        emoji: 'pencil',
+        emoji: '✏️',
         title: 'Birdwatcher Spotter Journal',
         description: 'Keep a small notebook by the window and sketch every different colored bird that visits your feeder during the week.',
       },
       {
-        emoji: 'food-apple',
+        emoji: '🍎',
         title: 'Fruit & Berry Treat Bar',
         description: 'Add a few dried cranberries, apple dices, or unsalted sunflower seeds to attract different species of backyard birds.',
       },
@@ -453,14 +453,14 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'water-outline',
+        emoji: '🧼',
         title: 'Wash and dry your carton thoroughly',
         instruction:
           'Rinse the empty milk or juice carton with warm soapy water, shake out excess drops, and let it dry so the birdseed stays dry and fresh.',
         durationMinutes: 4,
       },
       {
-        emoji: 'ruler-square',
+        emoji: '📐',
         title: 'Cut the dining window opening',
         instruction:
           'Use a marker to draw a large arched window on one or two sides of the carton, leaving a 4 cm deep tray wall at the bottom. Ask an adult to cut out the window.',
@@ -468,14 +468,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 6,
       },
       {
-        emoji: 'pine-tree',
+        emoji: '🪵',
         title: 'Push through the wooden bird perch',
         instruction:
           'Poke a small hole centered 1.5 cm below the window opening. Push your wooden stick, pencil, or twig through so 6 cm sticks out in front as a landing perch.',
         durationMinutes: 4,
       },
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Decorate the birdhouse exterior',
         instruction:
           'Decorate the outside walls and roof with colorful duct tape, weatherproof stickers, or acrylic paint. Draw roof shingles and flowers!',
@@ -483,14 +483,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 8,
       },
       {
-        emoji: 'all-inclusive',
+        emoji: '🧶',
         title: 'Thread the hanging loop',
         instruction:
           'Punch a hole through the top ridge of the carton roof, thread your strong twine through, and tie a double overhand knot.',
         durationMinutes: 4,
       },
       {
-        emoji: 'flower',
+        emoji: '🌸',
         title: 'Fill with seeds and hang outdoors!',
         instruction:
           'Pour 1 cup of birdseed into the bottom tray and hang your feeder on a quiet tree branch visible from your window. Watch for your first feathered guest!',
@@ -511,7 +511,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 15,
     adultSupervision: false,
     safetyNote: 'Press creases firmly with your finger tip—no sharp tools needed!',
-    iconEmoji: 'star-four-points',
+    iconEmoji: '🐸',
     accentColor: '#26A69A',
     genderTarget: 'all',
     skills: ['Geometry & Symmetry', 'Fine Finger Dexterity', 'Spring Mechanics'],
@@ -522,17 +522,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'flag-checkered',
+        emoji: '🏁',
         title: 'Lily Pad Long-Jump Olympics',
         description: 'Cut green paper circles as lily pads, space them across the floor, and see how many hops it takes your frog to land on each pad!',
       },
       {
-        emoji: 'crown',
+        emoji: '👑',
         title: 'Mini vs. Giant Frog Family',
         description: 'Fold one frog from a 20 cm square and a tiny baby frog from a 7 cm sticky note—see which one jumps higher!',
       },
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Poison Dart Spotted Frog',
         description: 'Use bright blue or yellow paper and decorate the back with neon polka dots and racing stripes.',
       },
@@ -554,14 +554,14 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'file-outline',
+        emoji: '📄',
         title: 'Fold the square into a rectangle',
         instruction:
           'Lay your square paper flat on the table. Fold it in half from left to right so the corners line up evenly, then press firmly along the fold with your finger.',
         durationMinutes: 2,
       },
       {
-        emoji: 'scissors-cutting',
+        emoji: '✖️',
         title: 'Crease the diagonal X lines',
         instruction:
           'Fold the top-left corner down to touch the right edge, crease sharply, and unfold. Repeat with the top-right corner down to the left edge and unfold to reveal an X crease.',
@@ -569,28 +569,28 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: 'triangle',
+        emoji: '🔺',
         title: 'Pinch the sides into a waterbomb triangle',
         instruction:
           'Gently push the left and right sides of the X crease inward toward the middle, flattening the top roof down into a layered triangle.',
         durationMinutes: 3,
       },
       {
-        emoji: 'paw',
+        emoji: '🐾',
         title: 'Fold the front legs and narrow the body',
         instruction:
           'Fold the two bottom corners of the triangle upward at a slight outward angle to create two front frog legs. Then fold the left and right sides of the lower rectangle inward to meet at the center line.',
         durationMinutes: 3,
       },
       {
-        emoji: 'pulse',
+        emoji: '〰️',
         title: 'Create the Z-spring back legs',
         instruction:
           'Fold the bottom edge all the way up to the base of the front legs. Then fold half of that section back downward like an accordion zig-zag—this is your frog’s jumping spring!',
         durationMinutes: 2,
       },
       {
-        emoji: 'star-four-points',
+        emoji: '🌟',
         title: 'Draw eyes and launch your frog!',
         instruction:
           'Flip your frog right-side up, draw two big smiling eyes and spots on its back. Press your index finger down on the back fold and let it slip off the edge—BOING!',
@@ -616,7 +616,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 25,
     adultSupervision: true,
     safetyNote: 'Ask a grown-up to help punch center holes in the bottle cap wheels.',
-    iconEmoji: 'car-sports',
+    iconEmoji: '🏎️',
     accentColor: '#3B82F6',
     genderTarget: 'boy',
     skills: ['Mechanical Engineering', 'Kinetic Energy', 'Axle & Wheel Physics'],
@@ -627,17 +627,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'tire',
+        emoji: '🛞',
         title: 'High-Traction Rubber Tires',
         description: 'Stretch thick rubber bands around the outside rim of the two back bottle caps so they grip smooth tile or wood floors without spinning out!',
       },
       {
-        emoji: 'bird',
+        emoji: '🦅',
         title: 'Downforce Racing Spoiler Wing',
         description: 'Fold a cool angled paper wing and glue it onto the back trunk of your race car just like a Formula 1 racer.',
       },
       {
-        emoji: 'ruler-square',
+        emoji: '📐',
         title: 'Distance Championship Track',
         description: 'Use masking tape to mark 1-meter, 2-meter, and 3-meter finish lines on the hallway floor and test how many winds go the farthest!',
       },
@@ -663,7 +663,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'ruler-square',
+        emoji: '📐',
         title: 'Mount the straw axle bearings',
         instruction:
           'Cut two pieces of drinking straw slightly wider than your cardboard body. Tape one straw straight across the front underside and one across the back underside.',
@@ -671,7 +671,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 5,
       },
       {
-        emoji: 'tire',
+        emoji: '🛞',
         title: 'Slide in the axles and mount the 4 wheels',
         instruction:
           'Thread a wooden skewer through each straw. Have an adult poke a snug center hole in all 4 bottle caps, then press a cap onto each end of the skewers.',
@@ -679,7 +679,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 6,
       },
       {
-        emoji: 'all-inclusive',
+        emoji: '🧶',
         title: 'Hook up the rubber band drive shaft',
         instruction:
           'Cut a small notch or window near the back axle so you can reach the wooden skewer. Loop a rubber band tightly around the middle of the rear skewer and tape the front end of the rubber band to the nose of the car.',
@@ -687,14 +687,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 5,
       },
       {
-        emoji: 'fire',
+        emoji: '🔥',
         title: 'Add racing numbers and flame decals',
         instruction:
           'Flip your racer over and decorate the hood and sides with your favorite racing number, lightning bolts, flames, and a driver cockpit.',
         durationMinutes: 5,
       },
       {
-        emoji: 'flag-checkered',
+        emoji: '🏁',
         title: 'Wind the rear axle and race!',
         instruction:
           'Turn the back wheels backward 6–8 times so the rubber band winds tightly around the rear skewer. Hold the wheels, set the car on the floor, and let go—ZOOM!',
@@ -715,7 +715,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 30,
     adultSupervision: false,
     safetyNote: 'Work on a flat table and keep small marbles away from children under 3.',
-    iconEmoji: 'gamepad-variant',
+    iconEmoji: '🕹️',
     accentColor: '#F59E0B',
     genderTarget: 'boy',
     skills: ['Level Design & Logic', 'Hand-Eye Coordination', 'Measuring & Layout'],
@@ -726,17 +726,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'layers-triple',
+        emoji: '📜',
         title: 'Cardboard Arch Tunnels',
         description: 'Bend 3 cm strips of paper into U-shaped arches and tape them over paths as secret bridges the marble rolls under!',
       },
       {
-        emoji: 'clock-outline',
+        emoji: '⏱️',
         title: 'Speed-Run Time Trial Mode',
         description: 'Number 5 checkpoints (1 to 5) around the board and time yourself to see how fast you can hit all 5 in order!',
       },
       {
-        emoji: 'circle',
+        emoji: '🔴',
         title: 'Double-Marble Chaos Challenge',
         description: 'Drop TWO marbles into the Start zone at the same time and try to guide both to the Finish star!',
       },
@@ -761,7 +761,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'pencil',
+        emoji: '✏️',
         title: 'Blueprint your maze floor plan',
         instruction:
           'Use a pencil to draw a winding route from the top-left "START" corner to the bottom-right "FINISH" corner. Add 3 or 4 dead-end branches to make the puzzle challenging!',
@@ -769,28 +769,28 @@ export const STARTER_GUIDES = [
         durationMinutes: 6,
       },
       {
-        emoji: 'content-cut',
+        emoji: '✂️',
         title: 'Cut the labyrinth wall segments',
         instruction:
           'Cut cardboard strips (about 2 cm tall) or drinking straws to match the lengths of the lines on your blueprint.',
         durationMinutes: 6,
       },
       {
-        emoji: 'layers-triple',
+        emoji: '📜',
         title: 'Glue the maze walls upright',
         instruction:
           'Run a bead of glue along the bottom edge of each wall strip (or straw) and press it firmly onto your pencil lines. Let dry for 5 minutes.',
         durationMinutes: 8,
       },
       {
-        emoji: 'circle-double',
+        emoji: '🕳️',
         title: 'Add hazard zones and bonus arches',
         instruction:
           'Draw red "DANGER LAVA" circles in dead ends (or ask an adult to cut coin-sized trapdoor holes), and tape a paper arch bridge over the main path!',
         durationMinutes: 5,
       },
       {
-        emoji: 'trophy',
+        emoji: '🏆',
         title: 'Tilt, steer, and conquer the labyrinth!',
         instruction:
           'Place your marble on START, grip both sides of the box lid, and gently tilt in all directions to navigate every corner and reach the FINISH star!',
@@ -811,7 +811,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 15,
     adultSupervision: false,
     safetyNote: 'Snip the corners of the cardboard slightly so they are rounded and comfortable.',
-    iconEmoji: 'lightning-bolt',
+    iconEmoji: '⚡',
     accentColor: '#EF4444',
     genderTarget: 'boy',
     skills: ['Costume Design', 'Pattern Cutting', 'Imaginative Roleplay'],
@@ -822,17 +822,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'robot',
+        emoji: '🤖',
         title: 'Cyber-Robot Control Gauntlets',
         description: 'Wrap one cuff in kitchen aluminum foil and draw digital radar screens, buttons, and power meters with permanent markers!',
       },
       {
-        emoji: 'shield-star',
+        emoji: '🛡️',
         title: 'Pop-Out Energy Shield',
         description: 'Cut a 12 cm cardboard octagon shield and tape it to the outside of one cuff so you can block imaginary laser beams!',
       },
       {
-        emoji: 'bone',
+        emoji: '🦖',
         title: 'Dino-Ranger Tracker Cuffs',
         description: 'Use green and brown paper, draw a dinosaur claw emblem, and add a compass drawing on the wrist.',
       },
@@ -857,28 +857,28 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'content-cut',
+        emoji: '✂️',
         title: 'Cut the snap-on wrist opening',
         instruction:
           'Use your scissors to make one straight cut lengthwise from top to bottom on both cardboard rolls so they can open up like a bracelet.',
         durationMinutes: 3,
       },
       {
-        emoji: 'shimmer',
+        emoji: '✨',
         title: 'Round off the four corners',
         instruction:
           'Snip a gentle curve on the four corners along the cut slit so the cuffs feel smooth and comfortable against your arms.',
         durationMinutes: 2,
       },
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Wrap in heroic armor colors',
         instruction:
           'Glue bright construction paper or shiny aluminum foil around the outside of each tube, tucking the edges neatly inside.',
         durationMinutes: 4,
       },
       {
-        emoji: 'lightning-bolt',
+        emoji: '⚡',
         title: 'Craft your signature power emblem',
         instruction:
           'Cut bold lightning bolts, stars, flames, or your superhero initial from yellow or gold paper. Layer it over a contrasting circle badge.',
@@ -886,7 +886,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: 'shield-star',
+        emoji: '🛡️',
         title: 'Glue badges and power up!',
         instruction:
           'Glue your emblems centered on the front of each cuff. Slip them onto your wrists, cross your arms in a hero salute, and embark on your adventure!',
@@ -907,7 +907,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 20,
     adultSupervision: true,
     safetyNote: 'Adult supervision needed for baking. Salt dough is for craft play, not for eating.',
-    iconEmoji: 'bone',
+    iconEmoji: '🦖',
     accentColor: '#10B981',
     genderTarget: 'boy',
     skills: ['Paleontology & Earth Science', 'Dough Kneading', 'Fossil Imprinting'],
@@ -918,17 +918,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Sandbox Excavation Dig Site',
         description: 'Hide your hardened fossils in a tray of sand or cornmeal and use an old paintbrush to carefully uncover them like a real paleontologist!',
       },
       {
-        emoji: 'star-four-points',
+        emoji: '🌟',
         title: 'Prehistoric Sea Shell & Ammonite Stones',
         description: 'Press spiral seashells, pasta wheels, or fern leaves into the dough to create ancient ocean fossils.',
       },
       {
-        emoji: 'flask',
+        emoji: '🍋',
         title: 'Ancient Rock Coffee-Wash Finish',
         description: 'Mix a drop of brown paint (or instant coffee) with water and brush it into the footprint grooves so they look millions of years old!',
       },
@@ -953,7 +953,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'bowl-mix',
+        emoji: '🥣',
         title: 'Knead the prehistoric stone dough',
         instruction:
           'Combine 1 cup of flour and 1/2 cup of salt in a bowl. Pour in warm water a little at a time while mixing and kneading with your hands for 3 minutes until smooth like playdough.',
@@ -961,21 +961,21 @@ export const STARTER_GUIDES = [
         durationMinutes: 5,
       },
       {
-        emoji: 'circle-slice-8',
+        emoji: '🪨',
         title: 'Flatten into ancient rock slabs',
         instruction:
           'Roll the dough into 4 or 5 balls and press them flat onto parchment paper with the palm of your hand until they are about 1 cm thick with rough, natural rock edges.',
         durationMinutes: 4,
       },
       {
-        emoji: 'paw',
+        emoji: '🐾',
         title: 'Stamp dinosaur tracks and scales',
         instruction:
           'Press your toy dinosaur’s feet, tail, or side body firmly into the dough slabs, then lift straight up to reveal a deep, detailed fossil imprint!',
         durationMinutes: 5,
       },
       {
-        emoji: 'fire',
+        emoji: '🔥',
         title: 'Harden into stone (bake or air-dry)',
         instruction:
           'Have an adult bake the stones at 100°C (200°F) for 2 hours until hard, OR leave them on a sunny windowsill for 2–3 days to air-dry naturally.',
@@ -983,7 +983,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: 'magnify',
+        emoji: '🔍',
         title: 'Antiquing wash and museum display!',
         instruction:
           'Brush a little watered-down brown paint into the footprint indents and wipe the top surface with a paper towel. Create museum labels with each dinosaur’s name!',
@@ -1008,7 +1008,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 20,
     adultSupervision: true,
     safetyNote: 'Use battery-operated LED tea lights only. Never use real burning candles with tissue paper.',
-    iconEmoji: 'butterfly',
+    iconEmoji: '🧚',
     accentColor: '#EC4899',
     genderTarget: 'girl',
     skills: ['Stained-Glass Decoupage', 'Light & Shadow Art', 'Decorative Styling'],
@@ -1019,17 +1019,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'auto-fix',
+        emoji: '✨',
         title: 'Unicorn & Rainbow Cloud Lantern',
         description: 'Cut a prancing unicorn silhouette from black paper and surround it with rainbow-striped tissue squares.',
       },
       {
-        emoji: 'sprout',
+        emoji: '🌿',
         title: 'Pressed Flower Botanical Jar',
         description: 'Glue real small pressed daisy petals and fern leaves between layers of white tissue paper for a nature cottage lantern.',
       },
       {
-        emoji: 'weather-night',
+        emoji: '🌌',
         title: 'Starry Moonbeam Nightlight',
         description: 'Use deep blue and violet tissue paper with gold star confetti and a crescent moon cutout.',
       },
@@ -1055,21 +1055,21 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'butterfly',
+        emoji: '🧚',
         title: 'Glue the fairy silhouette to the jar',
         instruction:
           'Draw and cut out a small 5 cm fairy or butterfly shape from black or dark paper. Dab glue onto the center of your clean jar and press the silhouette flat against the glass.',
         durationMinutes: 3,
       },
       {
-        emoji: 'flower',
+        emoji: '🌸',
         title: 'Tear pastel tissue mosaic squares',
         instruction:
           'Tear or cut your pink, purple, yellow, and blue tissue paper into small 2–3 cm pieces. Tearing by hand gives soft feathery edges that blend beautifully!',
         durationMinutes: 4,
       },
       {
-        emoji: 'palette',
+        emoji: '🎨',
         title: 'Layer the stained-glass coat',
         instruction:
           'Brush a thin layer of watered-down glue onto a section of the jar, press tissue squares onto the wet glue, and gently brush a little more glue on top to seal.',
@@ -1077,14 +1077,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 6,
       },
       {
-        emoji: 'auto-fix',
+        emoji: '✨',
         title: 'Dust with pixie sparkle',
         instruction:
           'While the outer coat of glue is still slightly damp, sprinkle a pinch of fine glitter around the jar so it shimmers in the light. Let dry for 10 minutes.',
         durationMinutes: 3,
       },
       {
-        emoji: 'heart',
+        emoji: '🎀',
         title: 'Tie a bow and switch on the glow!',
         instruction:
           'Tie a satin ribbon or twine bow around the neck of the jar. Switch on your battery LED tea light, place it inside, and watch your enchanted fairy garden come alive!',
@@ -1105,7 +1105,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 25,
     adultSupervision: false,
     safetyNote: 'Use scissors carefully when cutting slits into the cardboard disc.',
-    iconEmoji: 'dots-horizontal-circle',
+    iconEmoji: '📿',
     accentColor: '#8B5CF6',
     genderTarget: 'girl',
     skills: ['Traditional Weaving', 'Counting & Pattern Rhythm', 'Jewelry Making'],
@@ -1116,17 +1116,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'looks',
+        emoji: '🌈',
         title: 'Candy Stripe Spiral Pattern',
         description: 'Use 4 pink strands and 3 mint-green strands for a swirling peppermint twist design!',
       },
       {
-        emoji: 'auto-fix',
+        emoji: '✨',
         title: 'Beaded Charm Centerpiece',
         description: 'Slide 3 shiny pony beads or a letter bead onto one strand halfway through weaving so it locks right into the middle of the braid!',
       },
       {
-        emoji: 'bag-personal',
+        emoji: '🧺',
         title: 'Backpack Keychain Tassel',
         description: 'Weave a shorter 10 cm cord and leave a fluffy 5 cm fringe at the bottom to clip onto your school backpack zipper!',
       },
@@ -1150,28 +1150,28 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'compass-outline',
+        emoji: '⭕',
         title: 'Craft your 8-notch cardboard loom wheel',
         instruction:
           'Cut a 10 cm circle from sturdy cardboard. Draw lines like a pizza to mark 8 even points around the edge (top, bottom, left, right, and the 4 diagonals). Cut a 1 cm slit at each mark and poke a hole in the center.',
         durationMinutes: 5,
       },
       {
-        emoji: 'all-inclusive',
+        emoji: '🧶',
         title: 'Knot and thread the 7 colorful strands',
         instruction:
           'Cut 7 strands of yarn or embroidery floss (each 45 cm long). Tie all 7 together in a knot at one end, and push the knot down through the center hole of the disc.',
         durationMinutes: 4,
       },
       {
-        emoji: 'compass',
+        emoji: '🧭',
         title: 'Hook strings into 7 notches',
         instruction:
           'Spread the 7 strands out like sunbeams and hook one strand into each slit around the wheel—leaving the top slit (12 o’clock) completely EMPTY.',
         durationMinutes: 4,
       },
       {
-        emoji: 'cached',
+        emoji: '🔄',
         title: 'Weave with the "Count 3 & Hop" rhythm',
         instruction:
           'Hold the wheel with the empty slit at the top. Count 3 strings clockwise to the right, unhook that 3rd string, and hop it into the top empty slit! Turn the wheel counter-clockwise so the new empty slit is at the top, and repeat!',
@@ -1179,7 +1179,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 8,
       },
       {
-        emoji: 'auto-fix',
+        emoji: '✨',
         title: 'Finish and tie your bracelet!',
         instruction:
           'Keep weaving until a 15 cm braided cord grows out the bottom of the center hole. Unhook the strings, tie an overhand knot at the end, and tie your bracelet gently around your wrist!',
@@ -1200,7 +1200,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 15,
     adultSupervision: false,
     safetyNote: 'Pick a clean, smooth fallen twig from the yard or park.',
-    iconEmoji: 'auto-fix',
+    iconEmoji: '💖',
     accentColor: '#F43F5E',
     genderTarget: 'girl',
     skills: ['Tactile Yarn Wrapping', 'Nature Upcycling', 'Fine Motor Coordination'],
@@ -1211,17 +1211,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'star',
+        emoji: '⭐',
         title: 'Shooting Star Ribbon Wand',
         description: 'Cut a 5-point cardboard star instead of a heart, wrap it in golden yellow yarn, and tie trailing pastel ribbons to the bottom!',
       },
       {
-        emoji: 'flower',
+        emoji: '🌸',
         title: 'Daisy Flower Crown Wand',
         description: 'Tuck small artificial flowers, dried lavender, or paper blossoms under the criss-crossed yarn strings.',
       },
       {
-        emoji: 'compass',
+        emoji: '🧭',
         title: 'Bedroom Door Name Hanger',
         description: 'Skip the twig handle and tie a top loop of yarn so your cozy wrapped heart hangs on your bedroom doorknob!',
       },
@@ -1246,21 +1246,21 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'heart',
+        emoji: '🎀',
         title: 'Cut and notch your cardboard heart',
         instruction:
           'Draw a plump heart shape on sturdy cardboard and cut it out. Snip tiny shallow notches around the perimeter so your yarn has places to grip.',
         durationMinutes: 3,
       },
       {
-        emoji: 'pine-tree',
+        emoji: '🪵',
         title: 'Secure the twig wand handle',
         instruction:
           'Place the top 5 cm of your smooth twig flat against the back center of the cardboard heart and tape it firmly in place.',
         durationMinutes: 2,
       },
       {
-        emoji: 'all-inclusive',
+        emoji: '🧶',
         title: 'Criss-cross the first yarn color',
         instruction:
           'Tape the starting end of your yarn to the back of the heart. Wind the yarn up, down, and diagonally across the heart—wrapping right over the twig on the back too!',
@@ -1268,14 +1268,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 5,
       },
       {
-        emoji: 'looks',
+        emoji: '🌈',
         title: 'Layer in second and third colors',
         instruction:
           'Tie a second contrasting yarn color to the end of your first strand and continue winding until no bare cardboard shows through.',
         durationMinutes: 3,
       },
       {
-        emoji: 'auto-fix',
+        emoji: '✨',
         title: 'Tie streaming ribbons and make a wish!',
         instruction:
           'Tuck the final end of yarn securely under several loops at the back. Tie leftover yarn or ribbons below the heart so they flutter when you wave your wand!',
@@ -1296,7 +1296,7 @@ export const STARTER_GUIDES = [
     estimatedMinutes: 25,
     adultSupervision: true,
     safetyNote: 'Have a grown-up assist when threading and handling sewing needles.',
-    iconEmoji: 'fruit-cherries',
+    iconEmoji: '🍓',
     accentColor: '#E11D48',
     genderTarget: 'girl',
     skills: ['Beginner Hand Sewing', '3D Plush Construction', 'Pretend Play'],
@@ -1307,17 +1307,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: 'square-rounded',
+        emoji: '🍫',
         title: 'Chocolate-Dipped Felt Berry',
         description: 'Sew or glue a wavy band of brown felt around the bottom tip of your strawberry so it looks dipped in chocolate!',
       },
       {
-        emoji: 'star-circle',
+        emoji: '😊',
         title: 'Kawaii Smiling Berry Plush',
         description: 'Use black and pink markers or thread to add two cute eyes and rosy cheeks to the front of your strawberry.',
       },
       {
-        emoji: 'needle',
+        emoji: '🧵',
         title: 'Sewing Kit Pincushion',
         description: 'Fill your strawberry extra firmly with stuffing or rice so it can hold pins and needles on a craft desk!',
       },
@@ -1342,14 +1342,14 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: 'circle',
+        emoji: '🔴',
         title: 'Cut the red felt half-circle',
         instruction:
           'Trace a wide mug or small bowl (about 12 cm across) onto red felt. Cut out the circle, then cut it straight down the middle to make two half-circles (each makes 1 strawberry!).',
         durationMinutes: 4,
       },
       {
-        emoji: 'needle',
+        emoji: '🧵',
         title: 'Fold and stitch into a cone pocket',
         instruction:
           'Fold one half-circle in half so the straight edges meet. Using a threaded needle (or fabric glue), sew small up-and-down stitches along the straight edge to form a cone.',
@@ -1357,21 +1357,21 @@ export const STARTER_GUIDES = [
         durationMinutes: 7,
       },
       {
-        emoji: 'shimmer',
+        emoji: '✨',
         title: 'Turn right-side out and stuff plump',
         instruction:
           'Turn the red felt cone right-side out so the seam hides inside. Use your finger to push torn pieces of cotton balls all the way into the tip until the berry is plump.',
         durationMinutes: 3,
       },
       {
-        emoji: 'heart',
+        emoji: '🎀',
         title: 'Cinch the top closed with a gathering stitch',
         instruction:
           'Sew a wide running stitch all the way around the open top circle. Gently pull the thread tight like a drawstring bag until the top closes up, then tie a knot!',
         durationMinutes: 5,
       },
       {
-        emoji: 'sprout',
+        emoji: '🌿',
         title: 'Crown with green leaves and seed dots!',
         instruction:
           'Cut a 5-point green felt star for the leafy cap and stitch or glue it onto the top of your berry. Add tiny white or yellow seed stitches (or paint dots) around the sides!',
@@ -1415,6 +1415,7 @@ export async function seedInitialGuides(db) {
             guide.genderTarget || 'all',
             guide.summary,
             guide.safetyNote ?? null,
+            guide.iconEmoji,
             existing.id,
           ]
         );

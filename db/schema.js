@@ -21,7 +21,7 @@ const MIGRATIONS = [
           estimated_minutes INTEGER NOT NULL DEFAULT 15,
           adult_supervision INTEGER NOT NULL DEFAULT 0,
           safety_note TEXT,
-          icon_emoji TEXT NOT NULL DEFAULT 'palette',
+          icon_emoji TEXT NOT NULL DEFAULT '🎨',
           accent_color TEXT NOT NULL DEFAULT '#FF8A65',
           is_favorite INTEGER NOT NULL DEFAULT 0,
           is_custom INTEGER NOT NULL DEFAULT 0,
