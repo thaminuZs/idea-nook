@@ -26,6 +26,7 @@ import {
   toggleStepCompleted,
 } from '../db';
 import AppIcon from './AppIcon';
+import PopArtCelebration from './PopArtCelebration';
 
 export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const db = useSQLiteContext();
@@ -38,6 +39,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('steps'); // 'steps' | 'supplies' | 'ideas'
+  const [showPopArt, setShowPopArt] = useState(false);
 
   const loadGuide = useCallback(async () => {
     if (!numericId || Number.isNaN(numericId)) {
@@ -125,10 +127,21 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const handleToggleStep = async (step) => {
     if (!guide) return;
     try {
+      const wasCompleted =
+        guide.status === 'completed' ||
+        (guide.steps?.length > 0 && guide.completedSteps >= guide.steps.length);
+
       await toggleStepCompleted(db, guide.id, step.id);
       const refreshed = await getGuideById(db, guide.id);
       if (refreshed) {
         setGuide(refreshed);
+        const nowCompleted =
+          refreshed.status === 'completed' ||
+          (refreshed.steps?.length > 0 &&
+            refreshed.completedSteps >= refreshed.steps.length);
+        if (!wasCompleted && nowCompleted) {
+          setShowPopArt(true);
+        }
       }
     } catch (err) {
       console.error('Failed to toggle step:', err);
@@ -388,18 +401,50 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
         {/* Completion Banner */}
         {isCompleted && (
           <View style={styles.celebrationCard}>
-            <AppIcon name="trophy" size={26} color="#047857" />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.celebrationTitle}>
-                Great job, {profile?.name || 'Builder'}!
-              </Text>
-              <Text style={styles.celebrationSubtitle}>
-                You finished all {stepsList.length} steps and earned 3 Stars!
-              </Text>
+            <View style={styles.celebrationTopRow}>
+              <AppIcon name="trophy" size={26} color="#047857" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.celebrationTitle}>
+                  Great job, {profile?.name || 'Builder'}!
+                </Text>
+                <Text style={styles.celebrationSubtitle}>
+                  You finished all {stepsList.length} steps and earned 3 Stars!
+                </Text>
+              </View>
+              <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
+                <AppIcon name="restart" size={14} color="#FFFFFF" />
+                <Text style={styles.resetCraftBtnText}>Restart</Text>
+              </Pressable>
             </View>
-            <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
-              <AppIcon name="restart" size={14} color="#FFFFFF" />
-              <Text style={styles.resetCraftBtnText}>Restart</Text>
+
+            {/* Interactive Pop-Art Comic Stickers Row (Tap to replay burst) */}
+            <Pressable
+              style={styles.popArtMiniRow}
+              onPress={() => setShowPopArt(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Replay Pop Art Celebration"
+            >
+              {[
+                { label: 'GOOD JOB!', bg: '#FF5252', color: '#FFFFFF', rot: '-2deg' },
+                { label: 'WOW!', bg: '#FFEB3B', color: '#0F172A', rot: '2deg' },
+                { label: 'SUPERB!', bg: '#00E5FF', color: '#0F172A', rot: '-2deg' },
+                { label: 'EXCELLENT!', bg: '#69F0AE', color: '#0F172A', rot: '2deg' },
+              ].map((tag) => (
+                <View
+                  key={tag.label}
+                  style={[
+                    styles.popArtMiniBadge,
+                    {
+                      backgroundColor: tag.bg,
+                      transform: [{ rotate: tag.rot }],
+                    },
+                  ]}
+                >
+                  <Text style={[styles.popArtMiniText, { color: tag.color }]}>
+                    {tag.label}
+                  </Text>
+                </View>
+              ))}
             </Pressable>
           </View>
         )}
@@ -812,6 +857,12 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           </View>
         )}
       </ScrollView>
+
+      {/* Small Pop-Art Celebration Burst on All Steps Completed */}
+      <PopArtCelebration
+        visible={showPopArt}
+        onFinish={() => setShowPopArt(false)}
+      />
     </View>
   );
 }
@@ -1010,8 +1061,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   celebrationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#ECFDF5',
     borderRadius: 12,
     padding: 16,
@@ -1019,6 +1068,35 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#10B981',
     gap: 12,
+  },
+  celebrationTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  popArtMiniRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingTop: 4,
+  },
+  popArtMiniBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#0F172A',
+    borderStyle: 'solid',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 2,
+  },
+  popArtMiniText: {
+    fontSize: 11,
+    fontFamily: Fonts.extraBold,
+    letterSpacing: 0.6,
   },
   celebrationTitle: {
     fontSize: 17,
