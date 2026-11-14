@@ -11,7 +11,7 @@ function normalizeProfile(row) {
     name: row.name,
     age: Number(row.age),
     gender: row.gender,
-    avatarEmoji: row.avatar_emoji || '🌟',
+    avatarEmoji: row.avatar_emoji || 'star-four-points',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -32,7 +32,7 @@ export async function getUserProfile(db) {
 /**
  * Saves or updates the child profile on first launch or edit.
  */
-export async function saveUserProfile(db, { name, age, gender, avatarEmoji = '🌟' }) {
+export async function saveUserProfile(db, { name, age, gender, avatarEmoji = 'star-four-points' }) {
   const trimmedName = String(name || '').trim();
   if (!trimmedName) {
     throw new Error('Please enter your name.');
@@ -48,7 +48,7 @@ export async function saveUserProfile(db, { name, age, gender, avatarEmoji = '�
     throw new Error('Please select a gender.');
   }
 
-  const cleanAvatar = String(avatarEmoji || '🌟').trim();
+  const cleanAvatar = String(avatarEmoji || 'star-four-points').trim();
   const nowIso = new Date().toISOString();
 
   await db.runAsync(

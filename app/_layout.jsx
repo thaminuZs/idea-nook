@@ -1,8 +1,11 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { Component, Suspense } from 'react';
+import { useFonts } from 'expo-font';
 import { router, Tabs } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
+import AppIcon from '../components/AppIcon';
 import OnboardingScreen from '../components/OnboardingScreen';
+import { Fonts } from '../constants/Colors';
 import { ProfileProvider, useProfile } from '../contexts/ProfileContext';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { DATABASE_NAME, initializeDatabase } from '../db';
@@ -38,9 +41,9 @@ function DatabaseLoadingFallback() {
 
   return (
     <View style={[styles.centered, { backgroundColor: theme.background }]}>
-      <ActivityIndicator size="large" color={theme.text} />
-      <Text style={[styles.loadingText, { color: theme.text }]}>
-        Loading offline DIY library...
+      <ActivityIndicator size="large" color={theme.primary} />
+      <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+        Loading your DIY library...
       </Text>
     </View>
   );
@@ -54,36 +57,93 @@ const Navigation = () => {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.background,
+          backgroundColor: theme.surface,
+          borderBottomColor: theme.border,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+        },
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          fontFamily: Fonts.extraBold,
+          fontSize: 18,
+          color: theme.text,
         },
         headerTintColor: theme.text,
         tabBarStyle: {
-          backgroundColor: theme.background,
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
+          height: 62,
+          paddingBottom: 8,
+          paddingTop: 6,
         },
-        tabBarActiveTintColor: '#FF7043',
-        tabBarInactiveTintColor: 'gray',
+        tabBarLabelStyle: {
+          fontFamily: Fonts.bold,
+          fontSize: 11,
+        },
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textMuted,
         headerRight: () => (
           <View style={styles.headerRightContainer}>
             {profile && (
               <Pressable
                 onPress={() => router.push('/scrol')}
-                style={styles.profileBadge}
+                style={[
+                  styles.profileBadge,
+                  { backgroundColor: theme.surfaceSubtle },
+                ]}
               >
-                <Text style={styles.profileBadgeText}>
-                  {profile.avatarEmoji} {profile.name} ({profile.age})
+                <AppIcon name={profile.avatarEmoji} size={15} color={theme.primary} />
+                <Text style={[styles.profileBadgeText, { color: theme.text }]}>
+                  {profile.name}
                 </Text>
               </Pressable>
             )}
-            <Pressable onPress={toggleTheme} style={styles.themeToggle}>
-              <Text>{scheme === 'light' ? '☀️' : '🌙'}</Text>
+            <Pressable
+              onPress={toggleTheme}
+              style={[
+                styles.themeToggle,
+                { backgroundColor: theme.surfaceSubtle },
+              ]}
+            >
+              <AppIcon
+                name={scheme === 'light' ? 'weather-night' : 'weather-sunny'}
+                size={18}
+                color={theme.text}
+              />
             </Pressable>
           </View>
         ),
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'For You', headerTitle: 'For You 🎯' }} />
-      <Tabs.Screen name="flat" options={{ title: 'Explore', headerTitle: 'Explore All Projects 🌈' }} />
-      <Tabs.Screen name="scrol" options={{ title: 'Profile', headerTitle: 'My Profile' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'For You',
+          headerTitle: 'IdeaNook',
+          tabBarIcon: ({ color }) => (
+            <AppIcon name="star-four-points" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="flat"
+        options={{
+          title: 'Explore',
+          headerTitle: 'Explore',
+          tabBarIcon: ({ color }) => (
+            <AppIcon name="compass-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="scrol"
+        options={{
+          title: 'Profile',
+          headerTitle: 'Profile',
+          tabBarIcon: ({ color }) => (
+            <AppIcon name="account-circle-outline" size={22} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="guide/[id]"
         options={{
@@ -104,15 +164,11 @@ function RootApp() {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color={theme.text} />
-        <Text style={[styles.loadingText, { color: theme.text }]}>
-          Checking child profile...
-        </Text>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
-  // On first start: if no profile exists, ask for name, age, and gender
   if (!profile) {
     return <OnboardingScreen onComplete={saveProfile} isFirstTime={true} />;
   }
@@ -121,6 +177,19 @@ function RootApp() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Montserrat_400Regular: require('../assets/fonts/Montserrat-Regular.ttf'),
+    Montserrat_500Medium: require('../assets/fonts/Montserrat-Medium.ttf'),
+    Montserrat_600SemiBold: require('../assets/fonts/Montserrat-SemiBold.ttf'),
+    Montserrat_700Bold: require('../assets/fonts/Montserrat-Bold.ttf'),
+    Montserrat_800ExtraBold: require('../assets/fonts/Montserrat-ExtraBold.ttf'),
+    MaterialCommunityIcons: require('../assets/fonts/MaterialCommunityIcons.ttf'),
+  });
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <ThemeProvider>
       <DatabaseErrorBoundary>
@@ -149,38 +218,54 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 15,
+    fontSize: 14,
+    fontFamily: Fonts.semiBold,
   },
   errorTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#D32F2F',
+    fontFamily: Fonts.bold,
+    color: '#DC2626',
     marginBottom: 8,
     textAlign: 'center',
   },
   errorMessage: {
     fontSize: 14,
-    color: '#555555',
+    fontFamily: Fonts.regular,
+    color: '#64748B',
     textAlign: 'center',
   },
   headerRightContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginRight: 15,
+    marginRight: 16,
   },
   profileBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#FFEBE5',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 99,
+  },
+  profileBadgeEmoji: {
+    fontSize: 14,
   },
   profileBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#D84315',
+    fontSize: 13,
+    fontFamily: Fonts.bold,
   },
   themeToggle: {
-    padding: 4,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  themeToggleIcon: {
+    fontSize: 15,
+  },
+  tabIcon: {
+    fontSize: 18,
   },
 });

@@ -10,15 +10,26 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Fonts } from '../constants/Colors';
 import { useTheme } from '../contexts/ThemeContext';
+import AppIcon, { resolveIconName } from './AppIcon';
 
-const AVATAR_OPTIONS = ['🌟', '🚀', '🎨', '🦁', '🦄', '🦖', '🤖', '🐼'];
+const AVATAR_OPTIONS = [
+  'star-four-points',
+  'rocket-launch',
+  'palette',
+  'paw',
+  'unicorn-variant',
+  'bone',
+  'robot',
+  'panda',
+];
 const AGE_OPTIONS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 const GENDER_OPTIONS = [
-  { id: 'boy', label: 'Boy', emoji: '👦' },
-  { id: 'girl', label: 'Girl', emoji: '👧' },
-  { id: 'other', label: 'Super Star', emoji: '⭐' },
+  { id: 'boy', label: 'Boy', emoji: 'human-male' },
+  { id: 'girl', label: 'Girl', emoji: 'human-female' },
+  { id: 'other', label: 'Super Star', emoji: 'star-circle' },
 ];
 
 export default function OnboardingScreen({
@@ -32,31 +43,33 @@ export default function OnboardingScreen({
   const [name, setName] = useState(initialProfile?.name || '');
   const [age, setAge] = useState(initialProfile?.age || null);
   const [gender, setGender] = useState(initialProfile?.gender || null);
-  const [avatarEmoji, setAvatarEmoji] = useState(initialProfile?.avatarEmoji || '🌟');
+  const [avatarEmoji, setAvatarEmoji] = useState(
+    resolveIconName(initialProfile?.avatarEmoji, 'star-four-points')
+  );
   const [errorMsg, setErrorMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const isDark = scheme === 'dark';
-  const cardBg = isDark ? '#1E1E1E' : '#FFFFFF';
-  const borderCol = isDark ? '#333333' : '#E2E8F0';
-  const inputBg = isDark ? '#2A2A2A' : '#F8FAFC';
-  const subtitleColor = isDark ? '#A0AEC0' : '#64748B';
+  const cardBg = theme.surface;
+  const borderCol = theme.border;
+  const inputBg = theme.surfaceSubtle;
+  const subtitleColor = theme.textMuted;
 
   const handleSubmit = async () => {
     setErrorMsg('');
 
     if (!name.trim()) {
-      setErrorMsg('Please enter your name! ✏️');
+      setErrorMsg('Please enter your name!');
       return;
     }
 
     if (!age) {
-      setErrorMsg('Please tap your age! 🎂');
+      setErrorMsg('Please tap your age!');
       return;
     }
 
     if (!gender) {
-      setErrorMsg('Please choose your badge! 🌈');
+      setErrorMsg('Please choose your badge!');
       return;
     }
 
@@ -87,7 +100,9 @@ export default function OnboardingScreen({
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.heroEmoji}>{avatarEmoji}</Text>
+          <View style={[styles.heroIconCircle, { backgroundColor: theme.primarySoft }]}>
+            <AppIcon name={avatarEmoji} size={40} color={theme.primary} />
+          </View>
           <Text style={[styles.title, { color: theme.text }]}>
             {isFirstTime ? 'Welcome to IdeaNook!' : 'Edit Your Profile'}
           </Text>
@@ -100,9 +115,12 @@ export default function OnboardingScreen({
 
         {/* Avatar Picker */}
         <View style={[styles.card, { backgroundColor: cardBg, borderColor: borderCol }]}>
-          <Text style={[styles.sectionLabel, { color: theme.text }]}>
-            Pick Your Companion 🐾
-          </Text>
+          <View style={styles.labelRow}>
+            <AppIcon name="paw" size={18} color={theme.primary} />
+            <Text style={[styles.sectionLabel, { color: theme.text }]}>
+              Pick Your Companion
+            </Text>
+          </View>
           <View style={styles.avatarRow}>
             {AVATAR_OPTIONS.map((item) => {
               const isSelected = avatarEmoji === item;
@@ -112,10 +130,15 @@ export default function OnboardingScreen({
                   onPress={() => setAvatarEmoji(item)}
                   style={[
                     styles.avatarBtn,
+                    { backgroundColor: inputBg },
                     isSelected && styles.avatarBtnSelected,
                   ]}
                 >
-                  <Text style={styles.avatarEmojiText}>{item}</Text>
+                  <AppIcon
+                    name={item}
+                    size={24}
+                    color={isSelected ? '#FF7043' : theme.text}
+                  />
                 </Pressable>
               );
             })}
@@ -124,9 +147,12 @@ export default function OnboardingScreen({
 
         {/* Name Input */}
         <View style={[styles.card, { backgroundColor: cardBg, borderColor: borderCol }]}>
-          <Text style={[styles.sectionLabel, { color: theme.text }]}>
-            What is your name? ✏️
-          </Text>
+          <View style={styles.labelRow}>
+            <AppIcon name="pencil" size={18} color={theme.primary} />
+            <Text style={[styles.sectionLabel, { color: theme.text }]}>
+              What is your name?
+            </Text>
+          </View>
           <TextInput
             style={[
               styles.textInput,
@@ -152,9 +178,12 @@ export default function OnboardingScreen({
         {/* Age Picker */}
         <View style={[styles.card, { backgroundColor: cardBg, borderColor: borderCol }]}>
           <View style={styles.sectionHeaderRow}>
-            <Text style={[styles.sectionLabel, { color: theme.text }]}>
-              How old are you? 🎂
-            </Text>
+            <View style={styles.labelRowNoMargin}>
+              <AppIcon name="cake-variant" size={18} color={theme.primary} />
+              <Text style={[styles.sectionLabelNoMargin, { color: theme.text }]}>
+                How old are you?
+              </Text>
+            </View>
             {age && (
               <Text style={styles.selectedBadgeText}>
                 {age} years old
@@ -195,9 +224,12 @@ export default function OnboardingScreen({
 
         {/* Gender Choice */}
         <View style={[styles.card, { backgroundColor: cardBg, borderColor: borderCol }]}>
-          <Text style={[styles.sectionLabel, { color: theme.text }]}>
-            Choose your badge 🌈
-          </Text>
+          <View style={styles.labelRow}>
+            <AppIcon name="shield-star" size={18} color={theme.primary} />
+            <Text style={[styles.sectionLabel, { color: theme.text }]}>
+              Choose your badge
+            </Text>
+          </View>
           <View style={styles.genderRow}>
             {GENDER_OPTIONS.map((item) => {
               const isSelected = gender === item.id;
@@ -219,7 +251,11 @@ export default function OnboardingScreen({
                     },
                   ]}
                 >
-                  <Text style={styles.genderEmoji}>{item.emoji}</Text>
+                  <AppIcon
+                    name={item.emoji}
+                    size={28}
+                    color={isSelected ? '#FF7043' : theme.text}
+                  />
                   <Text
                     style={[
                       styles.genderLabel,
@@ -240,7 +276,8 @@ export default function OnboardingScreen({
         {/* Error Notice */}
         {Boolean(errorMsg) && (
           <View style={styles.errorBox}>
-            <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+            <AppIcon name="alert-circle-outline" size={18} color="#B91C1C" />
+            <Text style={styles.errorText}>{errorMsg}</Text>
           </View>
         )}
 
@@ -254,9 +291,16 @@ export default function OnboardingScreen({
             {submitting ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.primaryButtonText}>
-                {isFirstTime ? "Let's Start Crafting! 🚀" : 'Save Profile ✨'}
-              </Text>
+              <View style={styles.primaryBtnContent}>
+                <Text style={styles.primaryButtonText}>
+                  {isFirstTime ? "Let's Start Crafting!" : 'Save Profile'}
+                </Text>
+                <AppIcon
+                  name={isFirstTime ? 'rocket-launch' : 'check'}
+                  size={18}
+                  color="#FFFFFF"
+                />
+              </View>
             )}
           </Pressable>
 
@@ -290,18 +334,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  heroEmoji: {
-    fontSize: 56,
-    marginBottom: 8,
+  heroIconCircle: {
+    width: 76,
+    height: 76,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   title: {
     fontSize: 26,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     textAlign: 'center',
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
     lineHeight: 20,
     paddingHorizontal: 12,
@@ -312,6 +361,17 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  labelRowNoMargin: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -320,12 +380,15 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 12,
+    fontFamily: Fonts.bold,
+  },
+  sectionLabelNoMargin: {
+    fontSize: 16,
+    fontFamily: Fonts.bold,
   },
   selectedBadgeText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     color: '#FF7043',
   },
   avatarRow: {
@@ -357,7 +420,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   ageGrid: {
     flexDirection: 'row',
@@ -376,7 +439,7 @@ const styles = StyleSheet.create({
   },
   agePillText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   genderRow: {
     flexDirection: 'row',
@@ -396,8 +459,13 @@ const styles = StyleSheet.create({
   },
   genderLabel: {
     fontSize: 13,
+    fontFamily: Fonts.semiBold,
   },
   errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     backgroundColor: '#FEE2E2',
     borderColor: '#EF4444',
     borderWidth: 1,
@@ -408,7 +476,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#B91C1C',
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     textAlign: 'center',
   },
   buttonContainer: {
@@ -427,13 +495,18 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  primaryBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   buttonDisabled: {
     opacity: 0.6,
   },
   primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
   },
   cancelButton: {
     paddingVertical: 12,
@@ -444,6 +517,6 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
 });

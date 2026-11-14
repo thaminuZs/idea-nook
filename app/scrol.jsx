@@ -10,29 +10,43 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import AppIcon from '../components/AppIcon';
+import GuideDetailView from '../components/GuideDetailView';
 import OnboardingScreen from '../components/OnboardingScreen';
+import ProjectCard from '../components/ProjectCard';
+import { Fonts } from '../constants/Colors';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { getDashboardStats } from '../db';
+import { getDashboardStats, getGuides } from '../db';
 
 export default function ProfilePage() {
   const db = useSQLiteContext();
-  const { theme, scheme } = useTheme();
+  const { theme } = useTheme();
   const { profile, saveProfile, clearProfile } = useProfile();
 
   const [stats, setStats] = useState(null);
+  const [savedGuides, setSavedGuides] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [selectedGuide, setSelectedGuide] = useState(null);
 
-  const loadStats = useCallback(async () => {
+  const loadProfileData = useCallback(async () => {
     try {
-      const s = await getDashboardStats(db);
+      const [s, allGuides] = await Promise.all([
+        getDashboardStats(db),
+        getGuides(db),
+      ]);
       setStats(s);
+      setSavedGuides(
+        allGuides.filter(
+          (g) => g.isFavorite || g.status === 'in_progress' || g.status === 'completed'
+        )
+      );
     } catch (err) {
-      console.error('Failed to load dashboard stats in profile:', err);
+      console.error('Failed to load profile data:', err);
     } finally {
       setLoadingStats(false);
     }
@@ -40,22 +54,22 @@ export default function ProfilePage() {
 
   useFocusEffect(
     useCallback(() => {
-      loadStats();
-    }, [loadStats])
+      loadProfileData();
+    }, [loadProfileData])
   );
-
-  const isDark = scheme === 'dark';
-  const cardBg = isDark ? '#1E1E1E' : '#FFFFFF';
-  const borderCol = isDark ? '#2E2E2E' : '#E2E8F0';
-  const mutedText = isDark ? '#94A3B8' : '#64748B';
-  const highlightBg = isDark ? '#2D201A' : '#FFF7ED';
 
   const genderLabel =
     profile?.gender === 'boy'
-      ? 'Boy 👦'
+      ? 'Boy'
       : profile?.gender === 'girl'
-      ? 'Girl 👧'
-      : 'Super Star ⭐';
+      ? 'Girl'
+      : 'Super Star';
+  const genderIcon =
+    profile?.gender === 'boy'
+      ? 'human-male'
+      : profile?.gender === 'girl'
+      ? 'human-female'
+      : 'star-circle';
 
   const handleReset = () => {
     if (Platform.OS === 'web') {
@@ -63,7 +77,7 @@ export default function ProfilePage() {
     } else {
       Alert.alert(
         'Reset Profile',
-        'Are you sure you want to reset your profile? This will show the first-start setup screen again.',
+        'Do you want to clear this profile and set up a new one?',
         [
           { text: 'Cancel', style: 'cancel' },
           {
@@ -76,11 +90,24 @@ export default function ProfilePage() {
     }
   };
 
+  if (selectedGuide) {
+    return (
+      <GuideDetailView
+        guideId={selectedGuide.id}
+        initialGuide={selectedGuide}
+        onBack={() => {
+          setSelectedGuide(null);
+          loadProfileData();
+        }}
+      />
+    );
+  }
+
   if (!profile) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <Text style={[styles.emptyText, { color: theme.text }]}>
-          No profile found. Please restart the app to set up your profile.
+        <Text style={[styles.emptyText, { color: theme.textMuted }]}>
+          No profile found.
         </Text>
       </View>
     );
@@ -92,167 +119,182 @@ export default function ProfilePage() {
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-      {/* Profile Header Hero */}
+      {/* Clean Modern Profile Hero */}
       <View
         style={[
           styles.heroCard,
-          { backgroundColor: highlightBg, borderColor: '#FFD7C2' },
+          {
+            backgroundColor: theme.surface,
+            borderColor: theme.border,
+          },
         ]}
       >
-        <View style={styles.avatarWrapper}>
-          <Text style={styles.avatarEmoji}>{profile.avatarEmoji}</Text>
-        </View>
-
-        <Text style={[styles.profileName, { color: theme.text }]}>
-          {profile.name}
-        </Text>
-
-        <View style={styles.tagRow}>
-          <View style={styles.tagBadge}>
-            <Text style={styles.tagBadgeText}>{genderLabel}</Text>
+        <View style={styles.heroRow}>
+          <View
+            style={[
+              styles.avatarWrapper,
+              { backgroundColor: theme.primarySoft },
+            ]}
+          >
+            <AppIcon name={profile.avatarEmoji} size={34} color={theme.primary} />
           </View>
-          <View style={styles.tagBadge}>
-            <Text style={styles.tagBadgeText}>Age {profile.age}</Text>
-          </View>
-        </View>
 
-        <Pressable
-          style={styles.editButton}
-          onPress={() => setIsEditing(true)}
-        >
-          <Text style={styles.editButtonText}>Edit Profile ✏️</Text>
-        </Pressable>
+          <View style={styles.heroInfo}>
+            <Text style={[styles.profileName, { color: theme.text }]}>
+              {profile.name}
+            </Text>
+            <View style={styles.tagRow}>
+              <View
+                style={[
+                  styles.tagBadge,
+                  { backgroundColor: theme.surfaceSubtle },
+                ]}
+              >
+                <Text style={[styles.tagBadgeText, { color: theme.textMuted }]}>
+                  Age {profile.age}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.tagBadge,
+                  { backgroundColor: theme.surfaceSubtle },
+                ]}
+              >
+                <AppIcon name={genderIcon} size={13} color={theme.textMuted} />
+                <Text style={[styles.tagBadgeText, { color: theme.textMuted }]}>
+                  {genderLabel}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <Pressable
+            style={[styles.editButton, { backgroundColor: theme.primarySoft }]}
+            onPress={() => setIsEditing(true)}
+          >
+            <Text style={[styles.editButtonText, { color: theme.primary }]}>
+              Edit
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
-      {/* Crafting Achievements Stats */}
-      <Text style={[styles.sectionTitle, { color: theme.text }]}>
-        My Crafting Journey 🏆
-      </Text>
-
+      {/* 2x2 Stats Grid */}
       {loadingStats ? (
-        <ActivityIndicator color="#FF7043" style={{ marginVertical: 16 }} />
+        <ActivityIndicator color={theme.primary} style={{ marginVertical: 16 }} />
       ) : (
         <View style={styles.statsGrid}>
-          <View style={[styles.statBox, { backgroundColor: cardBg, borderColor: borderCol }]}>
-            <Text style={styles.statEmoji}>⭐</Text>
+          <View
+            style={[
+              styles.statBox,
+              { backgroundColor: theme.surface, borderColor: theme.border },
+            ]}
+          >
+            <AppIcon name="star" size={24} color="#F59E0B" />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.totalStars ?? 0}
             </Text>
-            <Text style={[styles.statLabel, { color: mutedText }]}>Stars Earned</Text>
+            <Text style={[styles.statLabel, { color: theme.textMuted }]}>
+              Stars
+            </Text>
           </View>
 
-          <View style={[styles.statBox, { backgroundColor: cardBg, borderColor: borderCol }]}>
-            <Text style={styles.statEmoji}>🎉</Text>
+          <View
+            style={[
+              styles.statBox,
+              { backgroundColor: theme.surface, borderColor: theme.border },
+            ]}
+          >
+            <AppIcon name="trophy" size={24} color="#10B981" />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.completedGuides ?? 0}
             </Text>
-            <Text style={[styles.statLabel, { color: mutedText }]}>Completed</Text>
+            <Text style={[styles.statLabel, { color: theme.textMuted }]}>
+              Completed
+            </Text>
           </View>
 
-          <View style={[styles.statBox, { backgroundColor: cardBg, borderColor: borderCol }]}>
-            <Text style={styles.statEmoji}>⏳</Text>
+          <View
+            style={[
+              styles.statBox,
+              { backgroundColor: theme.surface, borderColor: theme.border },
+            ]}
+          >
+            <AppIcon name="hammer-wrench" size={24} color={theme.primary} />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.inProgressGuides ?? 0}
             </Text>
-            <Text style={[styles.statLabel, { color: mutedText }]}>In Progress</Text>
+            <Text style={[styles.statLabel, { color: theme.textMuted }]}>
+              In Progress
+            </Text>
           </View>
 
-          <View style={[styles.statBox, { backgroundColor: cardBg, borderColor: borderCol }]}>
-            <Text style={styles.statEmoji}>❤️</Text>
+          <View
+            style={[
+              styles.statBox,
+              { backgroundColor: theme.surface, borderColor: theme.border },
+            ]}
+          >
+            <AppIcon name="heart" size={24} color="#EF4444" />
             <Text style={[styles.statValue, { color: theme.text }]}>
               {stats?.favoriteGuides ?? 0}
             </Text>
-            <Text style={[styles.statLabel, { color: mutedText }]}>Favorites</Text>
+            <Text style={[styles.statLabel, { color: theme.textMuted }]}>
+              Saved
+            </Text>
           </View>
         </View>
       )}
 
-      {/* Profile Details List */}
-      <Text style={[styles.sectionTitle, { color: theme.text }]}>
-        Profile Details 📋
-      </Text>
-
-      <View style={[styles.detailsCard, { backgroundColor: cardBg, borderColor: borderCol }]}>
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: mutedText }]}>Name</Text>
-          <Text style={[styles.detailValue, { color: theme.text }]}>{profile.name}</Text>
+      {/* Active & Saved Projects Section */}
+      {savedGuides.length > 0 && (
+        <View style={styles.savedSection}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Your Projects
+          </Text>
+          <View style={styles.savedList}>
+            {savedGuides.map((g) => (
+              <ProjectCard key={g.id} item={g} onPress={setSelectedGuide} />
+            ))}
+          </View>
         </View>
-        <View style={[styles.divider, { backgroundColor: borderCol }]} />
+      )}
 
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: mutedText }]}>Age</Text>
-          <Text style={[styles.detailValue, { color: theme.text }]}>{profile.age} years old</Text>
-        </View>
-        <View style={[styles.divider, { backgroundColor: borderCol }]} />
-
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: mutedText }]}>Gender Badge</Text>
-          <Text style={[styles.detailValue, { color: theme.text }]}>{genderLabel}</Text>
-        </View>
-        <View style={[styles.divider, { backgroundColor: borderCol }]} />
-
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: mutedText }]}>Companion</Text>
-          <Text style={[styles.detailValue, { color: theme.text }]}>{profile.avatarEmoji}</Text>
-        </View>
-      </View>
-
-      {/* Age & Gender Recommendation Guide Hint */}
-      <View
-        style={[
-          styles.hintCard,
-          { backgroundColor: isDark ? '#1C2630' : '#F0F9FF', borderColor: '#BAE6FD' },
-        ]}
-      >
-        <Text style={styles.hintTitle}>💡 Tailored Content Active</Text>
-        <Text style={[styles.hintBody, { color: mutedText }]}>
-          Your For You (FYP) feed is customized for {profile.name} (Age {profile.age} • {genderLabel}). Want to see every project? Visit the Explore tab!
+      {/* Subtle Switch / Reset Profile Action */}
+      <Pressable style={styles.resetButton} onPress={handleReset}>
+        <Text style={[styles.resetButtonText, { color: theme.textMuted }]}>
+          Switch or Reset Profile
         </Text>
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-          <Pressable
-            style={[styles.browseGuidesBtn, { flex: 1, marginTop: 0 }]}
-            onPress={() => router.push('/')}
-          >
-            <Text style={styles.browseGuidesBtnText}>
-              🎯 For You Feed
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.browseGuidesBtn, { flex: 1, marginTop: 0, backgroundColor: '#0284C7' }]}
-            onPress={() => router.push('/flat')}
-          >
-            <Text style={styles.browseGuidesBtnText}>
-              🌈 Explore All
-            </Text>
-          </Pressable>
-        </View>
-      </View>
-
-      {/* Testing / Reset Flow Button */}
-      <View style={styles.resetContainer}>
-        <Pressable style={styles.resetButton} onPress={handleReset}>
-          <Text style={styles.resetButtonText}>🔄 Reset Profile (Test First-Start Flow)</Text>
-        </Pressable>
-        <Text style={[styles.resetSubtext, { color: mutedText }]}>
-          Clears your saved profile so you can test the first-run onboarding screen again.
-        </Text>
-      </View>
+      </Pressable>
 
       {/* Web Confirmation Modal */}
       {showResetConfirm && (
         <Modal transparent animationType="fade" visible={showResetConfirm}>
           <View style={styles.modalOverlay}>
-            <View style={[styles.confirmModal, { backgroundColor: cardBg, borderColor: borderCol }]}>
-              <Text style={[styles.confirmTitle, { color: theme.text }]}>Reset Profile?</Text>
-              <Text style={[styles.confirmBody, { color: mutedText }]}>
-                This will delete your saved profile from SQLite and trigger the first-start setup screen.
+            <View
+              style={[
+                styles.confirmModal,
+                { backgroundColor: theme.surface, borderColor: theme.border },
+              ]}
+            >
+              <Text style={[styles.confirmTitle, { color: theme.text }]}>
+                Reset Profile?
+              </Text>
+              <Text style={[styles.confirmBody, { color: theme.textMuted }]}>
+                This will clear your current profile and open the welcome setup screen.
               </Text>
               <View style={styles.confirmActions}>
                 <Pressable
-                  style={[styles.confirmBtn, styles.cancelBtn, { borderColor: borderCol }]}
+                  style={[
+                    styles.confirmBtn,
+                    styles.cancelBtn,
+                    { borderColor: theme.border },
+                  ]}
                   onPress={() => setShowResetConfirm(false)}
                 >
-                  <Text style={{ color: theme.text, fontWeight: '600' }}>Cancel</Text>
+                  <Text style={{ color: theme.text, fontWeight: '600' }}>
+                    Cancel
+                  </Text>
                 </Pressable>
                 <Pressable
                   style={[styles.confirmBtn, styles.deleteBtn]}
@@ -261,7 +303,9 @@ export default function ProfilePage() {
                     await clearProfile();
                   }}
                 >
-                  <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Reset</Text>
+                  <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>
+                    Reset
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -271,9 +315,8 @@ export default function ProfilePage() {
 
       {/* Edit Profile Modal */}
       <Modal
-        visible={isEditing}
         animationType="slide"
-        presentationStyle="pageSheet"
+        visible={isEditing}
         onRequestClose={() => setIsEditing(false)}
       >
         <OnboardingScreen
@@ -295,7 +338,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 18,
+    padding: 16,
+    gap: 16,
     paddingBottom: 40,
   },
   centered: {
@@ -305,169 +349,111 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily: Fonts.medium,
     textAlign: 'center',
   },
   heroCard: {
-    borderRadius: 24,
-    borderWidth: 1.5,
-    padding: 20,
+    padding: 18,
+    borderRadius: 22,
+    borderWidth: 1,
+  },
+  heroRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    gap: 14,
   },
   avatarWrapper: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: '#FFFFFF',
+    width: 64,
+    height: 64,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF7043',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 3,
-    marginBottom: 12,
   },
   avatarEmoji: {
-    fontSize: 42,
+    fontSize: 34,
+  },
+  heroInfo: {
+    flex: 1,
+    gap: 6,
   },
   profileName: {
-    fontSize: 24,
-    fontWeight: '800',
-    marginBottom: 8,
+    fontSize: 20,
+    fontFamily: Fonts.extraBold,
   },
   tagRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
+    gap: 6,
   },
   tagBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
-    backgroundColor: '#FFEBE5',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 99,
   },
   tagBadgeText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#D84315',
+    fontSize: 12,
+    fontFamily: Fonts.bold,
   },
   editButton: {
-    backgroundColor: '#FF7043',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 14,
-    shadowColor: '#FF7043',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 99,
   },
   editButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 12,
-    marginTop: 6,
+    fontSize: 13,
+    fontFamily: Fonts.extraBold,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginBottom: 20,
   },
   statBox: {
     flex: 1,
-    minWidth: '45%',
-    padding: 14,
-    borderRadius: 16,
+    minWidth: '46%',
+    padding: 16,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: 'center',
+    gap: 4,
   },
   statEmoji: {
-    fontSize: 24,
-    marginBottom: 4,
+    fontSize: 22,
   },
   statValue: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 22,
+    fontFamily: Fonts.extraBold,
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '600',
-    marginTop: 2,
+    fontFamily: Fonts.semiBold,
   },
-  detailsCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 20,
+  savedSection: {
+    gap: 10,
   },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
+  sectionTitle: {
+    fontSize: 17,
+    fontFamily: Fonts.extraBold,
   },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  detailValue: {
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  divider: {
-    height: 1,
-  },
-  hintCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 14,
-    marginBottom: 24,
-  },
-  hintTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#0284C7',
-    marginBottom: 4,
-  },
-  hintBody: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  resetContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    marginBottom: 24,
+  savedList: {
+    gap: 12,
   },
   resetButton: {
+    alignSelf: 'center',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    marginTop: 8,
   },
   resetButtonText: {
-    color: '#DC2626',
     fontSize: 13,
-    fontWeight: '700',
-  },
-  resetSubtext: {
-    fontSize: 11,
-    textAlign: 'center',
-    marginTop: 6,
-    paddingHorizontal: 20,
+    fontFamily: Fonts.semiBold,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -476,16 +462,17 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 340,
     padding: 20,
-    borderRadius: 20,
+    borderRadius: 22,
     borderWidth: 1,
   },
   confirmTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     marginBottom: 8,
   },
   confirmBody: {
     fontSize: 14,
+    fontFamily: Fonts.medium,
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -504,18 +491,5 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     backgroundColor: '#DC2626',
-  },
-  browseGuidesBtn: {
-    backgroundColor: '#FF7043',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  browseGuidesBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 13,
   },
 });

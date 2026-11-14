@@ -80,7 +80,7 @@ const MIGRATIONS = [
           name TEXT NOT NULL,
           age INTEGER NOT NULL,
           gender TEXT NOT NULL,
-          avatar_emoji TEXT NOT NULL DEFAULT '🌟',
+          avatar_emoji TEXT NOT NULL DEFAULT 'star-four-points',
           created_at TEXT NOT NULL DEFAULT (datetime('now')),
           updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );

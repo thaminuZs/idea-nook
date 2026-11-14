@@ -20,7 +20,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🚀',
     accentColor: '#FF7043',
     genderTarget: 'all',
-    skills: ['🚀 Space Design', '✂️ Scissor Control', '📐 3D Shapes', '🎨 Creative Decorating'],
+    skills: ['Space Design', 'Scissor Control', '3D Shapes', 'Creative Decorating'],
     funFacts: [
       'Real space rockets have pointed nose cones to slice smoothly through Earth’s thick atmosphere with less air resistance!',
       'The fins at the bottom of a rocket keep it flying straight so it does not wobble or spin in circles during launch.',
@@ -118,7 +118,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🌋',
     accentColor: '#EF5350',
     genderTarget: 'all',
-    skills: ['🔬 Kitchen Chemistry', '🧪 Measuring & Mixing', '👀 Scientific Observation'],
+    skills: ['Kitchen Chemistry', 'Measuring & Mixing', 'Scientific Observation'],
     funFacts: [
       'When baking soda (a base) mixes with vinegar (an acid), they react to create carbon dioxide gas—the exact same gas that makes soda pop fizzy!',
       'Adding dish soap traps the tiny carbon dioxide gas bubbles, turning a quick fizz into thick, slow-moving foam lava.',
@@ -216,7 +216,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🌈',
     accentColor: '#AB47BC',
     genderTarget: 'all',
-    skills: ['🧘 Mindfulness & Focus', '🌊 Liquid Density', '✨ Color & Light Play'],
+    skills: ['Mindfulness & Focus', 'Liquid Density', 'Color & Light Play'],
     funFacts: [
       'Clear school glue thickens the water (increasing its viscosity), which slows down gravity’s pull on the glitter!',
       'Taking slow breaths while watching swirling glitter for 60 seconds can actually lower your heart rate when you feel frustrated or tired.',
@@ -229,7 +229,7 @@ export const STARTER_GUIDES = [
         description: 'Use 1 drop of blue and 1 drop of purple food coloring with silver star confetti for a swirling night-sky galaxy.',
       },
       {
-        emoji: '🐠',
+        emoji: '💧',
         title: 'Ocean Treasure Hunt Jar',
         description: 'Drop in small plastic sea shells, pony beads, or a tiny plastic fish and watch it swim through blue sparkle water!',
       },
@@ -290,7 +290,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: '🌬️',
+        emoji: '☀️',
         title: 'Swirl, watch, and take 3 calm breaths',
         instruction:
           'Turn the bottle upside down and give it a big spin! Set it on a table and take slow, deep belly breaths until the very last sparkle lands on the bottom.',
@@ -314,7 +314,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🍃',
     accentColor: '#66BB6A',
     genderTarget: 'all',
-    skills: ['🌿 Nature Exploration', '🧩 Shape Recognition', '🦊 Woodland Art'],
+    skills: ['Nature Exploration', 'Shape Recognition', 'Woodland Art'],
     funFacts: [
       'Leaves change color in autumn because trees stop making green chlorophyll, revealing hidden yellow and orange pigments that were there all along!',
       'Every tree species has its own leaf fingerprint—maple leaves look like open hands, while birch leaves have tiny saw-tooth edges.',
@@ -322,12 +322,12 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: '🦋',
+        emoji: '🌸',
         title: 'Symmetrical Leaf Butterfly',
         description: 'Pick two matching wide leaves for top wings, two smaller leaves for bottom wings, and a thin twig for the body!',
       },
       {
-        emoji: '🦁',
+        emoji: '🐾',
         title: 'Golden Leaf Mane Lion',
         description: 'Draw a friendly lion face in the middle of your paper and glue a ring of yellow and orange leaves all around it for a wild mane.',
       },
@@ -365,14 +365,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 8,
       },
       {
-        emoji: '📚',
+        emoji: '📜',
         title: 'Press curly leaves flat',
         instruction:
           'Place your collected leaves between two sheets of paper towel and press them under a heavy book for 5 minutes so they lie nice and flat.',
         durationMinutes: 5,
       },
       {
-        emoji: '🦊',
+        emoji: '🐾',
         title: 'Test-fit your animal puzzle',
         instruction:
           'Lay your leaves onto the paper without glue first! Try arranging an owl on a branch, a swimming fish with leafy fins, or a playful woodland fox.',
@@ -410,7 +410,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🐦',
     accentColor: '#29B6F6',
     genderTarget: 'all',
-    skills: ['♻️ Upcycling & Eco-Craft', '🐦 Wildlife Observation', '🏗️ Structural Building'],
+    skills: ['Upcycling & Eco-Craft', 'Wildlife Observation', 'Structural Building'],
     funFacts: [
       'Milk and juice cartons are coated with a thin waterproof layer, making them naturally rain-proof outdoors!',
       'Small songbirds like chickadees and finches eat up to 30% of their body weight in seeds every single day to stay warm.',
@@ -418,12 +418,12 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: '🏡',
+        emoji: '🪵',
         title: 'Bark & Twig Cottage Roof',
         description: 'Glue small flat twigs or pine cones along the sloped top of the carton so it looks like a miniature log cabin!',
       },
       {
-        emoji: '📓',
+        emoji: '✏️',
         title: 'Birdwatcher Spotter Journal',
         description: 'Keep a small notebook by the window and sketch every different colored bird that visits your feeder during the week.',
       },
@@ -460,7 +460,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 4,
       },
       {
-        emoji: '🪟',
+        emoji: '📐',
         title: 'Cut the dining window opening',
         instruction:
           'Use a marker to draw a large arched window on one or two sides of the carton, leaving a 4 cm deep tray wall at the bottom. Ask an adult to cut out the window.',
@@ -483,14 +483,14 @@ export const STARTER_GUIDES = [
         durationMinutes: 8,
       },
       {
-        emoji: '🪢',
+        emoji: '🧶',
         title: 'Thread the hanging loop',
         instruction:
           'Punch a hole through the top ridge of the carton roof, thread your strong twine through, and tie a double overhand knot.',
         durationMinutes: 4,
       },
       {
-        emoji: '🌻',
+        emoji: '🌸',
         title: 'Fill with seeds and hang outdoors!',
         instruction:
           'Pour 1 cup of birdseed into the bottom tray and hang your feeder on a quiet tree branch visible from your window. Watch for your first feathered guest!',
@@ -514,7 +514,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🐸',
     accentColor: '#26A69A',
     genderTarget: 'all',
-    skills: ['📐 Geometry & Symmetry', '🤲 Fine Finger Dexterity', '⚡ Spring Mechanics'],
+    skills: ['Geometry & Symmetry', 'Fine Finger Dexterity', 'Spring Mechanics'],
     funFacts: [
       'Origami comes from the Japanese words "ori" (folding) and "kami" (paper) and has been practiced for over 1,000 years!',
       'The zig-zag fold at the back of your paper frog stores elastic potential energy like a coiled metal spring.',
@@ -590,7 +590,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 2,
       },
       {
-        emoji: '🐸',
+        emoji: '🌟',
         title: 'Draw eyes and launch your frog!',
         instruction:
           'Flip your frog right-side up, draw two big smiling eyes and spots on its back. Press your index finger down on the back fold and let it slip off the edge—BOING!',
@@ -619,7 +619,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🏎️',
     accentColor: '#3B82F6',
     genderTarget: 'boy',
-    skills: ['⚙️ Mechanical Engineering', '⚡ Kinetic Energy', '🛞 Axle & Wheel Physics'],
+    skills: ['Mechanical Engineering', 'Kinetic Energy', 'Axle & Wheel Physics'],
     funFacts: [
       'Winding the rubber band around the axle stores "elastic potential energy." When you let go, it transforms into "kinetic energy" (motion)!',
       'The drinking straws act as low-friction bearings so the wooden skewer axles can spin freely without rubbing against the cardboard.',
@@ -637,7 +637,7 @@ export const STARTER_GUIDES = [
         description: 'Fold a cool angled paper wing and glue it onto the back trunk of your race car just like a Formula 1 racer.',
       },
       {
-        emoji: '📏',
+        emoji: '📐',
         title: 'Distance Championship Track',
         description: 'Use masking tape to mark 1-meter, 2-meter, and 3-meter finish lines on the hallway floor and test how many winds go the farthest!',
       },
@@ -663,7 +663,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: '📏',
+        emoji: '📐',
         title: 'Mount the straw axle bearings',
         instruction:
           'Cut two pieces of drinking straw slightly wider than your cardboard body. Tape one straw straight across the front underside and one across the back underside.',
@@ -679,7 +679,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 6,
       },
       {
-        emoji: '🔗',
+        emoji: '🧶',
         title: 'Hook up the rubber band drive shaft',
         instruction:
           'Cut a small notch or window near the back axle so you can reach the wooden skewer. Loop a rubber band tightly around the middle of the rear skewer and tape the front end of the rubber band to the nose of the car.',
@@ -718,7 +718,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🕹️',
     accentColor: '#F59E0B',
     genderTarget: 'boy',
-    skills: ['🗺️ Level Design & Logic', '✋ Hand-Eye Coordination', '📐 Measuring & Layout'],
+    skills: ['Level Design & Logic', 'Hand-Eye Coordination', 'Measuring & Layout'],
     funFacts: [
       'The word "Labyrinth" comes from ancient Greek mythology, where the inventor Daedalus built a giant maze on the island of Crete!',
       'Tilting a marble maze trains your brain’s proprioception—the ability to make tiny hand adjustments based on visual feedback.',
@@ -726,7 +726,7 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: '🌉',
+        emoji: '📜',
         title: 'Cardboard Arch Tunnels',
         description: 'Bend 3 cm strips of paper into U-shaped arches and tape them over paths as secret bridges the marble rolls under!',
       },
@@ -776,7 +776,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 6,
       },
       {
-        emoji: '🧱',
+        emoji: '📜',
         title: 'Glue the maze walls upright',
         instruction:
           'Run a bead of glue along the bottom edge of each wall strip (or straw) and press it firmly onto your pencil lines. Let dry for 5 minutes.',
@@ -814,7 +814,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '⚡',
     accentColor: '#EF4444',
     genderTarget: 'boy',
-    skills: ['🦸 Costume Design', '✂️ Pattern Cutting', '🎭 Imaginative Roleplay'],
+    skills: ['Costume Design', 'Pattern Cutting', 'Imaginative Roleplay'],
     funFacts: [
       'In comic book art, bright contrasting colors like red, gold, and electric blue are used so heroes stand out in action scenes!',
       'Cutting a single lengthwise slit in a cardboard cylinder turns it into a flexible spring cuff that hugs your wrist without needing Velcro.',
@@ -864,7 +864,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: '☁️',
+        emoji: '✨',
         title: 'Round off the four corners',
         instruction:
           'Snip a gentle curve on the four corners along the cut slit so the cuffs feel smooth and comfortable against your arms.',
@@ -886,7 +886,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: '🦸',
+        emoji: '🛡️',
         title: 'Glue badges and power up!',
         instruction:
           'Glue your emblems centered on the front of each cuff. Slip them onto your wrists, cross your arms in a hero salute, and embark on your adventure!',
@@ -910,7 +910,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🦖',
     accentColor: '#10B981',
     genderTarget: 'boy',
-    skills: ['🦴 Paleontology & Earth Science', '🥣 Dough Kneading', '🔍 Fossil Imprinting'],
+    skills: ['Paleontology & Earth Science', 'Dough Kneading', 'Fossil Imprinting'],
     funFacts: [
       'Trace fossils (like footprints and tail drags) tell scientists how fast dinosaurs ran and whether they walked in herds!',
       'Real fossils form over millions of years when mud and minerals harden into sedimentary rock around ancient tracks or bones.',
@@ -918,17 +918,17 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: '🖌️',
+        emoji: '🎨',
         title: 'Sandbox Excavation Dig Site',
         description: 'Hide your hardened fossils in a tray of sand or cornmeal and use an old paintbrush to carefully uncover them like a real paleontologist!',
       },
       {
-        emoji: '🐚',
+        emoji: '🌟',
         title: 'Prehistoric Sea Shell & Ammonite Stones',
         description: 'Press spiral seashells, pasta wheels, or fern leaves into the dough to create ancient ocean fossils.',
       },
       {
-        emoji: '☕',
+        emoji: '🍋',
         title: 'Ancient Rock Coffee-Wash Finish',
         description: 'Mix a drop of brown paint (or instant coffee) with water and brush it into the footprint grooves so they look millions of years old!',
       },
@@ -983,7 +983,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 3,
       },
       {
-        emoji: '🔎',
+        emoji: '🔍',
         title: 'Antiquing wash and museum display!',
         instruction:
           'Brush a little watered-down brown paint into the footprint indents and wipe the top surface with a paper towel. Create museum labels with each dinosaur’s name!',
@@ -1011,7 +1011,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🧚',
     accentColor: '#EC4899',
     genderTarget: 'girl',
-    skills: ['🎨 Stained-Glass Decoupage', '✨ Light & Shadow Art', '🎀 Decorative Styling'],
+    skills: ['Stained-Glass Decoupage', 'Light & Shadow Art', 'Decorative Styling'],
     funFacts: [
       'Decoupage comes from the French word "découper," meaning to cut out and layer paper art onto surfaces with glue!',
       'When light shines from inside the jar, the dark paper fairy blocks the light to cast a sharp shadow silhouette against the glowing pastel tissue paper.',
@@ -1019,7 +1019,7 @@ export const STARTER_GUIDES = [
     ],
     variations: [
       {
-        emoji: '🦄',
+        emoji: '✨',
         title: 'Unicorn & Rainbow Cloud Lantern',
         description: 'Cut a prancing unicorn silhouette from black paper and surround it with rainbow-striped tissue squares.',
       },
@@ -1029,7 +1029,7 @@ export const STARTER_GUIDES = [
         description: 'Glue real small pressed daisy petals and fern leaves between layers of white tissue paper for a nature cottage lantern.',
       },
       {
-        emoji: '🌙',
+        emoji: '🌌',
         title: 'Starry Moonbeam Nightlight',
         description: 'Use deep blue and violet tissue paper with gold star confetti and a crescent moon cutout.',
       },
@@ -1069,7 +1069,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 4,
       },
       {
-        emoji: '🖌️',
+        emoji: '🎨',
         title: 'Layer the stained-glass coat',
         instruction:
           'Brush a thin layer of watered-down glue onto a section of the jar, press tissue squares onto the wet glue, and gently brush a little more glue on top to seal.',
@@ -1108,7 +1108,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '📿',
     accentColor: '#8B5CF6',
     genderTarget: 'girl',
-    skills: ['🧶 Traditional Weaving', '🔢 Counting & Pattern Rhythm', '💝 Jewelry Making'],
+    skills: ['Traditional Weaving', 'Counting & Pattern Rhythm', 'Jewelry Making'],
     funFacts: [
       'Kumihimo means "gathered threads" in Japanese and was historically used by samurai to braid colorful silk cords for their armor!',
       'Using 7 strings around an 8-notch wheel creates an automatic spiral pattern as you move every 3rd thread into the empty slot.',
@@ -1126,7 +1126,7 @@ export const STARTER_GUIDES = [
         description: 'Slide 3 shiny pony beads or a letter bead onto one strand halfway through weaving so it locks right into the middle of the braid!',
       },
       {
-        emoji: '🎒',
+        emoji: '🧺',
         title: 'Backpack Keychain Tassel',
         description: 'Weave a shorter 10 cm cord and leave a fluffy 5 cm fringe at the bottom to clip onto your school backpack zipper!',
       },
@@ -1157,7 +1157,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 5,
       },
       {
-        emoji: '🪢',
+        emoji: '🧶',
         title: 'Knot and thread the 7 colorful strands',
         instruction:
           'Cut 7 strands of yarn or embroidery floss (each 45 cm long). Tie all 7 together in a knot at one end, and push the knot down through the center hole of the disc.',
@@ -1179,7 +1179,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 8,
       },
       {
-        emoji: '💖',
+        emoji: '✨',
         title: 'Finish and tie your bracelet!',
         instruction:
           'Keep weaving until a 15 cm braided cord grows out the bottom of the center hole. Unhook the strings, tie an overhand knot at the end, and tie your bracelet gently around your wrist!',
@@ -1203,7 +1203,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '💖',
     accentColor: '#F43F5E',
     genderTarget: 'girl',
-    skills: ['🧶 Tactile Yarn Wrapping', '🌿 Nature Upcycling', '✨ Fine Motor Coordination'],
+    skills: ['Tactile Yarn Wrapping', 'Nature Upcycling', 'Fine Motor Coordination'],
     funFacts: [
       'Wrapping yarn across different angles builds bilateral coordination—teaching both hands to work together smoothly!',
       'Many weavers and textile artists use cardboard looms to test color combinations before knitting sweaters or blankets.',
@@ -1221,7 +1221,7 @@ export const STARTER_GUIDES = [
         description: 'Tuck small artificial flowers, dried lavender, or paper blossoms under the criss-crossed yarn strings.',
       },
       {
-        emoji: '🚪',
+        emoji: '🧭',
         title: 'Bedroom Door Name Hanger',
         description: 'Skip the twig handle and tie a top loop of yarn so your cozy wrapped heart hangs on your bedroom doorknob!',
       },
@@ -1246,7 +1246,7 @@ export const STARTER_GUIDES = [
     ],
     steps: [
       {
-        emoji: '❤️',
+        emoji: '🎀',
         title: 'Cut and notch your cardboard heart',
         instruction:
           'Draw a plump heart shape on sturdy cardboard and cut it out. Snip tiny shallow notches around the perimeter so your yarn has places to grip.',
@@ -1299,7 +1299,7 @@ export const STARTER_GUIDES = [
     iconEmoji: '🍓',
     accentColor: '#E11D48',
     genderTarget: 'girl',
-    skills: ['🪡 Beginner Hand Sewing', '🧸 3D Plush Construction', '🍵 Pretend Play'],
+    skills: ['Beginner Hand Sewing', '3D Plush Construction', 'Pretend Play'],
     funFacts: [
       'Craft felt is the easiest fabric in the world for beginner sewers because its fibers are pressed together—so cut edges never unravel!',
       'Strawberries are the only fruit that wear their seeds on the outside—an average strawberry has about 200 tiny seeds!',
@@ -1317,7 +1317,7 @@ export const STARTER_GUIDES = [
         description: 'Use black and pink markers or thread to add two cute eyes and rosy cheeks to the front of your strawberry.',
       },
       {
-        emoji: '📌',
+        emoji: '🧵',
         title: 'Sewing Kit Pincushion',
         description: 'Fill your strawberry extra firmly with stuffing or rice so it can hold pins and needles on a craft desk!',
       },
@@ -1349,7 +1349,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 4,
       },
       {
-        emoji: '🪡',
+        emoji: '🧵',
         title: 'Fold and stitch into a cone pocket',
         instruction:
           'Fold one half-circle in half so the straight edges meet. Using a threaded needle (or fabric glue), sew small up-and-down stitches along the straight edge to form a cone.',
@@ -1357,7 +1357,7 @@ export const STARTER_GUIDES = [
         durationMinutes: 7,
       },
       {
-        emoji: '☁️',
+        emoji: '✨',
         title: 'Turn right-side out and stuff plump',
         instruction:
           'Turn the red felt cone right-side out so the seam hides inside. Use your finger to push torn pieces of cotton balls all the way into the tip until the berry is plump.',
@@ -1410,11 +1410,12 @@ export async function seedInitialGuides(db) {
       } else {
         // Ensure gender_target and metadata are synced for existing databases
         await db.runAsync(
-          'UPDATE guides SET gender_target = ?, summary = ?, safety_note = ? WHERE id = ?;',
+          'UPDATE guides SET gender_target = ?, summary = ?, safety_note = ?, icon_emoji = ? WHERE id = ?;',
           [
             guide.genderTarget || 'all',
             guide.summary,
             guide.safetyNote ?? null,
+            guide.iconEmoji,
             existing.id,
           ]
         );
