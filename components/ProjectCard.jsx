@@ -15,6 +15,7 @@ export default function ProjectCard({ item, onPress }) {
   const totalStepsCount = item.totalSteps || richInfo?.steps?.length || 5;
   const projectEmoji = resolveProjectEmoji(item.iconEmoji, item.slug);
   const outcomeImage = getProjectImage(item.slug);
+  const accent = item.accentColor || theme.primary;
 
   return (
     <Pressable
@@ -30,46 +31,33 @@ export default function ProjectCard({ item, onPress }) {
       accessibilityRole="button"
       accessibilityLabel={`Open DIY Guide: ${item.title}`}
     >
-      {/* Final Outcome Image Banner */}
-      {outcomeImage && (
-        <View style={styles.imageBannerWrapper}>
-          <Image
-            source={outcomeImage}
-            style={styles.outcomeImage}
-            resizeMode="cover"
-          />
-          <View
-            style={[
-              styles.floatingEmojiBadge,
-              { backgroundColor: item.accentColor || theme.primary },
-            ]}
-          >
-            <Text style={styles.emoji}>{projectEmoji}</Text>
-          </View>
-          <View style={styles.outcomeTag}>
-            <Text style={styles.outcomeTagText}>Final Outcome</Text>
-          </View>
-        </View>
-      )}
-
       <View style={styles.mainRow}>
-        {/* Fallback Emoji Box if custom guide has no image */}
-        {!outcomeImage && (
-          <View
-            style={[
-              styles.iconBox,
-              { backgroundColor: item.accentColor || theme.primary },
-            ]}
-          >
+        {/* Project PNG Artwork or Emoji Box */}
+        <View
+          style={[
+            styles.iconBox,
+            {
+              backgroundColor: outcomeImage ? `${accent}18` : accent,
+              borderColor: `${accent}35`,
+            },
+          ]}
+        >
+          {outcomeImage ? (
+            <Image
+              source={outcomeImage}
+              style={styles.projectPng}
+              resizeMode="contain"
+            />
+          ) : (
             <Text style={styles.emoji}>{projectEmoji}</Text>
-          </View>
-        )}
+          )}
+        </View>
 
         {/* Project Details */}
         <View style={styles.body}>
           <View style={styles.eyebrowRow}>
             <Text style={[styles.categoryText, { color: theme.primary }]}>
-              {outcomeImage ? `${projectEmoji}  ${item.category}` : item.category}
+              {projectEmoji}  {item.category}
             </Text>
 
             <View style={styles.statusGroup}>
@@ -139,9 +127,9 @@ export default function ProjectCard({ item, onPress }) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
-    padding: 14,
+    padding: 16,
     borderWidth: 1,
-    gap: 12,
+    gap: 14,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -152,62 +140,26 @@ const styles = StyleSheet.create({
     opacity: 0.92,
     transform: [{ scale: 0.99 }],
   },
-  imageBannerWrapper: {
-    width: '100%',
-    height: 156,
-    borderRadius: 14,
-    overflow: 'hidden',
-    position: 'relative',
-    backgroundColor: '#E2E8F0',
-  },
-  outcomeImage: {
-    width: '100%',
-    height: '100%',
-  },
-  floatingEmojiBadge: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  outcomeTag: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
-    backgroundColor: 'rgba(15, 23, 42, 0.72)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 99,
-  },
-  outcomeTagText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontFamily: Fonts.bold,
-    letterSpacing: 0.3,
-  },
   mainRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: 14,
   },
   iconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  projectPng: {
+    width: '100%',
+    height: '100%',
+  },
   emoji: {
-    fontSize: 22,
+    fontSize: 28,
   },
   body: {
     flex: 1,

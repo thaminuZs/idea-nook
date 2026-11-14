@@ -272,11 +272,19 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
           ]}
         >
           {outcomeImage && (
-            <View style={styles.heroImageWrapper}>
+            <View
+              style={[
+                styles.heroImageWrapper,
+                {
+                  backgroundColor: `${guide.accentColor || theme.primary}15`,
+                  borderColor: `${guide.accentColor || theme.primary}30`,
+                },
+              ]}
+            >
               <Image
                 source={outcomeImage}
                 style={styles.heroOutcomeImage}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <View style={styles.heroOutcomeBadge}>
                 <Text style={styles.heroOutcomeBadgeText}>
@@ -880,11 +888,13 @@ const styles = StyleSheet.create({
   },
   heroImageWrapper: {
     width: '100%',
-    height: 210,
-    borderRadius: 16,
-    overflow: 'hidden',
+    height: 170,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'relative',
-    backgroundColor: '#E2E8F0',
   },
   heroOutcomeImage: {
     width: '100%',
