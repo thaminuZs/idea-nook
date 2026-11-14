@@ -2,7 +2,6 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -10,9 +9,15 @@ import {
 import React, { useCallback, useMemo, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import GuideDetailView from '../components/GuideDetailView';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { getDashboardStats, getGuides } from '../db';
+import {
+  getDashboardStats,
+  getGuides,
+  getStarterGuideRichContent,
+  seedInitialGuides,
+} from '../db';
 
 const FILTER_TABS = [
   { id: 'for_you', label: '🎯 For You' },
@@ -31,10 +36,12 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState('for_you');
+  const [selectedGuide, setSelectedGuide] = useState(null);
 
   const loadData = useCallback(async () => {
     try {
       setError(null);
+      await seedInitialGuides(db);
       const [guideRows, dashboardStats] = await Promise.all([
         getGuides(db),
         getDashboardStats(db),
@@ -96,6 +103,20 @@ const Home = () => {
     return guides;
   }, [guides, selectedFilter, profile]);
 
+  // If a project is selected, render its full interactive GuideDetailView right here!
+  if (selectedGuide) {
+    return (
+      <GuideDetailView
+        guideId={selectedGuide.id}
+        initialGuide={selectedGuide}
+        onBack={() => {
+          setSelectedGuide(null);
+          loadData();
+        }}
+      />
+    );
+  }
+
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
@@ -141,7 +162,13 @@ const Home = () => {
                       Hi, {profile.name}! 👋
                     </Text>
                     <Text style={[styles.greetingSubtitle, { color: mutedText }]}>
-                      Age {profile.age} • {profile.gender === 'boy' ? 'Boy 👦' : profile.gender === 'girl' ? 'Girl 👧' : 'Super Star ⭐'}
+                      Age {profile.age} •{' '}
+                      {profile.gender === 'boy'
+                        ? 'Boy 👦'
+                        : profile.gender === 'girl'
+                        ? 'Girl 👧'
+                        : 'Super Star ⭐'}
+                      {stats ? ` • ⭐ ${stats.totalStars} Stars` : ''}
                     </Text>
                   </View>
                 </View>
@@ -193,7 +220,7 @@ const Home = () => {
                   : 'All DIY Guides 🌈'}
               </Text>
               <Text style={[styles.sectionSubtitle, { color: mutedText }]}>
-                {displayedGuides.length} activities ready offline
+                Tap any project card below to open supplies, steps, fun facts & ideas ({displayedGuides.length} projects)
               </Text>
             </View>
           </View>
@@ -207,70 +234,134 @@ const Home = () => {
               item.genderTarget === 'all' ||
               item.genderTarget === profile.gender);
 
+          const isCompleted = item.status === 'completed';
+          const isInProgress = item.status === 'in_progress';
+          const richInfo = getStarterGuideRichContent(item.slug);
+          const totalMaterialsCount =
+            item.totalMaterials || richInfo?.materials?.length || 5;
+          const totalStepsCount =
+            item.totalSteps || richInfo?.steps?.length || 5;
+          const skillTags = richInfo?.skills?.slice(0, 2) || [];
+
           return (
-            <View
-              style={[
+            <Pressable
+              onPress={() => setSelectedGuide(item)}
+              style={({ pressed }) => [
                 styles.card,
                 { backgroundColor: cardBackground, borderColor },
                 isBestForYou && styles.cardRecommended,
+                pressed && styles.cardPressed,
               ]}
+              accessibilityRole="button"
+              accessibilityLabel={`Open DIY Guide: ${item.title}`}
             >
-              <View style={[styles.badge, { backgroundColor: item.accentColor }]}>
-                <Text style={styles.emoji}>{item.iconEmoji}</Text>
-              </View>
-
-              <View style={styles.cardBody}>
-                <View style={styles.cardTitleRow}>
-                  <Text style={[styles.cardTitle, { color: theme.text }]}>
-                    {item.title}
-                  </Text>
-                  {isBestForYou && (
-                    <View style={styles.forYouBadge}>
-                      <Text style={styles.forYouBadgeText}>For You</Text>
-                    </View>
-                  )}
+              <View style={styles.cardTopRow}>
+                <View style={[styles.badge, { backgroundColor: item.accentColor }]}>
+                  <Text style={styles.emoji}>{item.iconEmoji}</Text>
                 </View>
 
-                <Text style={[styles.cardSummary, { color: mutedText }]} numberOfLines={2}>
-                  {item.summary}
-                </Text>
+                <View style={styles.cardBody}>
+                  <View style={styles.cardTitleRow}>
+                    <Text style={[styles.cardTitle, { color: theme.text }]}>
+                      {item.title}
+                    </Text>
+                    {isBestForYou && (
+                      <View style={styles.forYouBadge}>
+                        <Text style={styles.forYouBadgeText}>For You</Text>
+                      </View>
+                    )}
+                    {isCompleted && (
+                      <View style={styles.completedBadge}>
+                        <Text style={styles.completedBadgeText}>⭐ Done</Text>
+                      </View>
+                    )}
+                    {isInProgress && !isCompleted && (
+                      <View style={styles.inProgressBadge}>
+                        <Text style={styles.inProgressBadgeText}>🛠️ In Progress</Text>
+                      </View>
+                    )}
+                  </View>
 
-                <View style={styles.cardFooterRow}>
-                  <Text style={[styles.cardMeta, { color: mutedText }]}>
-                    {item.category} • Ages {item.minAge}–{item.maxAge} • {item.estimatedMinutes} min
+                  <Text
+                    style={[styles.cardSummary, { color: mutedText }]}
+                    numberOfLines={2}
+                  >
+                    {item.summary}
                   </Text>
+                </View>
+              </View>
 
-                  {/* Target Gender Pill */}
-                  <View
+              {/* Content Preview Badges: Supplies, Steps, Time, Age, Gender */}
+              <View style={styles.contentMetaRow}>
+                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    🎒 {totalMaterialsCount} Supplies
+                  </Text>
+                </View>
+                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    🛠️ {totalStepsCount} Steps
+                  </Text>
+                </View>
+                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    ⏱️ {item.estimatedMinutes} min
+                  </Text>
+                </View>
+                <View style={[styles.metaChip, { backgroundColor: filterPillBg }]}>
+                  <Text style={[styles.metaChipText, { color: theme.text }]}>
+                    🎯 Ages {item.minAge}–{item.maxAge}
+                  </Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.genderTargetPill,
+                    item.genderTarget === 'boy'
+                      ? styles.genderPillBoy
+                      : item.genderTarget === 'girl'
+                      ? styles.genderPillGirl
+                      : styles.genderPillAll,
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.genderTargetPill,
+                      styles.genderTargetText,
                       item.genderTarget === 'boy'
-                        ? styles.genderPillBoy
+                        ? styles.genderTextBoy
                         : item.genderTarget === 'girl'
-                        ? styles.genderPillGirl
-                        : styles.genderPillAll,
+                        ? styles.genderTextGirl
+                        : styles.genderTextAll,
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.genderTargetText,
-                        item.genderTarget === 'boy'
-                          ? styles.genderTextBoy
-                          : item.genderTarget === 'girl'
-                          ? styles.genderTextGirl
-                          : styles.genderTextAll,
-                      ]}
-                    >
-                      {item.genderTarget === 'boy'
-                        ? '👦 Boys'
-                        : item.genderTarget === 'girl'
-                        ? '👧 Girls'
-                        : '🌟 Everyone'}
-                    </Text>
-                  </View>
+                    {item.genderTarget === 'boy'
+                      ? '👦 Boys'
+                      : item.genderTarget === 'girl'
+                      ? '👧 Girls'
+                      : '🌟 Everyone'}
+                  </Text>
                 </View>
               </View>
-            </View>
+
+              {/* Skill Pills Row */}
+              {skillTags.length > 0 && (
+                <View style={styles.skillPreviewRow}>
+                  {skillTags.map((skill, idx) => (
+                    <Text key={idx} style={[styles.skillPreviewText, { color: mutedText }]}>
+                      {skill}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              {/* Explicit Action Button Bar */}
+              <View style={styles.openProjectBtnBar}>
+                <Text style={styles.openProjectBtnText}>
+                  📖 Open Project & Browse Steps ({totalStepsCount} Steps)
+                </Text>
+                <Text style={styles.openProjectBtnArrow}>→</Text>
+              </View>
+            </Pressable>
           );
         }}
       />
@@ -286,7 +377,8 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    gap: 12,
+    gap: 14,
+    paddingBottom: 32,
   },
   centered: {
     flex: 1,
@@ -301,21 +393,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 18,
-    borderWidth: 1.5,
     padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
     marginBottom: 14,
   },
   greetingLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    flex: 1,
   },
   avatarPill: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -370,26 +461,33 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 16,
+    padding: 15,
+    borderRadius: 18,
     borderWidth: 1,
     gap: 12,
+  },
+  cardPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.99 }],
   },
   cardRecommended: {
     borderColor: '#FFAB91',
     borderWidth: 1.5,
   },
+  cardTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
   badge: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emoji: {
-    fontSize: 24,
+    fontSize: 26,
   },
   cardBody: {
     flex: 1,
@@ -402,7 +500,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
     flex: 1,
   },
   forYouBadge: {
@@ -416,26 +514,51 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
+  completedBadge: {
+    backgroundColor: '#DEF7EC',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  completedBadgeText: {
+    color: '#03543F',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  inProgressBadge: {
+    backgroundColor: '#FEF08A',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  inProgressBadgeText: {
+    color: '#713F12',
+    fontSize: 11,
+    fontWeight: '700',
+  },
   cardSummary: {
     fontSize: 13,
     marginTop: 4,
     lineHeight: 18,
   },
-  cardFooterRow: {
+  contentMetaRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 8,
     gap: 6,
   },
-  cardMeta: {
+  metaChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  metaChipText: {
     fontSize: 11,
-    fontWeight: '500',
-    flex: 1,
+    fontWeight: '700',
   },
   genderTargetPill: {
-    paddingHorizontal: 7,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 8,
   },
   genderPillBoy: {
@@ -461,6 +584,36 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     fontSize: 11,
     fontWeight: '700',
+  },
+  skillPreviewRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  skillPreviewText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  openProjectBtnBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFF0EB',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFCCBC',
+  },
+  openProjectBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#D84315',
+  },
+  openProjectBtnArrow: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#D84315',
   },
   errorText: {
     color: '#D32F2F',

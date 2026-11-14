@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import OnboardingScreen from '../components/OnboardingScreen';
 import { useProfile } from '../contexts/ProfileContext';
@@ -208,6 +208,14 @@ export default function ProfilePage() {
         <Text style={[styles.hintBody, { color: mutedText }]}>
           Your Home feed is customized for {profile.name} (Age {profile.age} • {genderLabel}). You can browse tailored projects or explore all DIY crafts anytime on the Home tab!
         </Text>
+        <Pressable
+          style={styles.browseGuidesBtn}
+          onPress={() => router.push('/')}
+        >
+          <Text style={styles.browseGuidesBtnText}>
+            Browse Tailored DIY Guides 🚀
+          </Text>
+        </Pressable>
       </View>
 
       {/* Testing / Reset Flow Button */}
@@ -486,5 +494,18 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     backgroundColor: '#DC2626',
+  },
+  browseGuidesBtn: {
+    backgroundColor: '#FF7043',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  browseGuidesBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

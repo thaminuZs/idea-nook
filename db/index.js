@@ -1,5 +1,9 @@
 export { DATABASE_NAME, DATABASE_VERSION, initializeDatabase } from './schema';
-export { STARTER_GUIDES, seedInitialGuides } from './seed';
+export {
+  STARTER_GUIDES,
+  getStarterGuideRichContent,
+  seedInitialGuides,
+} from './seed';
 export {
   createCustomGuide,
   deleteCustomGuide,
