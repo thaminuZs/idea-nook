@@ -37,10 +37,10 @@ export default function OnboardingScreen({
   const [submitting, setSubmitting] = useState(false);
 
   const isDark = scheme === 'dark';
-  const cardBg = isDark ? '#1E1E1E' : '#FFFFFF';
-  const borderCol = isDark ? '#333333' : '#E2E8F0';
-  const inputBg = isDark ? '#2A2A2A' : '#F8FAFC';
-  const subtitleColor = isDark ? '#A0AEC0' : '#64748B';
+  const cardBg = theme.surface;
+  const borderCol = theme.border;
+  const inputBg = theme.surfaceSubtle;
+  const subtitleColor = theme.textMuted;
 
   const handleSubmit = async () => {
     setErrorMsg('');

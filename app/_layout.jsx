@@ -38,9 +38,9 @@ function DatabaseLoadingFallback() {
 
   return (
     <View style={[styles.centered, { backgroundColor: theme.background }]}>
-      <ActivityIndicator size="large" color={theme.text} />
-      <Text style={[styles.loadingText, { color: theme.text }]}>
-        Loading offline DIY library...
+      <ActivityIndicator size="large" color={theme.primary} />
+      <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+        Loading your DIY library...
       </Text>
     </View>
   );
@@ -54,36 +54,85 @@ const Navigation = () => {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.background,
+          backgroundColor: theme.surface,
+          borderBottomColor: theme.border,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+        },
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: '800',
+          fontSize: 18,
+          color: theme.text,
         },
         headerTintColor: theme.text,
         tabBarStyle: {
-          backgroundColor: theme.background,
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
+          height: 62,
+          paddingBottom: 8,
+          paddingTop: 6,
         },
-        tabBarActiveTintColor: '#FF7043',
-        tabBarInactiveTintColor: 'gray',
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '700',
+        },
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textMuted,
         headerRight: () => (
           <View style={styles.headerRightContainer}>
             {profile && (
               <Pressable
                 onPress={() => router.push('/scrol')}
-                style={styles.profileBadge}
+                style={[
+                  styles.profileBadge,
+                  { backgroundColor: theme.surfaceSubtle },
+                ]}
               >
-                <Text style={styles.profileBadgeText}>
-                  {profile.avatarEmoji} {profile.name} ({profile.age})
+                <Text style={styles.profileBadgeEmoji}>{profile.avatarEmoji}</Text>
+                <Text style={[styles.profileBadgeText, { color: theme.text }]}>
+                  {profile.name}
                 </Text>
               </Pressable>
             )}
-            <Pressable onPress={toggleTheme} style={styles.themeToggle}>
-              <Text>{scheme === 'light' ? '☀️' : '🌙'}</Text>
+            <Pressable
+              onPress={toggleTheme}
+              style={[
+                styles.themeToggle,
+                { backgroundColor: theme.surfaceSubtle },
+              ]}
+            >
+              <Text style={styles.themeToggleIcon}>
+                {scheme === 'light' ? '🌙' : '☀️'}
+              </Text>
             </Pressable>
           </View>
         ),
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'For You', headerTitle: 'For You 🎯' }} />
-      <Tabs.Screen name="flat" options={{ title: 'Explore', headerTitle: 'Explore All Projects 🌈' }} />
-      <Tabs.Screen name="scrol" options={{ title: 'Profile', headerTitle: 'My Profile' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'For You',
+          headerTitle: 'IdeaNook',
+          tabBarIcon: () => <Text style={styles.tabIcon}>✨</Text>,
+        }}
+      />
+      <Tabs.Screen
+        name="flat"
+        options={{
+          title: 'Explore',
+          headerTitle: 'Explore',
+          tabBarIcon: () => <Text style={styles.tabIcon}>🧭</Text>,
+        }}
+      />
+      <Tabs.Screen
+        name="scrol"
+        options={{
+          title: 'Profile',
+          headerTitle: 'Profile',
+          tabBarIcon: () => <Text style={styles.tabIcon}>👤</Text>,
+        }}
+      />
       <Tabs.Screen
         name="guide/[id]"
         options={{
@@ -104,15 +153,11 @@ function RootApp() {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color={theme.text} />
-        <Text style={[styles.loadingText, { color: theme.text }]}>
-          Checking child profile...
-        </Text>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
-  // On first start: if no profile exists, ask for name, age, and gender
   if (!profile) {
     return <OnboardingScreen onComplete={saveProfile} isFirstTime={true} />;
   }
@@ -136,7 +181,7 @@ export default function RootLayout() {
           </SQLiteProvider>
         </Suspense>
       </DatabaseErrorBoundary>
-    </ThemeProvider>
+      </ThemeProvider>
   );
 }
 
@@ -149,38 +194,53 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 15,
+    fontSize: 14,
+    fontWeight: '600',
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#D32F2F',
+    color: '#DC2626',
     marginBottom: 8,
     textAlign: 'center',
   },
   errorMessage: {
     fontSize: 14,
-    color: '#555555',
+    color: '#64748B',
     textAlign: 'center',
   },
   headerRightContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginRight: 15,
+    marginRight: 16,
   },
   profileBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#FFEBE5',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 99,
+  },
+  profileBadgeEmoji: {
+    fontSize: 14,
   },
   profileBadgeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#D84315',
   },
   themeToggle: {
-    padding: 4,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  themeToggleIcon: {
+    fontSize: 15,
+  },
+  tabIcon: {
+    fontSize: 18,
   },
 });

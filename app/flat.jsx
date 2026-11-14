@@ -12,24 +12,20 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import GuideDetailView from '../components/GuideDetailView';
+import ProjectCard from '../components/ProjectCard';
 import { useTheme } from '../contexts/ThemeContext';
-import {
-  getCategories,
-  getGuides,
-  getStarterGuideRichContent,
-  seedInitialGuides,
-} from '../db';
+import { getCategories, getGuides, seedInitialGuides } from '../db';
 
 const AUDIENCE_TABS = [
-  { id: 'all', label: '🌈 All Projects' },
+  { id: 'all', label: 'All' },
   { id: 'boy', label: '👦 Boys' },
   { id: 'girl', label: '👧 Girls' },
-  { id: 'favorites', label: '❤️ Favorites' },
+  { id: 'favorites', label: '❤️ Saved' },
 ];
 
 export default function ExploreScreen() {
   const db = useSQLiteContext();
-  const { theme, scheme } = useTheme();
+  const { theme } = useTheme();
 
   const [guides, setGuides] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -38,12 +34,6 @@ export default function ExploreScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGuide, setSelectedGuide] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const isDark = scheme === 'dark';
-  const cardBg = isDark ? '#1A1A1A' : '#FFFFFF';
-  const borderCol = isDark ? '#2D2D2D' : '#E2E8F0';
-  const mutedText = isDark ? '#94A3B8' : '#64748B';
-  const pillBg = isDark ? '#262626' : '#F1F5F9';
 
   const loadLibrary = useCallback(async () => {
     try {
@@ -69,7 +59,6 @@ export default function ExploreScreen() {
 
   const filteredGuides = useMemo(() => {
     return guides.filter((g) => {
-      // Audience filter
       if (selectedAudience === 'boy' && g.genderTarget !== 'boy' && g.genderTarget !== 'all') {
         return false;
       }
@@ -80,11 +69,9 @@ export default function ExploreScreen() {
         return false;
       }
 
-      // Category filter
       const matchesCat =
         selectedCategory === 'All' || g.category === selectedCategory;
 
-      // Search filter
       const q = searchQuery.trim().toLowerCase();
       const matchesSearch =
         !q ||
@@ -112,7 +99,7 @@ export default function ExploreScreen() {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color="#FF7043" />
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -123,45 +110,35 @@ export default function ExploreScreen() {
         data={filteredGuides}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View style={styles.header}>
-            <View style={styles.titleRow}>
-              <Text style={[styles.pageTitle, { color: theme.text }]}>
-                Explore All DIY Projects 🌈
-              </Text>
-              <View style={styles.countBadge}>
-                <Text style={styles.countBadgeText}>
-                  {filteredGuides.length} of {guides.length}
-                </Text>
-              </View>
-            </View>
-            <Text style={[styles.pageSubtitle, { color: mutedText }]}>
-              Browse our complete library of offline projects across all ages, categories, and interests
-            </Text>
-
             {/* Search Input */}
             <View
               style={[
                 styles.searchBox,
-                { backgroundColor: cardBg, borderColor: borderCol },
+                {
+                  backgroundColor: theme.surface,
+                  borderColor: theme.border,
+                },
               ]}
             >
-              <Text style={styles.searchIcon}>🔎</Text>
+              <Text style={styles.searchIcon}>🔍</Text>
               <TextInput
                 style={[styles.searchInput, { color: theme.text }]}
-                placeholder="Search rockets, volcano, bracelets, cars..."
-                placeholderTextColor={mutedText}
+                placeholder="Search rockets, volcano, bracelets..."
+                placeholderTextColor={theme.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
               {searchQuery.length > 0 && (
-                <Pressable onPress={() => setSearchQuery('')}>
-                  <Text style={[styles.clearText, { color: mutedText }]}>✕</Text>
+                <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+                  <Text style={[styles.clearText, { color: theme.textMuted }]}>✕</Text>
                 </Pressable>
               )}
             </View>
 
-            {/* Audience Filter Row (All, Boys, Girls, Favorites) */}
+            {/* Audience Filter Row */}
             <View style={styles.audienceRow}>
               {AUDIENCE_TABS.map((tab) => {
                 const isSelected = selectedAudience === tab.id;
@@ -172,8 +149,10 @@ export default function ExploreScreen() {
                     style={[
                       styles.audiencePill,
                       {
-                        backgroundColor: isSelected ? '#FF7043' : pillBg,
-                        borderColor: isSelected ? '#FF7043' : borderCol,
+                        backgroundColor: isSelected
+                          ? theme.primary
+                          : theme.surface,
+                        borderColor: isSelected ? theme.primary : theme.border,
                       },
                     ]}
                   >
@@ -182,7 +161,6 @@ export default function ExploreScreen() {
                         styles.audiencePillText,
                         {
                           color: isSelected ? '#FFFFFF' : theme.text,
-                          fontWeight: isSelected ? '700' : '600',
                         },
                       ]}
                     >
@@ -193,7 +171,7 @@ export default function ExploreScreen() {
               })}
             </View>
 
-            {/* Category Filter Pills */}
+            {/* Category Filter Chips */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -204,9 +182,9 @@ export default function ExploreScreen() {
                   styles.catPill,
                   {
                     backgroundColor:
-                      selectedCategory === 'All' ? '#0F172A' : pillBg,
-                    borderColor:
-                      selectedCategory === 'All' ? '#0F172A' : borderCol,
+                      selectedCategory === 'All'
+                        ? theme.text
+                        : theme.surfaceSubtle,
                   },
                 ]}
                 onPress={() => setSelectedCategory('All')}
@@ -216,7 +194,9 @@ export default function ExploreScreen() {
                     styles.catPillText,
                     {
                       color:
-                        selectedCategory === 'All' ? '#FFFFFF' : theme.text,
+                        selectedCategory === 'All'
+                          ? theme.background
+                          : theme.textMuted,
                     },
                   ]}
                 >
@@ -232,8 +212,9 @@ export default function ExploreScreen() {
                     style={[
                       styles.catPill,
                       {
-                        backgroundColor: isSelected ? '#0F172A' : pillBg,
-                        borderColor: isSelected ? '#0F172A' : borderCol,
+                        backgroundColor: isSelected
+                          ? theme.text
+                          : theme.surfaceSubtle,
                       },
                     ]}
                     onPress={() => setSelectedCategory(c.category)}
@@ -241,7 +222,9 @@ export default function ExploreScreen() {
                     <Text
                       style={[
                         styles.catPillText,
-                        { color: isSelected ? '#FFFFFF' : theme.text },
+                        {
+                          color: isSelected ? theme.background : theme.textMuted,
+                        },
                       ]}
                     >
                       {c.category} ({c.count})
@@ -256,153 +239,26 @@ export default function ExploreScreen() {
           <View style={styles.emptyBox}>
             <Text style={styles.emptyEmoji}>🔍</Text>
             <Text style={[styles.emptyTitle, { color: theme.text }]}>
-              No matching projects found
+              No projects found
             </Text>
-            <Text style={[styles.emptySub, { color: mutedText }]}>
-              Try clearing your search or switching category filters.
+            <Text style={[styles.emptySub, { color: theme.textMuted }]}>
+              Try clearing your search or switching filters.
             </Text>
             <Pressable
-              style={styles.resetFilterBtn}
+              style={[styles.resetFilterBtn, { backgroundColor: theme.primary }]}
               onPress={() => {
                 setSelectedAudience('all');
                 setSelectedCategory('All');
                 setSearchQuery('');
               }}
             >
-              <Text style={styles.resetFilterBtnText}>Show All Projects</Text>
+              <Text style={styles.resetFilterBtnText}>Reset Filters</Text>
             </Pressable>
           </View>
         }
-        renderItem={({ item }) => {
-          const isCompleted = item.status === 'completed';
-          const isInProgress = item.status === 'in_progress';
-          const richInfo = getStarterGuideRichContent(item.slug);
-          const totalMaterialsCount =
-            item.totalMaterials || richInfo?.materials?.length || 5;
-          const totalStepsCount =
-            item.totalSteps || richInfo?.steps?.length || 5;
-          const skillTags = richInfo?.skills?.slice(0, 2) || [];
-
-          return (
-            <Pressable
-              onPress={() => setSelectedGuide(item)}
-              style={({ pressed }) => [
-                styles.card,
-                { backgroundColor: cardBg, borderColor: borderCol },
-                pressed && styles.cardPressed,
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={`Open DIY Guide: ${item.title}`}
-            >
-              <View style={styles.cardTopRow}>
-                <View
-                  style={[styles.iconBox, { backgroundColor: item.accentColor }]}
-                >
-                  <Text style={styles.iconEmoji}>{item.iconEmoji}</Text>
-                </View>
-
-                <View style={styles.cardInfo}>
-                  <View style={styles.cardTitleRow}>
-                    <Text style={[styles.cardTitle, { color: theme.text }]}>
-                      {item.title}
-                    </Text>
-                    {item.isFavorite && <Text style={{ fontSize: 14 }}>❤️</Text>}
-                    {isCompleted && (
-                      <View style={styles.completedBadge}>
-                        <Text style={styles.completedBadgeText}>⭐ Done</Text>
-                      </View>
-                    )}
-                    {isInProgress && !isCompleted && (
-                      <View style={styles.inProgressBadge}>
-                        <Text style={styles.inProgressBadgeText}>🛠️ In Progress</Text>
-                      </View>
-                    )}
-                  </View>
-
-                  <Text
-                    style={[styles.cardSummary, { color: mutedText }]}
-                    numberOfLines={2}
-                  >
-                    {item.summary}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Content Preview Badges */}
-              <View style={styles.contentMetaRow}>
-                <View style={[styles.metaChip, { backgroundColor: pillBg }]}>
-                  <Text style={[styles.metaChipText, { color: theme.text }]}>
-                    🎒 {totalMaterialsCount} Supplies
-                  </Text>
-                </View>
-                <View style={[styles.metaChip, { backgroundColor: pillBg }]}>
-                  <Text style={[styles.metaChipText, { color: theme.text }]}>
-                    🛠️ {totalStepsCount} Steps
-                  </Text>
-                </View>
-                <View style={[styles.metaChip, { backgroundColor: pillBg }]}>
-                  <Text style={[styles.metaChipText, { color: theme.text }]}>
-                    ⏱️ {item.estimatedMinutes} min
-                  </Text>
-                </View>
-                <View style={[styles.metaChip, { backgroundColor: pillBg }]}>
-                  <Text style={[styles.metaChipText, { color: theme.text }]}>
-                    🎯 Ages {item.minAge}–{item.maxAge}
-                  </Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.genderTargetPill,
-                    item.genderTarget === 'boy'
-                      ? styles.genderPillBoy
-                      : item.genderTarget === 'girl'
-                      ? styles.genderPillGirl
-                      : styles.genderPillAll,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.genderTargetText,
-                      item.genderTarget === 'boy'
-                        ? styles.genderTextBoy
-                        : item.genderTarget === 'girl'
-                        ? styles.genderTextGirl
-                        : styles.genderTextAll,
-                    ]}
-                  >
-                    {item.genderTarget === 'boy'
-                      ? '👦 Boys'
-                      : item.genderTarget === 'girl'
-                      ? '👧 Girls'
-                      : '🌟 Everyone'}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Skills Row */}
-              {skillTags.length > 0 && (
-                <View style={styles.skillPreviewRow}>
-                  {skillTags.map((skill, idx) => (
-                    <Text
-                      key={idx}
-                      style={[styles.skillPreviewText, { color: mutedText }]}
-                    >
-                      {skill}
-                    </Text>
-                  ))}
-                </View>
-              )}
-
-              <View style={styles.openBtnBar}>
-                <Text style={styles.openBtnText}>
-                  📖 Open Project & Browse Steps ({totalStepsCount} Steps)
-                </Text>
-                <Text style={styles.openBtnArrow}>→</Text>
-              </View>
-            </Pressable>
-          );
-        }}
+        renderItem={({ item }) => (
+          <ProjectCard item={item} onPress={setSelectedGuide} />
+        )}
       />
     </View>
   );
@@ -419,48 +275,24 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    gap: 14,
+    gap: 12,
     paddingBottom: 32,
   },
   header: {
-    gap: 10,
+    gap: 12,
     marginBottom: 4,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  pageTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  countBadge: {
-    backgroundColor: '#FFEBE5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  countBadgeText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#D84315',
-  },
-  pageSubtitle: {
-    fontSize: 13,
-    lineHeight: 18,
   },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderRadius: 16,
     borderWidth: 1,
-    gap: 8,
+    gap: 10,
   },
   searchIcon: {
-    fontSize: 16,
+    fontSize: 15,
   },
   searchInput: {
     flex: 1,
@@ -468,185 +300,44 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   clearText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     paddingHorizontal: 4,
   },
   audienceRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
   },
   audiencePill: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 14,
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 12,
     borderWidth: 1,
+    alignItems: 'center',
   },
   audiencePillText: {
     fontSize: 12,
+    fontWeight: '700',
   },
   categoryScroll: {
     gap: 8,
-    paddingVertical: 2,
   },
   catPill: {
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 99,
   },
   catPillText: {
     fontSize: 12,
     fontWeight: '700',
   },
-  card: {
-    padding: 15,
-    borderRadius: 18,
-    borderWidth: 1,
-    gap: 12,
-  },
-  cardPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.99 }],
-  },
-  cardTopRow: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  iconBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconEmoji: {
-    fontSize: 26,
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  cardTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 6,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    flex: 1,
-  },
-  completedBadge: {
-    backgroundColor: '#DEF7EC',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  completedBadgeText: {
-    color: '#03543F',
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  inProgressBadge: {
-    backgroundColor: '#FEF08A',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  inProgressBadgeText: {
-    color: '#713F12',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  cardSummary: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 4,
-  },
-  contentMetaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 6,
-  },
-  metaChip: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  metaChipText: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  genderTargetPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  genderPillBoy: {
-    backgroundColor: '#EFF6FF',
-  },
-  genderTextBoy: {
-    color: '#1D4ED8',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  genderPillGirl: {
-    backgroundColor: '#FDF2F8',
-  },
-  genderTextGirl: {
-    color: '#DB2777',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  genderPillAll: {
-    backgroundColor: '#F3F4F6',
-  },
-  genderTextAll: {
-    color: '#4B5563',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  skillPreviewRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  skillPreviewText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  openBtnBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFF0EB',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFCCBC',
-  },
-  openBtnText: {
-    color: '#D84315',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  openBtnArrow: {
-    color: '#D84315',
-    fontSize: 16,
-    fontWeight: '900',
-  },
   emptyBox: {
-    padding: 32,
+    padding: 40,
     alignItems: 'center',
     gap: 8,
   },
   emptyEmoji: {
-    fontSize: 40,
+    fontSize: 36,
   },
   emptyTitle: {
     fontSize: 16,
@@ -658,10 +349,9 @@ const styles = StyleSheet.create({
   },
   resetFilterBtn: {
     marginTop: 8,
-    backgroundColor: '#FF7043',
     paddingHorizontal: 16,
     paddingVertical: 9,
-    borderRadius: 12,
+    borderRadius: 99,
   },
   resetFilterBtnText: {
     color: '#FFFFFF',

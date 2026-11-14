@@ -23,16 +23,9 @@ import {
   toggleStepCompleted,
 } from '../db';
 
-const VIEW_TABS = [
-  { id: 'full', label: '📖 Full Guide' },
-  { id: 'focus', label: '🎯 Step Focus' },
-  { id: 'materials', label: '🎒 Supplies' },
-  { id: 'extras', label: '🧠 Facts & Ideas' },
-];
-
 export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const db = useSQLiteContext();
-  const { theme, scheme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { profile } = useProfile();
 
   const numericId = Number(guideId || initialGuide?.id);
@@ -40,15 +33,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const [guide, setGuide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('full'); // 'full' | 'focus' | 'materials' | 'extras'
-  const [focusStepIndex, setFocusStepIndex] = useState(0);
-
-  const isDark = scheme === 'dark';
-  const cardBg = isDark ? '#1A1D24' : '#FFFFFF';
-  const borderCol = isDark ? '#2D323E' : '#E2E8F0';
-  const mutedText = isDark ? '#94A3B8' : '#64748B';
-  const highlightBg = isDark ? '#2C1D18' : '#FFF7ED';
-  const subtleBg = isDark ? '#242832' : '#F8FAFC';
+  const [activeTab, setActiveTab] = useState('steps'); // 'steps' | 'supplies' | 'ideas'
 
   const loadGuide = useCallback(async () => {
     if (!numericId || Number.isNaN(numericId)) {
@@ -60,7 +45,6 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
     try {
       let data = await getGuideById(db, numericId);
 
-      // If materials or steps are missing in DB, run seed sync and re-fetch
       if (data && (data.materials.length === 0 || data.steps.length === 0)) {
         await seedInitialGuides(db);
         data = await getGuideById(db, numericId);
@@ -71,13 +55,6 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
       } else {
         setGuide(data);
         setError(null);
-
-        const firstIncomplete = (data.steps || []).findIndex((s) => !s.isCompleted);
-        if (firstIncomplete !== -1) {
-          setFocusStepIndex(firstIncomplete);
-        } else if (data.steps?.length > 0) {
-          setFocusStepIndex(data.steps.length - 1);
-        }
       }
     } catch (err) {
       console.error('Failed to load project details:', err);
@@ -144,15 +121,10 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   const handleToggleStep = async (step) => {
     if (!guide) return;
     try {
-      const isNextComplete = !step.isCompleted;
       await toggleStepCompleted(db, guide.id, step.id);
-
       const refreshed = await getGuideById(db, guide.id);
       if (refreshed) {
         setGuide(refreshed);
-        if (isNextComplete && focusStepIndex < refreshed.steps.length - 1) {
-          setFocusStepIndex((idx) => idx + 1);
-        }
       }
     } catch (err) {
       console.error('Failed to toggle step:', err);
@@ -168,7 +140,6 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
         const refreshed = await getGuideById(db, guide.id);
         if (refreshed) {
           setGuide(refreshed);
-          setFocusStepIndex(0);
         }
       } catch (err) {
         console.error('Failed to reset project progress:', err);
@@ -182,7 +153,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
     } else {
       Alert.alert(
         'Start Over',
-        'Do you want to reset your step progress and start this project from Step 1?',
+        'Reset your step progress and start this project from Step 1?',
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Reset', style: 'destructive', onPress: doReset },
@@ -194,10 +165,7 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color="#FF7043" />
-        <Text style={[styles.loadingText, { color: theme.text }]}>
-          Opening DIY Project... 🚀
-        </Text>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -207,35 +175,32 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
         <Text style={styles.errorEmoji}>🔍</Text>
         <Text style={[styles.errorTitle, { color: theme.text }]}>Project Not Found</Text>
-        <Text style={[styles.errorSubtitle, { color: mutedText }]}>
+        <Text style={[styles.errorSubtitle, { color: theme.textMuted }]}>
           {error || "We couldn't find the requested DIY project."}
         </Text>
-        <Pressable style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back to All Projects</Text>
+        <Pressable
+          style={[styles.backButton, { backgroundColor: theme.primary }]}
+          onPress={onBack}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
         </Pressable>
       </View>
     );
   }
 
-  // Merge rich static content from STARTER_GUIDES (storyIntro, skills, funFacts, variations, troubleshooting, step emojis)
   const richContent = getStarterGuideRichContent(guide.slug) || {};
   const storyIntro = richContent.storyIntro || guide.summary;
-  const skills = richContent.skills || ['✂️ Hands-On Crafting', '🎨 Creative Play', '🧠 Problem Solving'];
   const funFacts = richContent.funFacts || [];
   const variations = richContent.variations || [];
   const troubleshooting = richContent.troubleshooting || [];
 
   const materialsList = guide.materials || [];
-  const stepsList = (guide.steps || []).map((step, index) => {
-    const richStep = richContent.steps?.[index];
-    return {
-      ...step,
-      emoji: richStep?.emoji || '🛠️',
-    };
-  });
+  const stepsList = (guide.steps || []).map((step, index) => ({
+    ...step,
+    emoji: richContent.steps?.[index]?.emoji || '🛠️',
+  }));
 
   const checkedMaterialsCount = materialsList.filter((m) => m.isChecked).length;
-  const currentStep = stepsList[focusStepIndex] || stepsList[0];
   const progressPercent =
     stepsList.length > 0
       ? Math.round((guide.completedSteps / stepsList.length) * 100)
@@ -244,47 +209,57 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Sticky Navigation Header */}
-      <View style={[styles.topBar, { backgroundColor: cardBg, borderColor: borderCol }]}>
+      {/* Clean Minimal Top Bar */}
+      <View
+        style={[
+          styles.topBar,
+          {
+            backgroundColor: theme.surface,
+            borderBottomColor: theme.border,
+          },
+        ]}
+      >
         <Pressable onPress={onBack} style={styles.navBackBtn} hitSlop={10}>
-          <Text style={styles.navBackArrow}>←</Text>
-          <Text style={[styles.navBackText, { color: theme.text }]}>All Projects</Text>
+          <Text style={[styles.navBackArrow, { color: theme.primary }]}>←</Text>
+          <Text style={[styles.navBackText, { color: theme.text }]}>Back</Text>
         </Pressable>
 
-        <View style={styles.topBarCenter}>
-          <View style={[styles.categoryPill, { backgroundColor: '#FFF0EB' }]}>
-            <Text style={styles.categoryPillText}>
-              {guide.iconEmoji} {guide.category}
-            </Text>
-          </View>
-        </View>
+        <Text
+          style={[styles.topBarCategory, { color: theme.textMuted }]}
+          numberOfLines={1}
+        >
+          {guide.category}
+        </Text>
 
-        <View style={styles.topBarRight}>
-          <Pressable
-            onPress={handleToggleFav}
-            style={styles.navIconBtn}
-            hitSlop={10}
-            accessibilityLabel="Toggle Favorite"
-          >
-            <Text style={styles.navFavEmoji}>{guide.isFavorite ? '❤️' : '🤍'}</Text>
-          </Pressable>
-          <Pressable onPress={toggleTheme} style={styles.navIconBtn} hitSlop={10}>
-            <Text style={styles.navThemeEmoji}>{scheme === 'light' ? '☀️' : '🌙'}</Text>
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={handleToggleFav}
+          style={[styles.favBtn, { backgroundColor: theme.surfaceSubtle }]}
+          hitSlop={10}
+          accessibilityLabel="Toggle Favorite"
+        >
+          <Text style={styles.favBtnEmoji}>{guide.isFavorite ? '❤️' : '🤍'}</Text>
+        </Pressable>
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Project Hero Overview Card */}
-        <View style={[styles.heroCard, { backgroundColor: cardBg, borderColor: borderCol }]}>
+        {/* Clean Modern Hero Card */}
+        <View
+          style={[
+            styles.heroCard,
+            {
+              backgroundColor: theme.surface,
+              borderColor: theme.border,
+            },
+          ]}
+        >
           <View style={styles.heroHeaderRow}>
             <View
               style={[
                 styles.heroEmojiBox,
-                { backgroundColor: guide.accentColor || '#FF7043' },
+                { backgroundColor: guide.accentColor || theme.primary },
               ]}
             >
               <Text style={styles.heroEmoji}>{guide.iconEmoji}</Text>
@@ -294,199 +269,264 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
               <Text style={[styles.guideTitle, { color: theme.text }]}>
                 {guide.title}
               </Text>
-              <View style={styles.badgeRow}>
-                <View style={styles.heroBadge}>
-                  <Text style={styles.heroBadgeText}>⏱️ {guide.estimatedMinutes} min</Text>
-                </View>
-                <View style={styles.heroBadge}>
-                  <Text style={styles.heroBadgeText}>
-                    🎯 Ages {guide.minAge}–{guide.maxAge}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.heroBadge,
-                    guide.difficulty === 'easy'
-                      ? styles.badgeEasy
-                      : guide.difficulty === 'medium'
-                      ? styles.badgeMed
-                      : styles.badgeHard,
-                  ]}
-                >
-                  <Text style={styles.heroBadgeText}>
-                    {guide.difficulty.toUpperCase()}
-                  </Text>
-                </View>
-                <View style={styles.heroBadge}>
-                  <Text style={styles.heroBadgeText}>
-                    {guide.genderTarget === 'boy'
-                      ? '👦 Boys'
-                      : guide.genderTarget === 'girl'
-                      ? '👧 Girls'
-                      : '🌟 Everyone'}
-                  </Text>
-                </View>
-              </View>
+              <Text style={[styles.metaLine, { color: theme.textMuted }]}>
+                ⏱️ {guide.estimatedMinutes} min  •  Ages {guide.minAge}–{guide.maxAge}  •  {guide.difficulty.toUpperCase()}
+              </Text>
             </View>
           </View>
 
-          {/* Rich Story Introduction */}
-          <View style={[styles.storyBox, { backgroundColor: subtleBg }]}>
-            <Text style={[styles.storyHeading, { color: theme.text }]}>
-              ✨ About This Project
-            </Text>
-            <Text style={[styles.storyText, { color: theme.text }]}>
-              {storyIntro}
-            </Text>
-          </View>
+          <Text style={[styles.storyText, { color: theme.textMuted }]}>
+            {storyIntro}
+          </Text>
 
-          {/* Skills You'll Practice */}
-          <View style={styles.skillsContainer}>
-            <Text style={[styles.skillsLabel, { color: mutedText }]}>
-              SKILLS YOU WILL PRACTICE:
-            </Text>
-            <View style={styles.skillsRow}>
-              {skills.map((skill, idx) => (
-                <View key={idx} style={styles.skillPill}>
-                  <Text style={styles.skillPillText}>{skill}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* Adult Supervision & Safety Banners */}
-          {guide.adultSupervision && (
-            <View style={styles.adultSupervisionBanner}>
-              <Text style={styles.adultBannerIcon}>👨‍👩‍👧</Text>
-              <Text style={styles.adultBannerText}>
-                Adult Helper Recommended! Ask a parent or guardian to join you for this build.
+          {/* Compact Safety Notice */}
+          {(guide.adultSupervision || guide.safetyNote) && (
+            <View style={styles.safetyCallout}>
+              <Text style={styles.safetyIcon}>
+                {guide.adultSupervision ? '👨‍👩‍👧' : '⚠️'}
+              </Text>
+              <Text style={styles.safetyText}>
+                {guide.safetyNote ||
+                  'Adult helper recommended while building this project.'}
               </Text>
             </View>
           )}
 
-          {guide.safetyNote ? (
-            <View style={styles.safetyBanner}>
-              <Text style={styles.safetyBannerIcon}>⚠️</Text>
-              <View style={styles.safetyBannerContent}>
-                <Text style={styles.safetyBannerTitle}>Safety Reminder</Text>
-                <Text style={styles.safetyBannerText}>{guide.safetyNote}</Text>
-              </View>
-            </View>
-          ) : null}
-        </View>
-
-        {/* Progress & Stars Tracker Bar */}
-        <View
-          style={[
-            styles.progressCard,
-            { backgroundColor: highlightBg, borderColor: '#FFD7C2' },
-          ]}
-        >
-          <View style={styles.progressHeaderRow}>
-            <View>
-              <Text style={[styles.progressTitle, { color: theme.text }]}>
+          {/* Integrated Progress Bar */}
+          <View style={[styles.progressBlock, { borderTopColor: theme.border }]}>
+            <View style={styles.progressLabelRow}>
+              <Text style={[styles.progressLabel, { color: theme.text }]}>
                 {isCompleted
-                  ? 'Project Completed! 🏆'
-                  : guide.completedSteps > 0
-                  ? 'Crafting in Progress 🛠️'
-                  : 'Ready to Build! 🚀'}
+                  ? 'Completed! 🎉'
+                  : `${guide.completedSteps} of ${stepsList.length} steps done`}
               </Text>
-              <Text style={[styles.progressSubtitle, { color: mutedText }]}>
-                {guide.completedSteps} of {stepsList.length} steps finished ({progressPercent}%) •{' '}
-                {checkedMaterialsCount}/{materialsList.length} supplies checked
-              </Text>
-            </View>
-
-            <View style={styles.starsBox}>
               <Text style={styles.starsText}>
                 {isCompleted ? '⭐⭐⭐' : guide.completedSteps > 0 ? '⭐☆☆' : '☆☆☆'}
               </Text>
             </View>
-          </View>
-
-          <View style={styles.progressBarTrack}>
             <View
               style={[
-                styles.progressBarFill,
-                { width: `${progressPercent}%` },
-                isCompleted && { backgroundColor: '#10B981' },
+                styles.progressBarTrack,
+                { backgroundColor: theme.surfaceSubtle },
               ]}
-            />
+            >
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: `${progressPercent}%`,
+                    backgroundColor: isCompleted ? theme.success : theme.primary,
+                  },
+                ]}
+              />
+            </View>
           </View>
         </View>
 
-        {/* Celebration Card when 100% Complete */}
+        {/* Completion Banner */}
         {isCompleted && (
           <View style={styles.celebrationCard}>
-            <Text style={styles.celebrationTitle}>🎉 Awesome Job, Master Crafter!</Text>
-            <Text style={styles.celebrationSubtitle}>
-              Way to go, {profile?.name || 'Builder'}! You finished all {stepsList.length} steps of{' '}
-              {guide.title} and earned 3 Gold Stars! ⭐⭐⭐
-            </Text>
-            <View style={styles.celebrationActions}>
-              <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
-                <Text style={styles.resetCraftBtnText}>Build Again 🔄</Text>
-              </Pressable>
-              <Pressable style={styles.exploreMoreBtn} onPress={onBack}>
-                <Text style={styles.exploreMoreBtnText}>More Projects 🚀</Text>
-              </Pressable>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.celebrationTitle}>
+                🎉 Great job, {profile?.name || 'Builder'}!
+              </Text>
+              <Text style={styles.celebrationSubtitle}>
+                You finished all {stepsList.length} steps and earned 3 Stars!
+              </Text>
             </View>
+            <Pressable style={styles.resetCraftBtn} onPress={handleResetGuide}>
+              <Text style={styles.resetCraftBtnText}>Restart</Text>
+            </Pressable>
           </View>
         )}
 
-        {/* Browse Mode Selector Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabSwitcher}
+        {/* Segmented Control: Steps | Supplies | Tips & Facts */}
+        <View
+          style={[
+            styles.segmentedBar,
+            {
+              backgroundColor: theme.surface,
+              borderColor: theme.border,
+            },
+          ]}
         >
-          {VIEW_TABS.map((tab) => {
-            const active = activeTab === tab.id;
-            return (
-              <Pressable
-                key={tab.id}
-                style={[
-                  styles.tabPill,
-                  { backgroundColor: active ? '#FF7043' : cardBg, borderColor: active ? '#FF7043' : borderCol },
-                ]}
-                onPress={() => setActiveTab(tab.id)}
-              >
-                <Text
-                  style={[
-                    styles.tabPillText,
-                    { color: active ? '#FFFFFF' : theme.text },
-                  ]}
-                >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+          <Pressable
+            style={[
+              styles.segmentBtn,
+              activeTab === 'steps' && { backgroundColor: theme.primary },
+            ]}
+            onPress={() => setActiveTab('steps')}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'steps' ? '#FFFFFF' : theme.textMuted },
+              ]}
+            >
+              🛠️ Steps ({guide.completedSteps}/{stepsList.length})
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.segmentBtn,
+              activeTab === 'supplies' && { backgroundColor: theme.primary },
+            ]}
+            onPress={() => setActiveTab('supplies')}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'supplies' ? '#FFFFFF' : theme.textMuted },
+              ]}
+            >
+              🎒 Supplies ({checkedMaterialsCount}/{materialsList.length})
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.segmentBtn,
+              activeTab === 'ideas' && { backgroundColor: theme.primary },
+            ]}
+            onPress={() => setActiveTab('ideas')}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'ideas' ? '#FFFFFF' : theme.textMuted },
+              ]}
+            >
+              💡 Tips & Facts
+            </Text>
+          </Pressable>
+        </View>
 
         {/* ============================================================ */}
-        {/* SECTION 1: SUPPLIES & MATERIALS CHECKLIST */}
-        {/* Shown in 'full' mode AND 'materials' mode */}
+        {/* TAB 1: STEP-BY-STEP INSTRUCTIONS */}
         {/* ============================================================ */}
-        {(activeTab === 'full' || activeTab === 'materials') && (
+        {activeTab === 'steps' && (
+          <View style={styles.stepsList}>
+            {stepsList.map((step, idx) => (
+              <View
+                key={step.id || idx}
+                style={[
+                  styles.stepCard,
+                  {
+                    backgroundColor: theme.surface,
+                    borderColor: step.isCompleted ? theme.success : theme.border,
+                  },
+                ]}
+              >
+                <View style={styles.stepHeaderRow}>
+                  <View style={styles.stepHeaderLeft}>
+                    <View
+                      style={[
+                        styles.stepNumberCircle,
+                        {
+                          backgroundColor: step.isCompleted
+                            ? theme.success
+                            : theme.primarySoft,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.stepNumberText,
+                          {
+                            color: step.isCompleted ? '#FFFFFF' : theme.primary,
+                          },
+                        ]}
+                      >
+                        {step.isCompleted ? '✓' : step.stepNumber}
+                      </Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.stepTitle, { color: theme.text }]}>
+                        {step.emoji} {step.title}
+                      </Text>
+                      {step.durationMinutes ? (
+                        <Text style={[styles.stepMeta, { color: theme.textMuted }]}>
+                          About {step.durationMinutes} min
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                </View>
+
+                <Text style={[styles.stepInstruction, { color: theme.text }]}>
+                  {step.instruction}
+                </Text>
+
+                {step.tip && (
+                  <View style={styles.tipBox}>
+                    <Text style={styles.tipText}>💡 {step.tip}</Text>
+                  </View>
+                )}
+
+                {step.safetyWarning && (
+                  <View style={styles.warningBox}>
+                    <Text style={styles.warningText}>⚠️ {step.safetyWarning}</Text>
+                  </View>
+                )}
+
+                <Pressable
+                  style={[
+                    styles.stepActionBtn,
+                    step.isCompleted
+                      ? { backgroundColor: theme.successSoft }
+                      : { backgroundColor: theme.surfaceSubtle },
+                  ]}
+                  onPress={() => handleToggleStep(step)}
+                >
+                  <Text
+                    style={[
+                      styles.stepActionBtnText,
+                      {
+                        color: step.isCompleted ? theme.success : theme.text,
+                      },
+                    ]}
+                  >
+                    {step.isCompleted
+                      ? `✓ Step ${step.stepNumber} Done`
+                      : `Mark Step ${step.stepNumber} Done`}
+                  </Text>
+                </Pressable>
+              </View>
+            ))}
+
+            {guide.completedSteps > 0 && (
+              <Pressable onPress={handleResetGuide} style={styles.resetFooterBtn}>
+                <Text style={[styles.resetFooterText, { color: theme.textMuted }]}>
+                  Reset Step Progress
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
+
+        {/* ============================================================ */}
+        {/* TAB 2: SUPPLIES CHECKLIST */}
+        {/* ============================================================ */}
+        {activeTab === 'supplies' && (
           <View
             style={[
-              styles.sectionContainer,
-              { backgroundColor: cardBg, borderColor: borderCol },
+              styles.sectionCard,
+              {
+                backgroundColor: theme.surface,
+                borderColor: theme.border,
+              },
             ]}
           >
             <View style={styles.sectionHeaderRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.sectionHeading, { color: theme.text }]}>
-                  🎒 Supplies & Materials ({checkedMaterialsCount}/{materialsList.length})
-                </Text>
-                <Text style={[styles.sectionSubheading, { color: mutedText }]}>
-                  Tap each item as you gather your supplies before building
-                </Text>
-              </View>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                What You Need
+              </Text>
               {checkedMaterialsCount > 0 && (
-                <Pressable onPress={handleResetMaterials} style={styles.resetLinkBtn}>
-                  <Text style={styles.resetLinkText}>Reset</Text>
+                <Pressable onPress={handleResetMaterials}>
+                  <Text style={[styles.resetLink, { color: theme.primary }]}>
+                    Uncheck all
+                  </Text>
                 </Pressable>
               )}
             </View>
@@ -497,21 +537,28 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                   key={item.id || idx}
                   style={[
                     styles.materialRow,
-                    item.isChecked && styles.materialRowChecked,
-                    { borderColor: borderCol },
+                    {
+                      borderColor: item.isChecked ? theme.success : theme.border,
+                      backgroundColor: item.isChecked
+                        ? theme.successSoft
+                        : 'transparent',
+                    },
                   ]}
                   onPress={() => handleToggleMaterial(item.id)}
                 >
                   <View
                     style={[
                       styles.checkbox,
-                      item.isChecked && styles.checkboxChecked,
+                      item.isChecked && {
+                        backgroundColor: theme.success,
+                        borderColor: theme.success,
+                      },
                     ]}
                   >
-                    {item.isChecked && <Text style={styles.checkboxCheckmark}>✓</Text>}
+                    {item.isChecked && <Text style={styles.checkmark}>✓</Text>}
                   </View>
 
-                  <View style={styles.materialTextContainer}>
+                  <View style={{ flex: 1 }}>
                     <Text
                       style={[
                         styles.materialName,
@@ -522,323 +569,55 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
                       {item.name}
                     </Text>
                     {item.quantity && (
-                      <Text style={[styles.materialQuantity, { color: mutedText }]}>
-                        Quantity: {item.quantity}
+                      <Text
+                        style={[styles.materialQuantity, { color: theme.textMuted }]}
+                      >
+                        {item.quantity}
                       </Text>
                     )}
                   </View>
 
-                  {item.isOptional ? (
-                    <View style={styles.optionalPill}>
-                      <Text style={styles.optionalPillText}>Optional</Text>
-                    </View>
-                  ) : (
-                    <View style={styles.requiredPill}>
-                      <Text style={styles.requiredPillText}>Needed</Text>
-                    </View>
+                  {item.isOptional && (
+                    <Text style={[styles.optionalTag, { color: theme.textMuted }]}>
+                      Optional
+                    </Text>
                   )}
                 </Pressable>
               ))}
             </View>
-          </View>
-        )}
 
-        {/* ============================================================ */}
-        {/* SECTION 2A: STEP-BY-STEP FOCUS CAROUSEL */}
-        {/* Shown when user selects 'focus' mode */}
-        {/* ============================================================ */}
-        {activeTab === 'focus' && currentStep && (
-          <View style={styles.stepsSection}>
-            {/* Step Numbers Bar */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.stepDotsContainer}
+            <Pressable
+              style={[styles.goToStepsBtn, { backgroundColor: theme.primary }]}
+              onPress={() => setActiveTab('steps')}
             >
-              {stepsList.map((step, idx) => {
-                const isCurrent = idx === focusStepIndex;
-                return (
-                  <Pressable
-                    key={step.id || idx}
-                    style={[
-                      styles.stepDot,
-                      step.isCompleted && styles.stepDotCompleted,
-                      isCurrent && styles.stepDotActive,
-                    ]}
-                    onPress={() => setFocusStepIndex(idx)}
-                  >
-                    <Text
-                      style={[
-                        styles.stepDotText,
-                        (step.isCompleted || isCurrent) && styles.stepDotTextWhite,
-                      ]}
-                    >
-                      {step.isCompleted ? '✓' : step.stepNumber}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-
-            <View
-              style={[
-                styles.focusStepCard,
-                { backgroundColor: cardBg, borderColor: borderCol },
-              ]}
-            >
-              <View style={styles.focusStepHeader}>
-                <View style={styles.stepPillBadge}>
-                  <Text style={styles.stepPillBadgeText}>
-                    STEP {currentStep.stepNumber} OF {stepsList.length}
-                  </Text>
-                </View>
-                {currentStep.durationMinutes && (
-                  <Text style={[styles.stepDurationText, { color: mutedText }]}>
-                    ⏱️ ~{currentStep.durationMinutes} min
-                  </Text>
-                )}
-              </View>
-
-              <View style={[styles.stepVisualBanner, { backgroundColor: subtleBg }]}>
-                <Text style={styles.stepVisualEmoji}>{currentStep.emoji}</Text>
-                <Text style={[styles.focusStepTitle, { color: theme.text }]}>
-                  {currentStep.title}
-                </Text>
-              </View>
-
-              <Text style={[styles.focusStepInstruction, { color: theme.text }]}>
-                {currentStep.instruction}
-              </Text>
-
-              {currentStep.tip && (
-                <View style={styles.tipBox}>
-                  <Text style={styles.tipIcon}>💡</Text>
-                  <View style={styles.tipContent}>
-                    <Text style={styles.tipHeading}>Pro Crafter Tip</Text>
-                    <Text style={styles.tipText}>{currentStep.tip}</Text>
-                  </View>
-                </View>
-              )}
-
-              {currentStep.safetyWarning && (
-                <View style={styles.stepWarningBox}>
-                  <Text style={styles.stepWarningIcon}>⚠️</Text>
-                  <View style={styles.stepWarningContent}>
-                    <Text style={styles.stepWarningHeading}>Safety Check</Text>
-                    <Text style={styles.stepWarningText}>
-                      {currentStep.safetyWarning}
-                    </Text>
-                  </View>
-                </View>
-              )}
-
-              <Pressable
-                style={[
-                  styles.stepCompleteButton,
-                  currentStep.isCompleted
-                    ? styles.stepCompletedBtnActive
-                    : styles.stepCompletedBtnIncomplete,
-                ]}
-                onPress={() => handleToggleStep(currentStep)}
-              >
-                <Text style={styles.stepCompleteBtnText}>
-                  {currentStep.isCompleted
-                    ? '✓ Step Completed! (Tap to undo)'
-                    : `Mark Step ${currentStep.stepNumber} Complete 🌟`}
-                </Text>
-              </Pressable>
-
-              <View style={styles.stepNavControls}>
-                <Pressable
-                  style={[
-                    styles.stepNavPrevBtn,
-                    focusStepIndex === 0 && styles.stepNavBtnDisabled,
-                  ]}
-                  disabled={focusStepIndex === 0}
-                  onPress={() => setFocusStepIndex((i) => Math.max(0, i - 1))}
-                >
-                  <Text
-                    style={[
-                      styles.stepNavPrevText,
-                      focusStepIndex === 0 && styles.stepNavTextDisabled,
-                    ]}
-                  >
-                    ← Previous Step
-                  </Text>
-                </Pressable>
-
-                {focusStepIndex < stepsList.length - 1 ? (
-                  <Pressable
-                    style={styles.stepNavNextBtn}
-                    onPress={() =>
-                      setFocusStepIndex((i) => Math.min(stepsList.length - 1, i + 1))
-                    }
-                  >
-                    <Text style={styles.stepNavNextText}>Next Step →</Text>
-                  </Pressable>
-                ) : (
-                  <Pressable
-                    style={[styles.stepNavNextBtn, { backgroundColor: '#10B981' }]}
-                    onPress={() => setActiveTab('full')}
-                  >
-                    <Text style={styles.stepNavNextText}>View Full Guide 📖</Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
+              <Text style={styles.goToStepsBtnText}>Go to Steps →</Text>
+            </Pressable>
           </View>
         )}
 
         {/* ============================================================ */}
-        {/* SECTION 2B: ALL STEP-BY-STEP INSTRUCTIONS (EXPANDED BROWSE VIEW) */}
-        {/* Shown by default in 'full' mode */}
+        {/* TAB 3: TIPS, FUN FACTS & REMIX IDEAS */}
         {/* ============================================================ */}
-        {activeTab === 'full' && (
-          <View style={styles.stepsSection}>
-            <View style={styles.sectionTitleBanner}>
-              <View>
-                <Text style={[styles.sectionHeading, { color: theme.text }]}>
-                  🛠️ Step-by-Step Instructions ({stepsList.length} Steps)
-                </Text>
-                <Text style={[styles.sectionSubheading, { color: mutedText }]}>
-                  Follow each step in order and tap Complete as you build!
-                </Text>
-              </View>
-              <Pressable
-                style={styles.focusModeSwitchBtn}
-                onPress={() => setActiveTab('focus')}
-              >
-                <Text style={styles.focusModeSwitchText}>🎯 Focus Mode</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.allStepsList}>
-              {stepsList.map((step, idx) => (
-                <View
-                  key={step.id || idx}
-                  style={[
-                    styles.allStepItemCard,
-                    { backgroundColor: cardBg, borderColor: borderCol },
-                    step.isCompleted && styles.allStepItemCardDone,
-                  ]}
-                >
-                  {/* Step Top Row */}
-                  <View style={styles.allStepTopBar}>
-                    <View style={styles.stepNumberPill}>
-                      <Text style={styles.stepNumberPillText}>
-                        STEP {step.stepNumber} OF {stepsList.length}
-                      </Text>
-                    </View>
-                    {step.durationMinutes ? (
-                      <Text style={[styles.allStepMeta, { color: mutedText }]}>
-                        ⏱️ {step.durationMinutes} min
-                      </Text>
-                    ) : null}
-                  </View>
-
-                  {/* Step Title & Emoji */}
-                  <View style={styles.allStepItemHeader}>
-                    <View
-                      style={[
-                        styles.stepEmojiCircle,
-                        { backgroundColor: subtleBg },
-                      ]}
-                    >
-                      <Text style={styles.stepEmojiIcon}>{step.emoji}</Text>
-                    </View>
-                    <Text style={[styles.allStepTitle, { color: theme.text }]}>
-                      {step.title}
-                    </Text>
-                  </View>
-
-                  {/* Detailed Step Instruction */}
-                  <Text style={[styles.allStepInstruction, { color: theme.text }]}>
-                    {step.instruction}
-                  </Text>
-
-                  {/* Tip Callout */}
-                  {step.tip && (
-                    <View style={styles.tipBox}>
-                      <Text style={styles.tipIcon}>💡</Text>
-                      <View style={styles.tipContent}>
-                        <Text style={styles.tipHeading}>Pro Crafter Tip</Text>
-                        <Text style={styles.tipText}>{step.tip}</Text>
-                      </View>
-                    </View>
-                  )}
-
-                  {/* Safety Warning Callout */}
-                  {step.safetyWarning && (
-                    <View style={styles.stepWarningBox}>
-                      <Text style={styles.stepWarningIcon}>⚠️</Text>
-                      <View style={styles.stepWarningContent}>
-                        <Text style={styles.stepWarningHeading}>Be Careful</Text>
-                        <Text style={styles.stepWarningText}>
-                          {step.safetyWarning}
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-
-                  {/* Interactive Complete Button per Step */}
-                  <Pressable
-                    style={[
-                      styles.inlineStepBtn,
-                      step.isCompleted
-                        ? styles.inlineStepBtnDone
-                        : styles.inlineStepBtnTodo,
-                    ]}
-                    onPress={() => handleToggleStep(step)}
-                  >
-                    <Text
-                      style={[
-                        styles.inlineStepBtnText,
-                        step.isCompleted
-                          ? styles.inlineStepBtnTextDone
-                          : styles.inlineStepBtnTextTodo,
-                      ]}
-                    >
-                      {step.isCompleted
-                        ? `✓ Step ${step.stepNumber} Completed!`
-                        : `○ Mark Step ${step.stepNumber} Done`}
-                    </Text>
-                  </Pressable>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* ============================================================ */}
-        {/* SECTION 3: FUN FACTS, CREATIVE VARIATIONS & TROUBLESHOOTING */}
-        {/* Shown in 'full' mode AND 'extras' mode */}
-        {/* ============================================================ */}
-        {(activeTab === 'full' || activeTab === 'extras') && (
-          <View style={styles.extrasSection}>
-            {/* Fun Facts & Science Secrets */}
+        {activeTab === 'ideas' && (
+          <View style={styles.extrasContainer}>
             {funFacts.length > 0 && (
               <View
                 style={[
-                  styles.sectionContainer,
+                  styles.sectionCard,
                   {
-                    backgroundColor: isDark ? '#1A2433' : '#F0F9FF',
-                    borderColor: '#BAE6FD',
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
                   },
                 ]}
               >
-                <Text style={[styles.sectionHeading, { color: isDark ? '#E0F2FE' : '#0369A1' }]}>
-                  🧠 Did You Know? (Fun Facts!)
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                  🧠 Did You Know?
                 </Text>
                 <View style={styles.factsList}>
                   {funFacts.map((fact, idx) => (
-                    <View key={idx} style={styles.factItem}>
-                      <Text style={styles.factBullet}>🌟</Text>
-                      <Text
-                        style={[
-                          styles.factText,
-                          { color: isDark ? '#E2E8F0' : '#0F172A' },
-                        ]}
-                      >
+                    <View key={idx} style={styles.factRow}>
+                      <Text style={styles.factDot}>•</Text>
+                      <Text style={[styles.factText, { color: theme.textMuted }]}>
                         {fact}
                       </Text>
                     </View>
@@ -847,36 +626,41 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
               </View>
             )}
 
-            {/* Creative Variations & Level-Up Ideas */}
             {variations.length > 0 && (
               <View
                 style={[
-                  styles.sectionContainer,
-                  { backgroundColor: cardBg, borderColor: borderCol },
+                  styles.sectionCard,
+                  {
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
+                  },
                 ]}
               >
-                <Text style={[styles.sectionHeading, { color: theme.text }]}>
-                  🎨 Creative Remix & Level-Up Ideas
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                  🎨 Remix & Level-Up Ideas
                 </Text>
-                <Text style={[styles.sectionSubheading, { color: mutedText }]}>
-                  Finished the main build? Try these awesome ways to customize your project:
-                </Text>
-
                 <View style={styles.variationsList}>
                   {variations.map((v, idx) => (
                     <View
                       key={idx}
                       style={[
-                        styles.variationCard,
-                        { backgroundColor: subtleBg, borderColor: borderCol },
+                        styles.variationItem,
+                        { backgroundColor: theme.surfaceSubtle },
                       ]}
                     >
                       <Text style={styles.variationEmoji}>{v.emoji}</Text>
-                      <View style={styles.variationBody}>
-                        <Text style={[styles.variationTitle, { color: theme.text }]}>
+                      <View style={{ flex: 1, gap: 2 }}>
+                        <Text
+                          style={[styles.variationTitle, { color: theme.text }]}
+                        >
                           {v.title}
                         </Text>
-                        <Text style={[styles.variationDesc, { color: mutedText }]}>
+                        <Text
+                          style={[
+                            styles.variationDesc,
+                            { color: theme.textMuted },
+                          ]}
+                        >
                           {v.description}
                         </Text>
                       </View>
@@ -886,31 +670,33 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
               </View>
             )}
 
-            {/* Troubleshooting Tips */}
             {troubleshooting.length > 0 && (
               <View
                 style={[
-                  styles.sectionContainer,
-                  { backgroundColor: cardBg, borderColor: borderCol },
+                  styles.sectionCard,
+                  {
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
+                  },
                 ]}
               >
-                <Text style={[styles.sectionHeading, { color: theme.text }]}>
-                  🔧 Crafter Fix-It Tips
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                  🔧 Quick Fixes
                 </Text>
-                <View style={styles.troubleshootingList}>
+                <View style={styles.variationsList}>
                   {troubleshooting.map((item, idx) => (
                     <View
                       key={idx}
                       style={[
-                        styles.troubleCard,
-                        { backgroundColor: subtleBg, borderColor: borderCol },
+                        styles.troubleItem,
+                        { backgroundColor: theme.surfaceSubtle },
                       ]}
                     >
                       <Text style={[styles.troubleQ, { color: theme.text }]}>
-                        ❓ “{item.question}”
+                        {item.question}
                       </Text>
-                      <Text style={[styles.troubleA, { color: mutedText }]}>
-                        ✅ <Text style={{ fontWeight: '700' }}>Fix:</Text> {item.answer}
+                      <Text style={[styles.troubleA, { color: theme.textMuted }]}>
+                        {item.answer}
                       </Text>
                     </View>
                   ))}
@@ -919,16 +705,6 @@ export default function GuideDetailView({ guideId, initialGuide, onBack }) {
             )}
           </View>
         )}
-
-        {/* Footer Actions */}
-        <View style={styles.footerRow}>
-          <Pressable onPress={onBack} style={styles.bottomBackBtn}>
-            <Text style={styles.bottomBackBtnText}>← Back to All DIY Projects</Text>
-          </Pressable>
-          <Pressable onPress={handleResetGuide} style={styles.resetFooterBtn}>
-            <Text style={styles.resetFooterText}>🔄 Reset Steps & Stars</Text>
-          </Pressable>
-        </View>
       </ScrollView>
     </View>
   );
@@ -944,17 +720,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
   },
-  loadingText: {
-    marginTop: 14,
-    fontSize: 16,
-    fontWeight: '600',
-  },
   errorEmoji: {
-    fontSize: 48,
+    fontSize: 42,
     marginBottom: 12,
   },
   errorTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     marginBottom: 6,
   },
@@ -964,15 +735,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    backgroundColor: '#FF7043',
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 24,
+    paddingVertical: 11,
+    borderRadius: 99,
   },
   backButtonText: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 14,
   },
   topBar: {
     flexDirection: 'row',
@@ -980,63 +750,44 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   navBackBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF0EB',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    gap: 6,
   },
   navBackArrow: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#D84315',
-    marginRight: 6,
+    fontSize: 18,
+    fontWeight: '800',
   },
   navBackText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#D84315',
-  },
-  topBarCenter: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 8,
-  },
-  categoryPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  categoryPillText: {
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#D84315',
   },
-  topBarRight: {
-    flexDirection: 'row',
+  topBarCategory: {
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  favBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
   },
-  navIconBtn: {
-    padding: 4,
-  },
-  navFavEmoji: {
-    fontSize: 22,
-  },
-  navThemeEmoji: {
-    fontSize: 18,
+  favBtnEmoji: {
+    fontSize: 16,
   },
   scrollContent: {
     padding: 16,
-    gap: 16,
-    paddingBottom: 48,
+    gap: 14,
+    paddingBottom: 40,
   },
   heroCard: {
-    borderRadius: 20,
+    borderRadius: 22,
     padding: 18,
     borderWidth: 1,
     gap: 14,
@@ -1044,240 +795,213 @@ const styles = StyleSheet.create({
   heroHeaderRow: {
     flexDirection: 'row',
     gap: 14,
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   heroEmojiBox: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
   heroEmoji: {
-    fontSize: 36,
+    fontSize: 32,
   },
   heroHeaderInfo: {
     flex: 1,
-    gap: 8,
+    gap: 4,
   },
   guideTitle: {
-    fontSize: 21,
+    fontSize: 20,
     fontWeight: '800',
-    lineHeight: 27,
+    lineHeight: 26,
   },
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  heroBadge: {
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  badgeEasy: {
-    backgroundColor: '#DEF7EC',
-  },
-  badgeMed: {
-    backgroundColor: '#FEF08A',
-  },
-  badgeHard: {
-    backgroundColor: '#FEE2E2',
-  },
-  heroBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#334155',
-  },
-  storyBox: {
-    padding: 14,
-    borderRadius: 14,
-    gap: 6,
-  },
-  storyHeading: {
-    fontSize: 14,
-    fontWeight: '800',
+  metaLine: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   storyText: {
     fontSize: 14,
     lineHeight: 21,
   },
-  skillsContainer: {
-    gap: 6,
-  },
-  skillsLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  skillsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  skillPill: {
-    backgroundColor: '#FFF7ED',
-    borderWidth: 1,
-    borderColor: '#FED7AA',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-  },
-  skillPillText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#C2410C',
-  },
-  adultSupervisionBanner: {
+  safetyCallout: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    padding: 12,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#3B82F6',
-    gap: 10,
-  },
-  adultBannerIcon: {
-    fontSize: 20,
-  },
-  adultBannerText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1E40AF',
-  },
-  safetyBanner: {
-    flexDirection: 'row',
     backgroundColor: '#FFFBEB',
     padding: 12,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#F59E0B',
+    borderRadius: 14,
     gap: 10,
   },
-  safetyBannerIcon: {
-    fontSize: 20,
+  safetyIcon: {
+    fontSize: 18,
   },
-  safetyBannerContent: {
+  safetyText: {
     flex: 1,
-  },
-  safetyBannerTitle: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#92400E',
-    marginBottom: 2,
-  },
-  safetyBannerText: {
-    fontSize: 12,
-    color: '#B45309',
     lineHeight: 17,
   },
-  progressCard: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    gap: 10,
+  progressBlock: {
+    paddingTop: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    gap: 8,
   },
-  progressHeaderRow: {
+  progressLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  progressTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  progressSubtitle: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  starsBox: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  progressLabel: {
+    fontSize: 13,
+    fontWeight: '700',
   },
   starsText: {
-    fontSize: 18,
+    fontSize: 15,
     letterSpacing: 2,
   },
   progressBarTrack: {
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    height: 8,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#FF7043',
-    borderRadius: 5,
+    borderRadius: 4,
   },
   celebrationCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#ECFDF5',
     borderRadius: 18,
-    padding: 18,
-    borderWidth: 2,
+    padding: 16,
+    borderWidth: 1,
     borderColor: '#10B981',
-    alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   celebrationTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '800',
     color: '#065F46',
   },
   celebrationSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#047857',
-    textAlign: 'center',
-    lineHeight: 19,
-  },
-  celebrationActions: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 6,
+    marginTop: 2,
   },
   resetCraftBtn: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#10B981',
     paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 12,
+    paddingVertical: 8,
+    borderRadius: 99,
   },
   resetCraftBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#374151',
-  },
-  exploreMoreBtn: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 12,
-  },
-  exploreMoreBtnText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',
   },
-  tabSwitcher: {
+  segmentedBar: {
     flexDirection: 'row',
-    gap: 8,
-    paddingVertical: 2,
-  },
-  tabPill: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 14,
+    padding: 4,
+    borderRadius: 16,
     borderWidth: 1,
+    gap: 4,
   },
-  tabPillText: {
-    fontSize: 13,
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: 9,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  segmentText: {
+    fontSize: 12,
     fontWeight: '700',
   },
-  sectionContainer: {
-    borderRadius: 18,
+  stepsList: {
+    gap: 12,
+  },
+  stepCard: {
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  stepHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  stepHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  stepNumberCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepNumberText: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  stepMeta: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  stepInstruction: {
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  tipBox: {
+    backgroundColor: '#FEF9C3',
+    padding: 12,
+    borderRadius: 12,
+  },
+  tipText: {
+    fontSize: 12,
+    color: '#854D0E',
+    lineHeight: 18,
+    fontWeight: '600',
+  },
+  warningBox: {
+    backgroundColor: '#FEE2E2',
+    padding: 12,
+    borderRadius: 12,
+  },
+  warningText: {
+    fontSize: 12,
+    color: '#991B1B',
+    lineHeight: 18,
+    fontWeight: '600',
+  },
+  stepActionBtn: {
+    paddingVertical: 11,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  stepActionBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  resetFooterBtn: {
+    alignSelf: 'center',
+    padding: 10,
+  },
+  resetFooterText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  sectionCard: {
+    borderRadius: 20,
     padding: 16,
     borderWidth: 1,
     gap: 14,
@@ -1285,40 +1009,15 @@ const styles = StyleSheet.create({
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  sectionTitleBanner: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
   },
-  sectionHeading: {
-    fontSize: 18,
+  sectionTitle: {
+    fontSize: 16,
     fontWeight: '800',
   },
-  sectionSubheading: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  focusModeSwitchBtn: {
-    backgroundColor: '#FFF0EB',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 10,
-  },
-  focusModeSwitchText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#D84315',
-  },
-  resetLinkBtn: {
-    padding: 4,
-  },
-  resetLinkText: {
+  resetLink: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#FF7043',
   },
   materialsList: {
     gap: 8,
@@ -1327,34 +1026,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     gap: 12,
   },
-  materialRowChecked: {
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-    borderColor: '#10B981',
-  },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 7,
+    width: 22,
+    height: 22,
+    borderRadius: 6,
     borderWidth: 2,
     borderColor: '#CBD5E1',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkboxChecked: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
-  },
-  checkboxCheckmark: {
+  checkmark: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 14,
-  },
-  materialTextContainer: {
-    flex: 1,
+    fontSize: 13,
   },
   materialName: {
     fontSize: 14,
@@ -1362,390 +1050,79 @@ const styles = StyleSheet.create({
   },
   materialNameChecked: {
     textDecorationLine: 'line-through',
-    opacity: 0.7,
+    opacity: 0.65,
   },
   materialQuantity: {
     fontSize: 12,
     marginTop: 2,
   },
-  optionalPill: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  optionalPillText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#6B7280',
-  },
-  requiredPill: {
-    backgroundColor: '#FFF7ED',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  requiredPillText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#C2410C',
-  },
-  stepsSection: {
-    gap: 14,
-  },
-  stepDotsContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingVertical: 4,
-  },
-  stepDot: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#E2E8F0',
-  },
-  stepDotCompleted: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
-  },
-  stepDotActive: {
-    borderColor: '#FF7043',
-    backgroundColor: '#FF7043',
-  },
-  stepDotText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#475569',
-  },
-  stepDotTextWhite: {
-    color: '#FFFFFF',
-  },
-  focusStepCard: {
-    borderRadius: 20,
-    padding: 18,
-    borderWidth: 1,
-    gap: 14,
-  },
-  focusStepHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  stepPillBadge: {
-    backgroundColor: '#FFEBE5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  stepPillBadgeText: {
+  optionalTag: {
     fontSize: 11,
-    fontWeight: '800',
-    color: '#D84315',
-  },
-  stepDurationText: {
-    fontSize: 12,
     fontWeight: '600',
   },
-  stepVisualBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 14,
-    gap: 12,
-  },
-  stepVisualEmoji: {
-    fontSize: 32,
-  },
-  focusStepTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '800',
-    lineHeight: 24,
-  },
-  focusStepInstruction: {
-    fontSize: 15,
-    lineHeight: 23,
-  },
-  tipBox: {
-    flexDirection: 'row',
-    backgroundColor: '#FEF9C3',
-    padding: 12,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#EAB308',
-    gap: 10,
-  },
-  tipIcon: {
-    fontSize: 20,
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipHeading: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#713F12',
-    marginBottom: 2,
-  },
-  tipText: {
-    fontSize: 13,
-    color: '#854D0E',
-    lineHeight: 18,
-  },
-  stepWarningBox: {
-    flexDirection: 'row',
-    backgroundColor: '#FEE2E2',
-    padding: 12,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#EF4444',
-    gap: 10,
-  },
-  stepWarningIcon: {
-    fontSize: 20,
-  },
-  stepWarningContent: {
-    flex: 1,
-  },
-  stepWarningHeading: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#991B1B',
-    marginBottom: 2,
-  },
-  stepWarningText: {
-    fontSize: 13,
-    color: '#B91C1C',
-    lineHeight: 18,
-  },
-  stepCompleteButton: {
-    paddingVertical: 14,
+  goToStepsBtn: {
+    paddingVertical: 13,
     borderRadius: 14,
     alignItems: 'center',
     marginTop: 4,
   },
-  stepCompletedBtnIncomplete: {
-    backgroundColor: '#FF7043',
-  },
-  stepCompletedBtnActive: {
-    backgroundColor: '#10B981',
-  },
-  stepCompleteBtnText: {
+  goToStepsBtnText: {
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  stepNavControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 4,
-  },
-  stepNavPrevBtn: {
-    flex: 1,
-    paddingVertical: 11,
-    borderRadius: 12,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-  },
-  stepNavBtnDisabled: {
-    opacity: 0.4,
-  },
-  stepNavPrevText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#475569',
-  },
-  stepNavTextDisabled: {
-    color: '#94A3B8',
-  },
-  stepNavNextBtn: {
-    flex: 1,
-    paddingVertical: 11,
-    borderRadius: 12,
-    backgroundColor: '#FF7043',
-    alignItems: 'center',
-  },
-  stepNavNextText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  allStepsList: {
-    gap: 14,
-  },
-  allStepItemCard: {
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    gap: 12,
-  },
-  allStepItemCardDone: {
-    borderColor: '#10B981',
-    borderWidth: 1.5,
-  },
-  allStepTopBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  stepNumberPill: {
-    backgroundColor: '#FFEBE5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  stepNumberPillText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#D84315',
-  },
-  allStepItemHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  stepEmojiCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  stepEmojiIcon: {
-    fontSize: 24,
-  },
-  allStepTitle: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '800',
-    lineHeight: 22,
-  },
-  allStepMeta: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  allStepInstruction: {
     fontSize: 14,
-    lineHeight: 22,
-  },
-  inlineStepBtn: {
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  inlineStepBtnTodo: {
-    backgroundColor: '#FFF0EB',
-    borderWidth: 1,
-    borderColor: '#FFCCBC',
-  },
-  inlineStepBtnDone: {
-    backgroundColor: '#10B981',
-  },
-  inlineStepBtnText: {
-    fontSize: 13,
     fontWeight: '800',
   },
-  inlineStepBtnTextTodo: {
-    color: '#D84315',
-  },
-  inlineStepBtnTextDone: {
-    color: '#FFFFFF',
-  },
-  extrasSection: {
-    gap: 16,
+  extrasContainer: {
+    gap: 12,
   },
   factsList: {
     gap: 10,
   },
-  factItem: {
+  factRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
+    gap: 8,
   },
-  factBullet: {
+  factDot: {
     fontSize: 16,
-    marginTop: 1,
+    color: '#FF6B35',
+    fontWeight: '800',
   },
   factText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 20,
   },
   variationsList: {
     gap: 10,
   },
-  variationCard: {
+  variationItem: {
     flexDirection: 'row',
     padding: 12,
     borderRadius: 14,
-    borderWidth: 1,
     gap: 12,
     alignItems: 'flex-start',
   },
   variationEmoji: {
-    fontSize: 28,
-  },
-  variationBody: {
-    flex: 1,
-    gap: 3,
+    fontSize: 24,
   },
   variationTitle: {
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   variationDesc: {
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 12,
+    lineHeight: 18,
   },
-  troubleshootingList: {
-    gap: 10,
-  },
-  troubleCard: {
+  troubleItem: {
     padding: 12,
     borderRadius: 14,
-    borderWidth: 1,
-    gap: 6,
+    gap: 4,
   },
   troubleQ: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   troubleA: {
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  footerRow: {
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 8,
-    marginBottom: 20,
-  },
-  bottomBackBtn: {
-    backgroundColor: '#FF7043',
-    paddingHorizontal: 24,
-    paddingVertical: 13,
-    borderRadius: 16,
-    width: '100%',
-    alignItems: 'center',
-  },
-  bottomBackBtnText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  resetFooterBtn: {
-    padding: 8,
-  },
-  resetFooterText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#94A3B8',
+    lineHeight: 18,
   },
 });
