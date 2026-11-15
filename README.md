@@ -47,14 +47,6 @@ npm run ios
 npm run web
 ```
 
-### ✅ Verification Commands
-
-```bash
-npx expo lint
-npx tsc --noEmit
-npx expo-doctor
-```
-
 ## 📁 Project Structure
 
 ```text
