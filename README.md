@@ -1,12 +1,12 @@
-# IdeaNook
+# 🎨 IdeaNook
 
 An offline-first DIY project guide mobile app for children built with Expo, React Native, Expo Router, and SQLite.
 
-## Overview
+## 📖 Overview
 
 IdeaNook provides kid-friendly, step-by-step craft and STEM activity guides that work completely offline. All starter projects, outcome illustrations, UI icons, fonts, and user progress are stored locally on the device.
 
-### Key Features
+### ✨ Key Features
 
 - Offline-first library of 14 DIY projects for children
 - Personalized For You feed based on child age and profile
@@ -15,27 +15,27 @@ IdeaNook provides kid-friendly, step-by-step craft and STEM activity guides that
 - Local SQLite persistence for profile, favorites, stars, and progress
 - Light and dark theme support with bundled fonts and icons
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Framework**: Expo (`~58.0.23`), React Native (`0.88.1`), React (`19.3.0`)
 - **Navigation**: Expo Router (`~58.0.30`)
 - **Database**: `expo-sqlite` (`~58.0.16`) with WAL mode (native) and Metro WASM/COOP/COEP headers (`metro.config.js`) for Web
 - **Icons & Fonts**: `@expo/vector-icons` (`MaterialCommunityIcons`) and `expo-font`
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
 
 - Node.js (LTS)
 - Expo CLI (`npx expo`)
 
-### Installation
+### 📦 Installation
 
 ```bash
 npm install
 ```
 
-### Running the App
+### ▶️ Running the App
 
 ```bash
 # Start the Expo development server
@@ -47,7 +47,7 @@ npm run ios
 npm run web
 ```
 
-### Verification Commands
+### ✅ Verification Commands
 
 ```bash
 npx expo lint
@@ -55,7 +55,7 @@ npx tsc --noEmit
 npx expo-doctor
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 ideanook/
@@ -91,7 +91,7 @@ ideanook/
 └── metro.config.js          # WASM support and cross-origin isolation headers for SQLite on Web
 ```
 
-## Database Schema
+## 🗄️ Database Schema
 
 The SQLite database (`ideanook.db`, schema version `3`) includes:
 
@@ -101,6 +101,6 @@ The SQLite database (`ideanook.db`, schema version `3`) includes:
 - `guide_progress`: Tracks `not_started` / `in_progress` / `completed` status, current step, stars earned, and timestamps.
 - `user_profile`: Single active profile (`id = 1`) storing name, age, gender badge, and companion icon.
 
-## License
+## 📄 License
 
 See [LICENSE](LICENSE).
