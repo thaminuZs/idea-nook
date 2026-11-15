@@ -6,7 +6,7 @@ An offline-first DIY project guide mobile app for children built with Expo, Reac
 
 IdeaNook provides kid-friendly, step-by-step craft and STEM activity guides that work completely offline. All starter projects, outcome illustrations, UI icons, fonts, and user progress are stored locally on the device.
 
-### 🗽 Key Features
+## 🗽 Key Features
 
 - Offline-first library of 14 DIY projects for children
 - Personalized For You feed based on child age and profile
