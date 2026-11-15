@@ -4,6 +4,8 @@ export const Fonts = {
   semiBold: 'Montserrat_600SemiBold',
   bold: 'Montserrat_700Bold',
   extraBold: 'Montserrat_800ExtraBold',
+  heading: 'Audiowide_400Regular',
+  brandTitle: 'BlackOpsOne_400Regular',
 };
 
 export const Colors = {

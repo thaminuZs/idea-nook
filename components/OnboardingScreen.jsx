@@ -108,9 +108,20 @@ export default function OnboardingScreen({
           >
             <AppIcon name={avatarEmoji} size={40} color={theme.primary} />
           </View>
-          <Text style={[styles.title, { color: theme.text }]}>
-            {isFirstTime ? 'Welcome to IdeaNook!' : 'Edit Your Profile'}
-          </Text>
+          {isFirstTime ? (
+            <View style={styles.brandTitleWrap}>
+              <Text style={[styles.welcomeHeading, { color: theme.text }]}>
+                Welcome to
+              </Text>
+              <Text style={[styles.brandTitle, { color: theme.primary }]}>
+                IdeaNook
+              </Text>
+            </View>
+          ) : (
+            <Text style={[styles.title, { color: theme.text }]}>
+              Edit Your Profile
+            </Text>
+          )}
           <Text style={[styles.subtitle, { color: subtitleColor }]}>
             {isFirstTime
               ? 'Tell us about yourself so we can show you the best DIY guides!'
@@ -352,9 +363,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
   },
+  brandTitleWrap: {
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  welcomeHeading: {
+    fontSize: 18,
+    fontFamily: Fonts.heading,
+    textAlign: 'center',
+  },
+  brandTitle: {
+    fontSize: 30,
+    fontFamily: Fonts.brandTitle,
+    letterSpacing: 0.8,
+    textAlign: 'center',
+  },
   title: {
-    fontSize: 26,
-    fontFamily: Fonts.extraBold,
+    fontSize: 24,
+    fontFamily: Fonts.heading,
     textAlign: 'center',
     marginBottom: 6,
   },

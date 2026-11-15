@@ -4,7 +4,6 @@ import {
   FlatList,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -26,6 +25,23 @@ const AUDIENCE_TABS = [
   { id: 'favorites', label: 'Saved', icon: 'heart' },
 ];
 
+const CATEGORY_EMOJIS = {
+  'Paper & Origami': '🚀',
+  'Science & Sensory': '🌋',
+  'Nature & Recycled': '🍃',
+  'STEM & Toys': '🏎️',
+  'Wearables & Decor': '✨',
+};
+
+function shuffleGuides(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export default function ExploreScreen() {
   const db = useSQLiteContext();
   const { theme } = useTheme();
@@ -34,6 +50,7 @@ export default function ExploreScreen() {
   const [categories, setCategories] = useState([]);
   const [selectedAudience, setSelectedAudience] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedGuide, setSelectedGuide] = useState(null);
@@ -46,7 +63,13 @@ export default function ExploreScreen() {
         getGuides(db),
         getCategories(db),
       ]);
-      setGuides(allGuides);
+      setGuides((prev) => {
+        if (prev.length === allGuides.length && prev.length > 0) {
+          const mapById = new Map(allGuides.map((g) => [g.id, g]));
+          return prev.map((oldItem) => mapById.get(oldItem.id) || oldItem);
+        }
+        return shuffleGuides(allGuides);
+      });
       setCategories(allCats);
     } catch (err) {
       console.error('Failed to load explore library:', err);
@@ -86,6 +109,15 @@ export default function ExploreScreen() {
       return matchesCat && matchesSearch;
     });
   }, [guides, selectedAudience, selectedCategory, searchQuery]);
+
+  const selectedCategoryLabel = useMemo(() => {
+    if (selectedCategory === 'All') {
+      return `All Categories (${guides.length})`;
+    }
+    const found = categories.find((c) => c.category === selectedCategory);
+    const emoji = CATEGORY_EMOJIS[selectedCategory] || '🎨';
+    return `${emoji}  ${selectedCategory}${found ? ` (${found.count})` : ''}`;
+  }, [selectedCategory, guides.length, categories]);
 
   if (selectedGuide) {
     return (
@@ -203,71 +235,121 @@ export default function ExploreScreen() {
               })}
             </View>
 
-            {/* Category Filter Chips */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryScroll}
-            >
+            {/* Select-Option Style Category Dropdown */}
+            <View style={styles.selectContainer}>
               <Pressable
                 style={[
-                  styles.catPill,
+                  styles.selectTrigger,
                   {
-                    backgroundColor:
-                      selectedCategory === 'All'
-                        ? theme.text
-                        : theme.surfaceSubtle,
-                    borderColor:
-                      selectedCategory === 'All' ? theme.text : theme.border,
+                    backgroundColor: theme.surface,
+                    borderColor: isCategorySelectOpen ? theme.primary : theme.border,
                   },
                 ]}
-                onPress={() => setSelectedCategory('All')}
+                onPress={() => setIsCategorySelectOpen((prev) => !prev)}
+                accessibilityRole="button"
+                accessibilityLabel="Select Category"
               >
-                <Text
+                <View style={styles.selectTriggerLeft}>
+                  <Text style={[styles.selectLabelPrefix, { color: theme.textMuted }]}>
+                    Category:
+                  </Text>
+                  <Text
+                    style={[styles.selectValueText, { color: theme.text }]}
+                    numberOfLines={1}
+                  >
+                    {selectedCategoryLabel}
+                  </Text>
+                </View>
+
+                <AppIcon
+                  name={isCategorySelectOpen ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color={isCategorySelectOpen ? theme.primary : theme.textMuted}
+                />
+              </Pressable>
+
+              {isCategorySelectOpen && (
+                <View
                   style={[
-                    styles.catPillText,
+                    styles.selectDropdownMenu,
                     {
-                      color:
-                        selectedCategory === 'All'
-                          ? theme.background
-                          : theme.textMuted,
+                      backgroundColor: theme.surface,
+                      borderColor: theme.border,
                     },
                   ]}
                 >
-                  All Categories ({guides.length})
-                </Text>
-              </Pressable>
-
-              {categories.map((c) => {
-                const isSelected = selectedCategory === c.category;
-                return (
                   <Pressable
-                    key={c.category}
                     style={[
-                      styles.catPill,
-                      {
-                        backgroundColor: isSelected
-                          ? theme.text
-                          : theme.surfaceSubtle,
-                        borderColor: isSelected ? theme.text : theme.border,
+                      styles.selectOptionRow,
+                      { borderBottomColor: theme.border },
+                      selectedCategory === 'All' && {
+                        backgroundColor: theme.primarySoft,
                       },
                     ]}
-                    onPress={() => setSelectedCategory(c.category)}
+                    onPress={() => {
+                      setSelectedCategory('All');
+                      setIsCategorySelectOpen(false);
+                    }}
                   >
                     <Text
                       style={[
-                        styles.catPillText,
+                        styles.selectOptionText,
                         {
-                          color: isSelected ? theme.background : theme.textMuted,
+                          color:
+                            selectedCategory === 'All' ? theme.primary : theme.text,
+                          fontFamily:
+                            selectedCategory === 'All'
+                              ? Fonts.extraBold
+                              : Fonts.semiBold,
                         },
                       ]}
                     >
-                      {c.category} ({c.count})
+                      All Categories ({guides.length})
                     </Text>
+                    {selectedCategory === 'All' && (
+                      <AppIcon name="check" size={18} color={theme.primary} />
+                    )}
                   </Pressable>
-                );
-              })}
-            </ScrollView>
+
+                  {categories.map((c, index) => {
+                    const isSelected = selectedCategory === c.category;
+                    const isLast = index === categories.length - 1;
+                    const emoji = CATEGORY_EMOJIS[c.category] || '🎨';
+                    return (
+                      <Pressable
+                        key={c.category}
+                        style={[
+                          styles.selectOptionRow,
+                          !isLast && { borderBottomColor: theme.border, borderBottomWidth: 1 },
+                          isSelected && { backgroundColor: theme.primarySoft },
+                        ]}
+                        onPress={() => {
+                          setSelectedCategory(c.category);
+                          setIsCategorySelectOpen(false);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.selectOptionText,
+                            {
+                              color: isSelected ? theme.primary : theme.text,
+                              fontFamily: isSelected
+                                ? Fonts.extraBold
+                                : Fonts.semiBold,
+                            },
+                          ]}
+                        >
+                          {emoji}  {c.category} ({c.count})
+                        </Text>
+                        {isSelected && (
+                          <AppIcon name="check" size={18} color={theme.primary} />
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
           </View>
         }
         ListEmptyComponent={
@@ -285,6 +367,7 @@ export default function ExploreScreen() {
                 setSelectedAudience('all');
                 setSelectedCategory('All');
                 setSearchQuery('');
+                setIsCategorySelectOpen(false);
               }}
             >
               <Text style={styles.resetFilterBtnText}>Reset Filters</Text>
@@ -367,19 +450,52 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.bold,
   },
-  categoryScroll: {
-    gap: 8,
+  selectContainer: {
+    gap: 6,
   },
-  catPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 8,
+  selectTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 48,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
     borderWidth: 1,
     borderStyle: 'solid',
   },
-  catPillText: {
-    fontSize: 12,
+  selectTriggerLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  selectLabelPrefix: {
+    fontSize: 13,
     fontFamily: Fonts.bold,
+  },
+  selectValueText: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: Fonts.extraBold,
+  },
+  selectDropdownMenu: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    overflow: 'hidden',
+  },
+  selectOptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderStyle: 'solid',
+  },
+  selectOptionText: {
+    fontSize: 14,
   },
   emptyBox: {
     padding: 40,

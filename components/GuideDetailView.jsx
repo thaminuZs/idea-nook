@@ -996,9 +996,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   guideTitle: {
-    fontSize: 22,
-    fontFamily: Fonts.extraBold,
-    lineHeight: 29,
+    fontSize: 21,
+    fontFamily: Fonts.heading,
+    lineHeight: 28,
   },
   metaInlineRow: {
     flexDirection: 'row',
@@ -1267,8 +1267,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontFamily: Fonts.extraBold,
+    fontSize: 17,
+    fontFamily: Fonts.heading,
   },
   resetLink: {
     fontSize: 14,
