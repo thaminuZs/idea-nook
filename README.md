@@ -45,6 +45,9 @@ npm start
 npm run android
 npm run ios
 npm run web
+
+# Run the offline test suite
+npm test
 ```
 
 ## 📁 Project Structure
@@ -79,6 +82,7 @@ ideanook/
 │   ├── seed.js              # 14 starter DIY guides and rich step/tip/variation content
 │   ├── guidesRepository.js  # CRUD, filtering, step/material toggles, and progress stats
 │   └── profileRepository.js # Profile persistence and full progress reset
+├── tests/                   # Automated unit, database, asset, and component render tests
 ├── app.json                 # Expo app configuration
 └── metro.config.js          # WASM support and cross-origin isolation headers for SQLite on Web
 ```
