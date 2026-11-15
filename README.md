@@ -8,16 +8,12 @@ IdeaNook provides kid-friendly, step-by-step craft and STEM activity guides that
 
 ### Key Features
 
-- **Child Profile & Onboarding**: First-launch setup captures name, age, companion icon, and badge selection, stored in SQLite (`user_profile`).
-- **For You Feed (`app/index.jsx`)**: Personalized project recommendations matched to the child's age and profile preferences.
-- **Explore Library (`app/flat.jsx`)**: Search across titles, summaries, and categories; filter by audience (`All`, `Boys`, `Girls`, `Saved`) and category dropdown (`Paper & Origami`, `Science & Sensory`, `Nature & Recycled`, `STEM & Toys`, `Wearables & Decor`).
-- **Interactive Guide Reader (`components/GuideDetailView.jsx`)**:
-  - Outcome illustration preview, safety callouts, and progress bar.
-  - Three organized tabs: **Supplies** (checkable materials list), **Steps** (step-by-step instructions with tips, safety warnings, and completion tracking), and **Tips & Facts** (fun facts, remix ideas, and troubleshooting).
-  - Star rewards (3 stars upon completing all steps) and a pop-art celebration animation (`components/PopArtCelebration.jsx`).
-- **Profile & Progress (`app/scrol.jsx`)**: Displays earned stars, completed, in-progress, and saved project counts, profile editing, and full profile/progress reset with a shared confirmation dialog (`components/ConfirmDialog.jsx`).
-- **Light & Dark Theme (`contexts/ThemeContext.jsx`)**: Instant theme switching across app UI, navigation bar, and system surfaces.
-- **100% Offline Assets**: Bundled Google Fonts (`Montserrat`, `Audiowide`, `Black Ops One`), vector icon font (`MaterialCommunityIcons`), and local PNG project illustrations (`assets/projects/new-pngs/`).
+- Offline-first library of 14 DIY projects for children
+- Personalized For You feed based on child age and profile
+- Explore view with search, audience filters, and category selector
+- Step-by-step guide reader with Supplies checklist, Steps tracking, and Tips & Facts
+- Local SQLite persistence for profile, favorites, stars, and progress
+- Light and dark theme support with bundled fonts and icons
 
 ## Tech Stack
 
