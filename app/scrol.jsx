@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 20,
-    fontFamily: Fonts.extraBold,
+    fontFamily: Fonts.heading,
   },
   tagRow: {
     flexDirection: 'row',
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 17,
-    fontFamily: Fonts.extraBold,
+    fontFamily: Fonts.heading,
   },
   savedList: {
     gap: 12,

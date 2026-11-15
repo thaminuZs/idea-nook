@@ -138,9 +138,9 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 18,
-    fontFamily: Fonts.extraBold,
-    lineHeight: 24,
+    fontSize: 17,
+    fontFamily: Fonts.heading,
+    lineHeight: 23,
   },
   message: {
     fontSize: 15,

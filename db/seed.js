@@ -10,7 +10,7 @@ export const STARTER_GUIDES = [
     summary: 'Turn an empty cardboard paper tube into a colorful space rocket with flame streamers!',
     storyIntro:
       'Get ready for an intergalactic mission! In this project, you will transform an everyday cardboard tube into a sleek deep-space explorer complete with aerodynamic stabilization fins, a pointed nose cone, and fluttering fiery exhaust streamers.',
-    category: 'Paper Crafts',
+    category: 'Paper & Origami',
     difficulty: 'easy',
     minAge: 5,
     maxAge: 9,
@@ -108,7 +108,7 @@ export const STARTER_GUIDES = [
     summary: 'Create a bubbly, colorful baking soda and vinegar eruption right on a kitchen tray.',
     storyIntro:
       'Turn your kitchen table into an exciting geology and chemistry lab! Using safe everyday ingredients from the pantry, you will trigger a foaming acid-base chemical reaction that bubbles over just like molten lava flowing down a volcano.',
-    category: 'Science Fun',
+    category: 'Science & Sensory',
     difficulty: 'easy',
     minAge: 5,
     maxAge: 10,
@@ -206,7 +206,7 @@ export const STARTER_GUIDES = [
     summary: 'Make a swirling glittery calm-down bottle that shimmers slowly when you shake it.',
     storyIntro:
       'Create your very own magical galaxy in a bottle! When you shake this sensory jar, thousands of colourful sparkles and stars swirl in slow motion—helping your mind relax and focus while you watch them gently drift down.',
-    category: 'Sensory & Slime',
+    category: 'Science & Sensory',
     difficulty: 'easy',
     minAge: 4,
     maxAge: 8,
@@ -304,7 +304,7 @@ export const STARTER_GUIDES = [
     summary: 'Go on a backyard leaf hunt and turn real leaves into owls, foxes, or butterflies!',
     storyIntro:
       'Every leaf on the ground is a puzzle piece waiting to become art! Head outside on a nature treasure hunt, collect fallen leaves of different shapes and colors, and combine them into woodland foxes, fluttering butterflies, and wise owls.',
-    category: 'Nature Crafts',
+    category: 'Nature & Recycled',
     difficulty: 'easy',
     minAge: 4,
     maxAge: 9,
@@ -400,7 +400,7 @@ export const STARTER_GUIDES = [
     summary: 'Recycle an empty milk or juice carton into a cozy backyard feeder for neighborhood birds.',
     storyIntro:
       'Turn recycling into a cozy café for your feathered neighbors! By upcycling a waterproof beverage carton, you will build a weather-resistant birdhouse feeder and observe real wild birds visiting right outside your window.',
-    category: 'Recycled Art',
+    category: 'Nature & Recycled',
     difficulty: 'medium',
     minAge: 7,
     maxAge: 12,
@@ -504,7 +504,7 @@ export const STARTER_GUIDES = [
     summary: 'Fold a single square piece of paper into a springy frog that really hops when you tap its back!',
     storyIntro:
       'Discover the ancient Japanese art of paper folding! Using zero glue and zero tape, you will fold a flat square of paper into an action toy with a built-in accordion spring that leaps across the table when you press its back.',
-    category: 'Origami',
+    category: 'Paper & Origami',
     difficulty: 'medium',
     minAge: 6,
     maxAge: 12,
@@ -609,7 +609,7 @@ export const STARTER_GUIDES = [
     summary: 'Engineer a zooming speed car using cardboard, bottle caps, skewers, and rubber band kinetic power!',
     storyIntro:
       'Start your engines, young mechanical engineer! In this hands-on STEM build, you will construct a working 4-wheel race car powered entirely by stored elastic tension. Wind up the rear axle, release the wheels, and watch it rocket across the floor!',
-    category: 'STEM & Building',
+    category: 'STEM & Toys',
     difficulty: 'medium',
     minAge: 6,
     maxAge: 12,
@@ -708,7 +708,7 @@ export const STARTER_GUIDES = [
     summary: 'Design a tilting maze game inside a shoebox lid with cardboard walls, tricky dead-ends, and trapdoors!',
     storyIntro:
       'Become an arcade game designer! Using a simple shoebox lid and strips of cardboard, you will architect a multi-path tilting labyrinth complete with secret shortcuts, bumper walls, and tricky trapdoor hazards.',
-    category: 'STEM & Building',
+    category: 'STEM & Toys',
     difficulty: 'medium',
     minAge: 6,
     maxAge: 13,
@@ -804,7 +804,7 @@ export const STARTER_GUIDES = [
     summary: 'Transform cardboard paper tubes into wearable superhero gauntlets with lightning bolts and stars!',
     storyIntro:
       'Every hero needs custom gear! Design your own pair of wearable superhero wrist gauntlets complete with metallic armor plating, energy shields, and custom emblem badges that snap right onto your wrists for imaginative action play.',
-    category: 'Wearable Crafts',
+    category: 'Wearables & Decor',
     difficulty: 'easy',
     minAge: 4,
     maxAge: 9,
@@ -900,7 +900,7 @@ export const STARTER_GUIDES = [
     summary: 'Bake realistic prehistoric stone fossils by pressing toy dinosaur footprints into homemade salt dough!',
     storyIntro:
       'Travel back 65 million years to the Jurassic era! Mix your own stone-like modeling dough from kitchen flour and salt, stamp ancient dinosaur footprints and skeletons into rock discs, and stage a backyard paleontology excavation!',
-    category: 'Science Fun',
+    category: 'Science & Sensory',
     difficulty: 'easy',
     minAge: 4,
     maxAge: 11,
@@ -1001,7 +1001,7 @@ export const STARTER_GUIDES = [
     summary: 'Craft a glowing stained-glass fairy nightlight using a clean glass jar, pastel tissue paper, and fairy silhouettes!',
     storyIntro:
       'Bring a touch of woodland fairy magic to your bedroom! By layering translucent pastel tissue paper over a silhouette cutout on a jar, you will create a stained-glass lantern that casts a cozy, dreamy glow when lit with an LED tealight.',
-    category: 'Room Decor',
+    category: 'Wearables & Decor',
     difficulty: 'easy',
     minAge: 5,
     maxAge: 12,
@@ -1098,7 +1098,7 @@ export const STARTER_GUIDES = [
     summary: 'Weave a beautiful rounded braided friendship bracelet using a homemade circular cardboard loom!',
     storyIntro:
       'Learn the hypnotic rhythm of Japanese cord braiding! Using a simple cardboard wheel you make yourself, you will weave 7 colorful strands of thread into a thick, spiral-patterned friendship bracelet to wear or gift to your best friend.',
-    category: 'Wearable Crafts',
+    category: 'Wearables & Decor',
     difficulty: 'medium',
     minAge: 7,
     maxAge: 14,
@@ -1193,7 +1193,7 @@ export const STARTER_GUIDES = [
     summary: 'Weave soft pastel yarns around a cardboard heart and attach a smooth garden twig to make a magical wand!',
     storyIntro:
       'Combine cozy yarn art with woodland treasures! In this relaxing tactile craft, you will wrap colorful wool in criss-cross geometric patterns around a heart frame and mount it onto a natural branch to create a whimsical fairy nature wand.',
-    category: 'Nature Crafts',
+    category: 'Nature & Recycled',
     difficulty: 'easy',
     minAge: 4,
     maxAge: 10,
@@ -1289,7 +1289,7 @@ export const STARTER_GUIDES = [
     summary: 'Hand-stitch cute plush felt strawberries with green leafy tops for pretend kitchen tea parties!',
     storyIntro:
       'Welcome to the cozy plush bakery! Learn beginner hand-sewing skills using soft craft felt that never frays. With a simple cone fold and running stitch, you will craft plump, huggable strawberries topped with green felt leaves.',
-    category: 'Sewing & Felt',
+    category: 'Wearables & Decor',
     difficulty: 'medium',
     minAge: 7,
     maxAge: 13,
@@ -1408,10 +1408,11 @@ export async function seedInitialGuides(db) {
         await insertGuideRecord(db, guide, { isCustom: false });
         seededCount += 1;
       } else {
-        // Ensure gender_target and metadata are synced for existing databases
+        // Ensure category, gender_target, and metadata are synced for existing databases
         await db.runAsync(
-          'UPDATE guides SET gender_target = ?, summary = ?, safety_note = ?, icon_emoji = ? WHERE id = ?;',
+          'UPDATE guides SET category = ?, gender_target = ?, summary = ?, safety_note = ?, icon_emoji = ? WHERE id = ?;',
           [
+            guide.category,
             guide.genderTarget || 'all',
             guide.summary,
             guide.safetyNote ?? null,

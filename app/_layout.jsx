@@ -184,8 +184,8 @@ const Navigation = () => {
             },
             headerShadowVisible: false,
             headerTitleStyle: {
-              fontFamily: Fonts.extraBold,
-              fontSize: 18,
+              fontFamily: Fonts.heading,
+              fontSize: 19,
               color: theme.text,
             },
             headerTintColor: theme.text,
@@ -227,6 +227,12 @@ const Navigation = () => {
             options={{
               title: 'For You',
               headerTitle: 'IdeaNook',
+              headerTitleStyle: {
+                fontFamily: Fonts.brandTitle,
+                fontSize: 23,
+                letterSpacing: 0.6,
+                color: theme.text,
+              },
             }}
           />
           <Tabs.Screen
@@ -283,6 +289,8 @@ export default function RootLayout() {
     Montserrat_600SemiBold: require('../assets/fonts/Montserrat-SemiBold.ttf'),
     Montserrat_700Bold: require('../assets/fonts/Montserrat-Bold.ttf'),
     Montserrat_800ExtraBold: require('../assets/fonts/Montserrat-ExtraBold.ttf'),
+    Audiowide_400Regular: require('../assets/fonts/Audiowide-Regular.ttf'),
+    BlackOpsOne_400Regular: require('../assets/fonts/BlackOpsOne-Regular.ttf'),
     MaterialCommunityIcons: require('../assets/fonts/MaterialCommunityIcons.ttf'),
   });
 

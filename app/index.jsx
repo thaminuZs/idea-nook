@@ -222,9 +222,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   title: {
-    fontSize: 22,
-    fontFamily: Fonts.extraBold,
-    letterSpacing: -0.3,
+    fontSize: 20,
+    fontFamily: Fonts.heading,
+    letterSpacing: 0.2,
   },
   subtitle: {
     fontSize: 13,
